@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idol1st Web Constructor</title>
+    <title>Idol1st Editor</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/js/creator-builder.js'])
+    @vite(['resources/js/creatorBuilder.js'])
 </head>
 <body>
     <header class="creator-builder-header">
         <div class="creator-builder-heading">
             <div class="creator-builder-kicker">Step 2/2</div>
-            <strong>Interactive Builder</strong>
+            <strong>Interactive Editor</strong>
             <span id="builder-url-preview" class="creator-builder-url"></span>
         </div>
 
         <div class="creator-builder-actions">
             <button type="button" id="save-builder">Save Draft JSON</button>
-            <a href="{{ route('creator.setup') }}">Back to setup</a>
-            <form method="POST" action="{{ route('creator.signout') }}">
+            <a href="{{ route('setup') }}">Back to setup</a>
+            <form method="POST" action="{{ route('signout') }}">
                 @csrf
                 <button type="submit">Sign out</button>
             </form>
@@ -37,12 +37,11 @@
         <div id="sidebar-content" aria-live="polite" aria-hidden="true"></div>
     </div>
 
-    <div id="custom-tooltip"></div>
     <div id="builder-save-status" class="builder-save-status" aria-live="polite"></div>
 
     <script>
         window.creatorDraft = @json($draft);
-        window.creatorSaveUrl = @json(route('creator.builder.save'));
+        window.creatorSaveUrl = @json(route('editor.save'));
         window.webConstructInitialProject = @json($initialProject);
         window.webConstructInitialProjectUrl = @json(url('/webconstruct/example.json'));
         window.webConstructAssetsUrl = @json(url('/webconstruct/assets/assets.json'));

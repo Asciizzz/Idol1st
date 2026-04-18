@@ -6,9 +6,10 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/global.css',
-                'resources/css/creator.css',
+                'resources/css/auth.css',
                 'resources/js/app.js',
-                'resources/js/creator-builder.js',
+                'resources/js/auth.js',
+                'resources/js/creatorBuilder.js',
             ],
             refresh: true,
         }),

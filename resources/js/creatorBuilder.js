@@ -1,8 +1,8 @@
 import '../css/global.css';
 import '../css/editor.css';
-import './webconstruct/editor.js';
-import './webconstruct/sidebar.js';
-import './webconstruct/global/EzTooltip.js';
+import './editor.js';
+import './editorSidebar.js';
+import './global/EzFloater.js';
 
 const draft = window.creatorDraft || {};
 const saveButton = document.querySelector('#save-builder');

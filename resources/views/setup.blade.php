@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Setup</title>
+    <title>Idol1st Setup</title>
     @vite(['resources/css/global.css'])
 </head>
 <body class="creator-bg">
@@ -23,7 +23,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('creator.setup.store') }}" class="form-grid">
+            <form method="POST" action="{{ route('setup.store') }}" class="form-grid">
                 @csrf
 
                 <label>
@@ -62,7 +62,7 @@
                     <input type="color" name="theme_color" value="{{ old('theme_color', $draft['theme_color'] ?? '#C8102E') }}" required>
                 </label>
 
-                <button type="submit" class="primary-btn">Open Visual Builder</button>
+                <button type="submit" class="primary-btn">Open Editor</button>
             </form>
         </section>
     </main>

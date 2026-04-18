@@ -1,23 +1,22 @@
 <?php
 
-use App\Http\Controllers\SiteCreatorController;
+use App\Http\Controllers\AuthEditorController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home');
+Route::redirect('/', '/auth');
 
-Route::prefix('creator')->group(function (): void {
-	Route::get('/signin', [SiteCreatorController::class, 'showSignin'])->name('creator.signin');
-	Route::post('/signin', [SiteCreatorController::class, 'signin'])->name('creator.signin.store');
+Route::get('/auth', [AuthEditorController::class, 'showAuth'])->name('auth');
+Route::get('/signin', [AuthEditorController::class, 'showSignin'])->name('signin');
+Route::post('/signin', [AuthEditorController::class, 'signin'])->name('signin.store');
 
-	Route::get('/signup', [SiteCreatorController::class, 'showSignup'])->name('creator.signup');
-	Route::post('/signup', [SiteCreatorController::class, 'signup'])->name('creator.signup.store');
+Route::get('/signup', [AuthEditorController::class, 'showSignup'])->name('signup');
+Route::post('/signup', [AuthEditorController::class, 'signup'])->name('signup.store');
 
-	Route::middleware('auth')->group(function (): void {
-		Route::post('/signout', [SiteCreatorController::class, 'signout'])->name('creator.signout');
-		Route::get('/setup', [SiteCreatorController::class, 'showSetup'])->name('creator.setup');
-		Route::post('/setup', [SiteCreatorController::class, 'saveSetup'])->name('creator.setup.store');
+Route::middleware('auth')->group(function (): void {
+	Route::post('/signout', [AuthEditorController::class, 'signout'])->name('signout');
+	Route::get('/setup', [AuthEditorController::class, 'showSetup'])->name('setup');
+	Route::post('/setup', [AuthEditorController::class, 'saveSetup'])->name('setup.store');
 
-		Route::get('/builder', [SiteCreatorController::class, 'showBuilder'])->name('creator.builder');
-		Route::post('/builder/save', [SiteCreatorController::class, 'saveBuilder'])->name('creator.builder.save');
-	});
+	Route::get('/editor', [AuthEditorController::class, 'showEditor'])->name('editor');
+	Route::post('/editor/save', [AuthEditorController::class, 'saveEditor'])->name('editor.save');
 });

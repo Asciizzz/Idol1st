@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
-class SiteCreatorController extends Controller
+class AuthEditorController extends Controller
 {
     public function showAuth(): View
     {

@@ -14,8 +14,4 @@ Then open http://127.0.0.1:8000.
 
 ## Current State
 
-- Home route: `routes/web.php`
-- Home view: `resources/views/home.blade.php`
-- Base styles: `resources/css/app.css`
-
-The homepage is intentionally blank so you can build a new design cleanly.
+- Idk, figure it out yourself, will update this later
