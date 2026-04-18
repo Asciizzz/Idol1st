@@ -30,14 +30,5 @@
 				"css": ["global.css", "home.css"]
 			}
 		}
-	],
-
-    "styles": {
-		"global.css": "body { font-family: Arial, sans-serif; }",
-		"home.css": "h1 { color: blue; }"
-	},
-
-    "scripts": {
-		"home.js": "console.log('Home page script loaded');"
-	}
+	]
 }

@@ -6,7 +6,7 @@ USE idol1st;
 --  One row per tenant, created automatically on tenant registration.
 -- =============================================================
 
-CREATE TABLE page_settings (
+CREATE TABLE IF NOT EXISTS page_settings (
     id                       CHAR(36)   NOT NULL DEFAULT (UUID()),
     tenant_id                CHAR(36)   NOT NULL,
 
@@ -27,6 +27,7 @@ CREATE TABLE page_settings (
     auto_approve_fan_content TINYINT(1) NOT NULL DEFAULT 0,  -- require review
     require_login_to_comment TINYINT(1) NOT NULL DEFAULT 1,
 
+    created_at               DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at               DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP
                                                   ON UPDATE CURRENT_TIMESTAMP,
 

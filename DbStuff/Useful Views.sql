@@ -4,8 +4,11 @@ USE idol1st;
 --  USEFUL VIEWS
 -- =============================================================
 
+DROP VIEW IF EXISTS v_tenant_summary;
+DROP VIEW IF EXISTS v_pending_moderation;
+
 -- Quick summary of each tenant for the Platform Admin dashboard.
-CREATE OR REPLACE VIEW v_tenant_summary AS
+CREATE VIEW v_tenant_summary AS
 SELECT
     t.id,
     t.slug,
@@ -27,7 +30,7 @@ LEFT JOIN idol_profiles ip ON ip.tenant_id = t.id
 LEFT JOIN page_settings ps ON ps.tenant_id = t.id;
 
 -- Pending moderation queue per tenant (comments + fan content combined).
-CREATE OR REPLACE VIEW v_pending_moderation AS
+CREATE VIEW v_pending_moderation AS
 SELECT
     tenant_id,
     'comment'     AS content_type,

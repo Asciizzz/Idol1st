@@ -8,7 +8,7 @@ USE idol1st;
 
 -- Core profile record. One per tenant.
 -- Could add more fields for more profile customization
-CREATE TABLE idol_profiles (
+CREATE TABLE IF NOT EXISTS idol_profiles (
     id                       CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id                CHAR(36)     NOT NULL,
 
@@ -63,7 +63,7 @@ CREATE TABLE idol_profiles (
 
 -- File upload history for each tenant.
 -- Keeps old versions so tenants can revert assets.
-CREATE TABLE tenant_assets (
+CREATE TABLE IF NOT EXISTS tenant_assets (
     id           CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id    CHAR(36)     NOT NULL,
     type         ENUM(
@@ -87,7 +87,7 @@ CREATE TABLE tenant_assets (
 );
 
 -- Social / streaming links shown on the idol's link hub.
-CREATE TABLE platform_links (
+CREATE TABLE IF NOT EXISTS platform_links (
     id             CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id      CHAR(36)     NOT NULL,
     platform       VARCHAR(80)  NOT NULL, -- e.g. 'youtube', 'twitter', 'instagram'

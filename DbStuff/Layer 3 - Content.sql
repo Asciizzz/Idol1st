@@ -5,7 +5,7 @@ USE idol1st;
 --  Blog posts, comments, fan uploads — all scoped to a tenant.
 -- =============================================================
 
-CREATE TABLE blog_posts (
+CREATE TABLE IF NOT EXISTS blog_posts (
     id            CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id     CHAR(36)     NOT NULL,
     author_id     CHAR(36)     NOT NULL,  -- FK to users (must be tenant_admin or moderator)
@@ -30,7 +30,7 @@ CREATE TABLE blog_posts (
     INDEX idx_posts_tenant_status (tenant_id, status, published_at)
 );
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     id          CHAR(36)  NOT NULL DEFAULT (UUID()),
     tenant_id   CHAR(36)  NOT NULL,
     post_id     CHAR(36)  NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE comments (
     INDEX idx_comments_tenant (tenant_id, status)
 );
 
-CREATE TABLE fan_contents (
+CREATE TABLE IF NOT EXISTS fan_contents (
     id           CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id    CHAR(36)     NOT NULL,
     user_id      CHAR(36)     NOT NULL,

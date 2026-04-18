@@ -5,7 +5,7 @@ USE idol1st;
 --  Products, orders, order line items — scoped to a tenant.
 -- =============================================================
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id           CHAR(36)      NOT NULL DEFAULT (UUID()),
     tenant_id    CHAR(36)      NOT NULL,
     name         VARCHAR(255)  NOT NULL,
@@ -25,10 +25,11 @@ CREATE TABLE products (
 
     PRIMARY KEY (id),
     CONSTRAINT fk_product_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE,
-    INDEX idx_products_tenant_status (tenant_id, status)
+    INDEX idx_products_tenant_status (tenant_id, status),
+    CONSTRAINT chk_products_stock CHECK (stock >= -1)
 );
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id           CHAR(36)     NOT NULL DEFAULT (UUID()),
     tenant_id    CHAR(36)     NOT NULL,
     user_id      CHAR(36)     NOT NULL,
@@ -53,15 +54,18 @@ CREATE TABLE orders (
 
 -- One row per product line in an order.
 -- unit_price_cents is snapshotted at time of order so price changes don't affect history.
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id               CHAR(36)     NOT NULL DEFAULT (UUID()),
     order_id         CHAR(36)     NOT NULL,
     product_id       CHAR(36)         NULL,   -- NULL if product was deleted
     product_name     VARCHAR(255) NOT NULL,   -- snapshot of name at order time
     unit_price_cents INT UNSIGNED NOT NULL,   -- snapshot of price at order time
-    quantity         SMALLINT     NOT NULL DEFAULT 1,
+    quantity         SMALLINT UNSIGNED NOT NULL DEFAULT 1,
 
     PRIMARY KEY (id),
     CONSTRAINT fk_item_order   FOREIGN KEY (order_id)   REFERENCES orders   (id) ON DELETE CASCADE,
-    CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE SET NULL
+    CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE SET NULL,
+    INDEX idx_order_items_order (order_id),
+    INDEX idx_order_items_product (product_id),
+    CONSTRAINT chk_order_items_quantity CHECK (quantity >= 1)
 );

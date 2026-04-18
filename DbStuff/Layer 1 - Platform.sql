@@ -6,7 +6,7 @@ USE idol1st;
 -- =============================================================
 
 -- Every idol page / agency on the platform is one tenant.
-CREATE TABLE tenants (
+CREATE TABLE IF NOT EXISTS tenants (
     id            CHAR(36)        NOT NULL DEFAULT (UUID()),
     slug          VARCHAR(80)     NOT NULL,           -- e.g. "hatsunemiku" → hatsunemiku.idol1st.app
     name          VARCHAR(150)    NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE tenants (
 
 -- All fan accounts. One user can follow / interact with many tenants.
 -- Fan account here is created for the entire SaaS, no matter the slug (works for any .idol1st.app)
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id            CHAR(36)     NOT NULL DEFAULT (UUID()),
     email         VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE users (
 
 -- Junction table: which users belong to which tenant, and in what role.
 -- Same user can be a fan on one tenant and a moderator on another.
-CREATE TABLE tenant_users (
+CREATE TABLE IF NOT EXISTS tenant_users (
     id          CHAR(36)  NOT NULL DEFAULT (UUID()),
     tenant_id   CHAR(36)  NOT NULL,
     user_id     CHAR(36)  NOT NULL,

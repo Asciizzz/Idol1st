@@ -1,0 +1,20 @@
+{
+    "guide (won't be included)": {
+        "what is assets.json": "Basically what the editor will provide the user with to construct their website. Containing presets, buttons, etc., you name it. This file is not meant for human-readability, because YOU WERE NOT MEANT TO SEE THIS FILE."
+    },
+
+    "elements": [
+        { "name": "Block", "tag": "div" },
+        { "name": "Text", "tag": "p" },
+        { "name": "Header Small", "tag": "h6" },
+        { "name": "Header Medium", "tag": "h3" },
+        { "name": "Header Large", "tag": "h1" },
+        { "name": "Link", "tag": "a" },
+        { "name": "Image", "tag": "img" }
+    ],
+    "css": [
+        { "name": "Border", "attr": "border", "thick": 1, "color": "#000", "style": "solid", "value": "${thick}px ${style} ${color};" },
+        { "name": "Background Color", "attr": "background-color", "color": "#fff", "value": "${color};" },
+        { "name": "Background Image", "attr": "background-image", "url": "image.jpg", "value": "url(${url});" }
+    ]
+}

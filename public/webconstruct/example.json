@@ -1,0 +1,118 @@
+{
+
+    "project": {
+        "name": "Example Website",
+        "description": "What the JSON file looks like for the example website",
+
+        "this attribute exist for information, not included in the final output": {
+            "hashmap approach": "Elements are stored in a hashmap (object) with their unique id as the key. This allows for easy access and manipulation of elements based on their id. Children are stored as array of ids instead of nested objects to avoid deep nesting and make it easier to manage parent-child relationships. This does somewhat kill readability but you shouldn't be able to see this JSON file in the first place so it doesn't matter. Since readability is no longer a concern, we will focus on optimization and efficiency instead.",
+            
+            "children vs text": "If an element has children, it cannot have text and vice versa. In the case both are present, children will be prioritized and text will be ignored. This should theoretically never happen since the editor will prevent this from happening. Hopefully.",
+
+            "page_counter and node_counter": "Will always increment by 1 for each new thing. This is used to generate unique ids for each page/element (p0, p1, p2 - n0, n1, n2, etc.). I trust you won't by some miracle end up with 2^53 elements in a single page or create 2^53 pages but if you do, well, what the actual f.",
+
+            "attributes with prefix _ (e.g., _href_id)": "These attributes are special editor attributes, instead of being passed straight to DOM, they will be processed by the editor to generate the correct output. For example, _href_id will be converted to href with the correct slug as its value when generating the final output. This is pretty cool because it allows us to do some other cool stuff, like literal if-then-else construction or something idk.",
+
+            "href vs _href_id": "href is used for external links, while _href_id is used for internal links (links to other pages within the project). _href_id will reference the page's unique id (e.g., p0, p1, etc.) instead of the slug to avoid renaming slug = broken links issue. The editor will handle the conversion from page id to slug when generating the final output.",
+
+            "why tf stylesheet look so ugly": "because of JSON ofc, but like I said, we are not supposed to see this JSON file in the first place so it doesn't matter. css will be store as raw text instead of these interpreted stuff."
+        }
+    },
+
+    "pages": {
+        "page_start": "p0",
+        "page_counter": 2,
+        "page_data": {
+            "p0": {
+                "title": "Hololie",
+                "slug": "hololie",
+
+                "node_start": "n0",
+                "node_counter": 4,
+                "nodes": {
+                    "n0": {
+                        "tag": "body",
+                        "parent": null,
+                        "children": [ "n1" ]
+                    },
+
+                    "n1": {
+                        "tag": "div",
+                        "parent": "n0",
+                        "children": [ "n2", "n3" ]
+                    },
+
+                    "n2": {
+                        "tag": "h1",
+                        "parent": "n1",
+                        "text": "Welcome to the official Hololie vtuber website!",
+                        "attrs": {
+                            "id": "welcome-heading",
+                            "class": "main-heading"
+                        }
+                    },
+
+                    "n3": {
+                        "tag": "a",
+                        "parent": "n1",
+                        "text": "Meet our talents!",
+                        "attrs": {
+                            "_href_id": "p0"
+                        }
+                    }
+                },
+
+                "include": {
+                    "css": [ "global.css", "welcome.css" ],
+                    "js": [ "welcome.js" ]
+                }
+            },
+
+            "p1": {
+                "title": "Talents",
+                "slug": "hololie/talents",
+                "node_start": "n0",
+                "node_counter": 2,
+                "nodes": {
+                    "n0": {
+                        "tag": "body",
+                        "parent": null,
+                        "children": [ "n1", "n2" ]
+                    },
+
+                    "n1": {
+                        "tag": "p",
+                        "parent": "n0",
+                        "text": "Here are the talents under Hololie!"
+                    },
+                    "n2": {
+                        "tag": "a",
+                        "parent": "n0",
+                        "attrs": {
+                            "_href_id": "p0"
+                        }
+                    }
+
+                },
+
+                "include": {
+                    "css": [ "global.css", "talents.css" ],
+                    "js": [ "talents.js" ]
+                }
+            }
+        }
+    },
+
+    "stylesheets": {
+        "global.css": "*{ margin: 0; padding: 0; box-sizing: border-box;} body { font-family: Arial, sans-serif; }",
+
+        "welcome.css": "body { background: #f0f0f0; } #welcome-heading { color: #0077cc; }",
+
+        "talents.css": "p { color: #333; }"
+    },
+
+    "scripts": {
+        "welcome.js": "console.log('Welcome to Hololie!');",
+        "talents.js": "console.log('Meet our amazing talents!');"
+    }
+}
