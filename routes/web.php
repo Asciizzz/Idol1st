@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/auth');
 
 Route::get('/auth', [AuthEditorController::class, 'showAuth'])->name('auth');
-Route::get('/signin', [AuthEditorController::class, 'showSignin'])->name('signin');
-Route::post('/signin', [AuthEditorController::class, 'signin'])->name('signin.store');
+Route::get('/login', [AuthEditorController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthEditorController::class, 'login'])->name('login.store');
 
 Route::get('/signup', [AuthEditorController::class, 'showSignup'])->name('signup');
 Route::post('/signup', [AuthEditorController::class, 'signup'])->name('signup.store');

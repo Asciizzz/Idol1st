@@ -1,0 +1,9 @@
+#toggle-login:checked ~ #login,
+#toggle-login:not(:checked) ~ #signup {
+    display: block;
+}
+
+#toggle-login:not(:checked) ~ #login,
+#toggle-login:checked ~ #signup {
+    display: none;
+}

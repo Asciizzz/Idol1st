@@ -19,12 +19,12 @@ class AuthEditorController extends Controller
         return view('auth');
     }
 
-    public function showSignin(): View
+    public function showLogin(): View
     {
         return $this->showAuth();
     }
 
-    public function signin(Request $request): RedirectResponse
+    public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'string', 'email'],

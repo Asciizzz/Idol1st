@@ -8,10 +8,13 @@
 </head>
 <body>
     <main>
-        <section id="signin">
-            <h1>Sign In</h1>
+        <!-- Toggle between login and signup -->
+        <input type="checkbox" id="toggle-login" hidden checked>
 
-            <p><a href="#signup">Jump to sign up</a></p>
+        <section id="login">
+            <h1>Login</h1>
+
+            <p><label for="toggle-login">Jump to sign up</label></p>
 
             @if ($errors->any())
                 <div>
@@ -23,16 +26,16 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('signin.store') }}">
+            <form method="POST" action="{{ route('login.store') }}">
                 @csrf
                 <div>
-                    <label for="signin-email">Email</label>
-                    <input id="signin-email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email">
+                    <label for="login-email">Email</label>
+                    <input id="login-email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email">
                 </div>
 
                 <div>
-                    <label for="signin-password">Password</label>
-                    <input id="signin-password" type="password" name="password" required autocomplete="current-password">
+                    <label for="login-password">Password</label>
+                    <input id="login-password" type="password" name="password" required autocomplete="current-password">
                 </div>
 
                 <div>
@@ -42,14 +45,14 @@
                     </label>
                 </div>
 
-                <button type="submit">Sign In</button>
+                <button type="submit">Login</button>
             </form>
         </section>
 
         <section id="signup">
             <h1>Sign Up</h1>
 
-            <p><a href="#signin">Jump to sign in</a></p>
+            <p><label for="toggle-login">Jump to login</label></p>
 
             <form method="POST" action="{{ route('signup.store') }}">
                 @csrf
