@@ -86,11 +86,6 @@ body {
     pointer-events: none;
     transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease;
 }
-#ez-floater.is-visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
 #ez-floater.mode-context {
     pointer-events: auto;
 }

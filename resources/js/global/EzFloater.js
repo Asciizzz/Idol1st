@@ -2,72 +2,132 @@
 
 + Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shit
 
-+ Query:
-    handlers.queries = {
-        'selector': {
-            context: function(element) { ... },
-            tooltip: function(element) { ... }
-        }
-    }
-
-    + Note: To display iframe's floater, do @<the-iframe-id> <the iframe element, attribute, etc>
-    + For example: @screen #inside-the-screen
-
-+ Style: freely customize the floater style in your css
-    #ez-floater
-
-+ Feel free to leave the name of the project you're working on here:
-    + Idol1st
++ Notes:
+    + To display iframe's handlers.floater, do @<the-iframe-id-but-without-#> <the iframe element, attribute, etc>
+        + For example: @screen #inside-the-screen
+    + Every iframe, regardless of iframe nest level, requires a unique id
+    + Freely customize the floater style in your css: #ez-floater and #ez-floater.ez-floater-active
 */
 
 (function() {
-    const FLOATER_ID = 'ez-floater';
-    const FLOATER_STYLE_ID = 'ez-floater-runtime-style';
-
-    // Default styles for coordination and display
-    if (!document.getElementById(FLOATER_STYLE_ID)) {
-        const style = document.createElement('style');
-        style.id = FLOATER_STYLE_ID;
-        style.innerHTML = `
-            #ez-floater {
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 2147483647;
-                opacity: 0;
-                pointer-events: none;
-            }
-            #ez-floater.is-visible {
-                opacity: 1;
-                visibility: visible;
-                pointer-events: auto;
-            }
-        `;
-
-        document.head.appendChild(style);
-    }
-
-    let floater = document.getElementById(FLOATER_ID);
-    if (!floater) {
-        floater = document.createElement('div');
-        floater.id = FLOATER_ID;
-        document.body.appendChild(floater);
-    } else if (floater.id !== FLOATER_ID) {
-        floater.id = FLOATER_ID;
-    }
-
-    const state = {
-        mode: null,
-        hoverElement: null,
-        hoverDocument: null,
-        hoverScopeKey: ''
-    };
 
     class Handler {
         constructor() {
             this.events = {};
             this.queries = {};
+            this.state = {
+                mode: null,
+                hoverElement: null,
+                hoverDocument: null,
+                hoverScopeKey: ''
+            }
+
+            this.FLOATER_ID = 'ez-floater';
+            this.FLOATER_STYLE_ID = 'ez-floater-runtime-style';
+            this.floater = null;
         }
+
+        init() {
+            // Create new handlers.floater element if not exist
+            this.floater = document.getElementById(this.FLOATER_ID);
+            if (!this.floater) {
+                this.floater = document.createElement('div');
+                this.floater.id = this.FLOATER_ID;
+                document.body.appendChild(this.floater);
+            }
+
+            // Create runtime style for handlers.floater if not exist
+            if (document.getElementById(this.FLOATER_STYLE_ID)) return;
+
+            const style = document.createElement('style');
+            style.id = this.FLOATER_STYLE_ID;
+            style.innerHTML = `
+                #ez-floater {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    z-index: 2147483647;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+                #ez-floater.ez-floater-active {
+                    opacity: 0.8;
+                    visibility: visible;
+                    pointer-events: auto;
+                }
+            `;
+
+            document.head.appendChild(style);
+
+            // Event delegation for floater clicks
+            this.floater.addEventListener('mousedown', function(event) {
+                const clickdata = (event.button === 0) ? 'leftclick' :
+                                ( (event.button === 2) ? 'rightclick' :
+                                ( (event.button === 1) ? 'middleclick' :
+                                ( null ) ) );
+
+                if (!clickdata) return;
+
+                // Find the closest element with this data attribute
+                const clickedElement = event.target.closest('[data-' + clickdata + ']');  
+                if (!clickedElement) return;
+
+                const action = clickedElement.dataset[clickdata];
+                const actionFn = this.getEventFn(clickdata, action);
+                if (typeof actionFn === 'function') actionFn(event, clickedElement);
+            });
+
+            // Click away or press Escape to hide floater
+            document.addEventListener('click', function(event) {
+                if (!this.floater.contains(event.target)) this.hideFloater();
+            }.bind(this));
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') this.hideFloater();
+            }.bind(this));
+        }
+
+    // Floater state management and utils
+
+        setFloaterCoord(x, y) {
+            const offset = 8;
+            const maxLeft = window.innerWidth - this.floater.offsetWidth - offset;
+            const maxTop = window.innerHeight - this.floater.offsetHeight - offset;
+
+            const nextLeft = Math.min(x + offset, Math.max(offset, maxLeft));
+            const nextTop = Math.min(y + offset, Math.max(offset, maxTop));
+
+            this.floater.style.left = nextLeft + 'px';
+            this.floater.style.top = nextTop + 'px';
+        }
+
+        showFloater(content, x, y, mode) {
+            this.floater.replaceChildren();
+
+            if (typeof content === 'string') {
+                this.floater.textContent = content;
+            } else {
+                this.floater.appendChild(content);
+            }
+
+            this.state.mode = mode;
+            this.floater.classList.toggle('mode-context', mode === 'context');
+            this.floater.classList.add('ez-floater-active');
+            this.setFloaterCoord(x, y);
+        }
+
+        hideFloater() {
+            this.state.mode = null;
+            this.floater.classList.remove('ez-floater-active');
+            this.floater.classList.remove('mode-context');
+
+            // Clear hover state
+            this.state.hoverElement = null;
+            this.state.hoverDocument = null;
+            this.state.hoverScopeKey = '';
+        }
+
+    // Floater events and queries management
 
         addEventFn(eventName, actionName, actionFn) {
             if (!eventName || !actionName || typeof actionFn !== 'function') return null;
@@ -108,6 +168,11 @@
             return eventGroup[actionName] || null;
         }
 
+        /* addQuery's definition = {
+            delegate: true/false (default true), false means needing the exact match, while true means finding closest ancestor match as well
+            context: function(element, ctx) { ... } return a wrapper element for the context menu
+            tooltip: function(element, ctx) { ... } return a wrapper element for the tooltip
+        }*/
         addQuery(rawQuery, definition) {
             if (!rawQuery || typeof definition !== 'object') return null;
 
@@ -130,6 +195,7 @@
                 raw: rawQuery,
                 scope: scope,
                 selector: selectorTokens.join(' '),
+                delegate: definition.delegate !== false,
                 context: hasContext ? definition.context : null,
                 tooltip: hasTooltip ? definition.tooltip : null
             };
@@ -147,15 +213,304 @@
             return true;
         }
 
-        getQuery(query) {
+        getQueryCtx(query) {
             return this.queries[query] || null;
         }
 
         getCompiledQueries() {
             return Object.values(this.queries);
         }
+
+    // Floater query execution
+
+        /* execQuery's ctx = {
+            mode: 'context' or 'tooltip',
+            scope: array of scope tokens,
+            element: the original event target element
+        } */
+        execQuery(ctx) {
+            let target = ctx.element;
+            if (!target) return null;
+
+            const compiledQueries = handlers.getCompiledQueries();
+
+            // If this a text node, use its parent instead (should not happen, i think)
+            if (target && target.nodeType === Node.TEXT_NODE) {
+                target = target.parentElement;
+            }
+
+            // Not a node = GTFO
+            if (!target || target.nodeType !== Node.ELEMENT_NODE) {
+                return null;
+            }
+
+            // Iterate through all compiled queries to find the match
+            for (let i = 0; i < compiledQueries.length; i += 1) {
+                const query = compiledQueries[i];
+
+                // This thing is not even a valid query object
+                if (!query.selector) continue;
+
+                // Scop length not the same = not it man
+                if (query.scope.length !== ctx.scope.length) continue;
+
+                // Scope comparison, support '*' as well
+                let scopeOk = true;
+                for (let j = 0; j < query.scope.length; j += 1) {
+                    if (query.scope[j] !== '*' && query.scope[j] !== ctx.scope[j]) {
+                        scopeOk = false;
+                        break;
+                    }
+                }
+                if (!scopeOk) continue;
+
+
+                // Find the matched element
+                const matched = query.delegate === false
+                    ? (target.matches(query.selector) ? target : null)
+                    : target.closest(query.selector);
+                if (!matched) continue;
+
+                // Run either context or tooltip mode function, if exists
+                const runFn = ctx.mode === 'context' ? query.context : query.tooltip;
+                if (typeof runFn !== 'function') continue; // should not happen
+
+                const content = runFn(matched, ctx);
+                if (!content) return null;
+
+                return {
+                    query: query,     // The matched query object
+                    matched: matched, // The matched element
+                    content: content  // The content to show in floater
+                };
+            }
+
+            return null;
+        }
     }
     const handlers = new Handler();
+    handlers.init();
+
+    const runtime = {
+        frameSelector: '#preview-frame',
+        docContextHandlers: new WeakMap(),
+        docClickHandlers: new WeakMap(),
+        docKeyHandlers: new WeakMap(),
+        docMoveHandlers: new WeakMap(),
+        docOutHandlers: new WeakMap(),
+        docLeaveHandlers: new WeakMap(),
+        watchedIframes: new WeakSet()
+    };
+
+    function getOrCreateHandler(map, key, factory) {
+        let handler = map.get(key);
+        if (!handler) {
+            handler = factory();
+            map.set(key, handler);
+        }
+        return handler;
+    }
+
+    // Getting the real clientX/Y by accumulating offsets from all frames in the chain
+    function resolveClientPoint(event, frameChain) {
+        let x = event.clientX;
+        let y = event.clientY;
+
+        frameChain.forEach(function(frameEl) {
+            const rect = frameEl.getBoundingClientRect();
+            x += rect.left;
+            y += rect.top;
+        });
+
+        return { x: x, y: y };
+    }
+
+    function bindDocumentContext(doc, scopeChain, frameChain) {
+        if (!doc) {
+            return;
+        }
+
+        const contextHandler = getOrCreateHandler(runtime.docContextHandlers, doc, function() {
+            return function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let result = null;
+                let point = null;
+                try {
+                    point = resolveClientPoint(event, frameChain);
+                    result = handlers.execQuery({
+                        scope: scopeChain,
+                        element: event.target,
+                        event: event,
+                        document: doc,
+                        mode: 'context'
+                    });
+                } catch (error) {
+                    handlers.hideFloater();
+                    return;
+                }
+
+                if (!result) {
+                    handlers.hideFloater();
+                    return;
+                }
+
+                handlers.showFloater(result.content, point.x, point.y, 'context');
+            };
+        });
+
+        doc.removeEventListener('contextmenu', contextHandler, true);
+        doc.addEventListener('contextmenu', contextHandler, true);
+
+        const moveHandler = getOrCreateHandler(runtime.docMoveHandlers, doc, function() {
+            return function(event) {
+                if (handlers.state.mode === 'context') {
+                    return;
+                }
+
+                const point = resolveClientPoint(event, frameChain);
+                const result = handlers.execQuery({
+                    scope: scopeChain,
+                    element: event.target,
+                    mode: 'tooltip'
+                });
+
+                if (!result) {
+                    if (handlers.state.mode === 'tooltip') {
+                        handlers.hideFloater();
+                    }
+                    return;
+                }
+
+                const scopeKey = scopeChain.join('>');
+                const isSameHoverTarget =
+                    handlers.state.mode === 'tooltip' &&
+                    handlers.state.hoverElement === result.matched &&
+                    handlers.state.hoverDocument === doc &&
+                    handlers.state.hoverScopeKey === scopeKey;
+
+                if (!isSameHoverTarget) {
+                    handlers.showFloater(result.content, point.x, point.y, 'tooltip');
+                } else {
+                    handlers.setFloaterCoord(point.x, point.y);
+                }
+
+                handlers.state.hoverElement = result.matched;
+                handlers.state.hoverDocument = doc;
+                handlers.state.hoverScopeKey = scopeKey;
+            };
+        });
+
+        doc.removeEventListener('mousemove', moveHandler, true);
+        doc.addEventListener('mousemove', moveHandler, true);
+
+        const outHandler = getOrCreateHandler(runtime.docOutHandlers, doc, function() {
+            return function(event) {
+                if (handlers.state.mode !== 'tooltip' || handlers.state.hoverDocument !== doc || !handlers.state.hoverElement) {
+                    return;
+                }
+
+                const nextTarget = event.relatedTarget;
+                if (nextTarget && handlers.state.hoverElement.contains(nextTarget)) {
+                    return;
+                }
+
+                handlers.hideFloater();
+            };
+        });
+
+        doc.removeEventListener('mouseout', outHandler, true);
+        doc.addEventListener('mouseout', outHandler, true);
+
+        const leaveHandler = getOrCreateHandler(runtime.docLeaveHandlers, doc, function() {
+            return function() {
+                if (handlers.state.mode === 'tooltip' && handlers.state.hoverDocument === doc) {
+                    handlers.hideFloater();
+                }
+            };
+        });
+
+        doc.removeEventListener('mouseleave', leaveHandler, true);
+        doc.addEventListener('mouseleave', leaveHandler, true);
+
+        const clickHandler = getOrCreateHandler(runtime.docClickHandlers, doc, function() {
+            return function(event) {
+                if (doc === document && handlers.floater.contains(event.target)) {
+                    return;
+                }
+                handlers.hideFloater();
+            };
+        });
+
+        doc.removeEventListener('click', clickHandler, true);
+        doc.addEventListener('click', clickHandler, true);
+
+        const keyHandler = getOrCreateHandler(runtime.docKeyHandlers, doc, function() {
+            return function(event) {
+                if (event.key === 'Escape') {
+                    handlers.hideFloater();
+                }
+            };
+        });
+
+        doc.removeEventListener('keydown', keyHandler, true);
+        doc.addEventListener('keydown', keyHandler, true);
+
+        const iframes = Array.from(doc.querySelectorAll('iframe'));
+        iframes.forEach(function(iframeEl, index) {
+            const scopeId = iframeEl.getAttribute('data-scope-id') || iframeEl.id || iframeEl.name || ('frame-' + index);
+            const nextScope = scopeChain.concat(scopeId);
+            const nextFrameChain = frameChain.concat(iframeEl);
+
+            function bindCurrentIframeDoc() {
+                let childDoc;
+                try {
+                    childDoc = iframeEl.contentDocument;
+                } catch (error) {
+                    return;
+                }
+
+                if (!childDoc) {
+                    return;
+                }
+
+                bindDocumentContext(childDoc, nextScope, nextFrameChain);
+            }
+
+            bindCurrentIframeDoc();
+
+            if (!runtime.watchedIframes.has(iframeEl)) {
+                runtime.watchedIframes.add(iframeEl);
+                iframeEl.addEventListener('load', bindCurrentIframeDoc);
+            }
+        });
+    }
+
+    bindDocumentContext(document, [], []);
+
+    document.addEventListener('wc:frame-rendered', function(event) {
+        const detail = event.detail || {};
+        const previewFrame = document.querySelector(runtime.frameSelector);
+        const frameDoc = detail.frameDocument || (previewFrame ? previewFrame.contentDocument : null);
+        if (!previewFrame || !frameDoc) {
+            return;
+        }
+
+        bindDocumentContext(frameDoc, ['preview-frame'], [previewFrame]);
+    });
+
+    {
+        const previewFrame = document.querySelector(runtime.frameSelector);
+        const frameDoc = previewFrame ? previewFrame.contentDocument : null;
+        if (previewFrame && frameDoc) {
+            bindDocumentContext(frameDoc, ['preview-frame'], [previewFrame]);
+        }
+    }
+
+
+
+
 
     handlers.addEventFn('leftclick', 'change-page-properties', function(event, button) {
         if (!window.WebConstruct) {
@@ -163,8 +518,8 @@
         }
 
         const pageId = button.dataset.pageId;
-        const titleInput = floater.querySelector('#floater-page-title');
-        const slugInput = floater.querySelector('#floater-page-slug');
+        const titleInput = handlers.floater.querySelector('#floater-page-title');
+        const slugInput = handlers.floater.querySelector('#floater-page-slug');
 
         const result = window.WebConstruct.updatePageProperties(pageId, {
             title: titleInput ? titleInput.value : '',
@@ -172,7 +527,7 @@
         });
 
         if (result.ok) {
-            hideFloater();
+            handlers.hideFloater();
         }
     });
 
@@ -191,7 +546,7 @@
 
         const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
         if (result.ok) {
-            hideFloater();
+            handlers.hideFloater();
             return;
         }
 
@@ -348,357 +703,14 @@
         }
     });
 
-    const runtime = {
-        frameSelector: '#preview-frame',
-        docContextHandlers: new WeakMap(),
-        docClickHandlers: new WeakMap(),
-        docKeyHandlers: new WeakMap(),
-        docMoveHandlers: new WeakMap(),
-        docOutHandlers: new WeakMap(),
-        docLeaveHandlers: new WeakMap(),
-        watchedIframes: new WeakSet()
-    };
 
-    function getOrCreateHandler(map, key, factory) {
-        let handler = map.get(key);
-        if (!handler) {
-            handler = factory();
-            map.set(key, handler);
-        }
-        return handler;
-    }
 
-    function clearHoverState() {
-        state.hoverElement = null;
-        state.hoverDocument = null;
-        state.hoverScopeKey = '';
-    }
 
-    function hideFloater() {
-        state.mode = null;
-        floater.classList.remove('is-visible');
-        floater.classList.remove('mode-context');
-        clearHoverState();
-    }
 
-    function setFloaterPosition(x, y) {
-        const offset = 8;
-        const maxLeft = window.innerWidth - floater.offsetWidth - offset;
-        const maxTop = window.innerHeight - floater.offsetHeight - offset;
 
-        const nextLeft = Math.min(x + offset, Math.max(offset, maxLeft));
-        const nextTop = Math.min(y + offset, Math.max(offset, maxTop));
 
-        floater.style.left = nextLeft + 'px';
-        floater.style.top = nextTop + 'px';
-    }
-
-    function showFloater(content, x, y, mode) {
-        floater.replaceChildren();
-
-        if (typeof content === 'string') {
-            floater.textContent = content;
-        } else {
-            floater.appendChild(content);
-        }
-
-        state.mode = mode;
-        floater.classList.toggle('mode-context', mode === 'context');
-        floater.classList.add('is-visible');
-        setFloaterPosition(x, y);
-    }
-
-    function resolveClientPoint(event, frameChain) {
-        let x = event.clientX;
-        let y = event.clientY;
-
-        frameChain.forEach(function(frameEl) {
-            const rect = frameEl.getBoundingClientRect();
-            x += rect.left;
-            y += rect.top;
-        });
-
-        return { x: x, y: y };
-    }
-
-    function runFloaterQueries(mode, context) {
-        let target = context.element;
-        const compiledQueries = handlers.getCompiledQueries();
-
-        // If this a text node, use its parent instead (should not happen, i think)
-        if (target && target.nodeType === Node.TEXT_NODE) {
-            target = target.parentElement;
-        }
-
-        // Not a node = GTFO
-        if (!target || target.nodeType !== Node.ELEMENT_NODE) {
-            return null;
-        }
-
-        for (let i = 0; i < compiledQueries.length; i += 1) {
-            const query = compiledQueries[i];
-
-            // Scop length not the same = not it man
-            if (query.scope.length !== context.scope.length) continue;
-
-            // Scope comparison, support '*' as well
-            let scopeOk = true;
-            for (let j = 0; j < query.scope.length; j += 1) {
-                if (query.scope[j] !== '*' && query.scope[j] !== context.scope[j]) {
-                    scopeOk = false;
-                    break;
-                }
-            }
-            if (!scopeOk) continue;
-
-            // In case this thing is not even valid
-            if (!query.selector) continue;
-
-            const matched = target.closest(query.selector);
-            if (!matched) continue;
-
-            const runMode = query[mode];
-            if (typeof runMode !== 'function') {
-                continue;
-            }
-
-            const content = runMode(matched, context);
-            if (!content) {
-                return null;
-            }
-
-            return {
-                query: query,
-                matched: matched,
-                content: content
-            };
-        }
-
-        return null;
-    }
-
-    function bindDocumentContext(doc, scopeChain, frameChain) {
-        if (!doc) {
-            return;
-        }
-
-        const contextHandler = getOrCreateHandler(runtime.docContextHandlers, doc, function() {
-            return function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                let result = null;
-                let point = null;
-                try {
-                    point = resolveClientPoint(event, frameChain);
-                    result = runFloaterQueries('context', {
-                        scope: scopeChain,
-                        element: event.target,
-                        x: point.x,
-                        y: point.y,
-                        event: event,
-                        document: doc
-                    });
-                } catch (error) {
-                    hideFloater();
-                    return;
-                }
-
-                if (!result) {
-                    hideFloater();
-                    return;
-                }
-
-                showFloater(result.content, point.x, point.y, 'context');
-            };
-        });
-
-        doc.removeEventListener('contextmenu', contextHandler, true);
-        doc.addEventListener('contextmenu', contextHandler, true);
-
-        const moveHandler = getOrCreateHandler(runtime.docMoveHandlers, doc, function() {
-            return function(event) {
-                if (state.mode === 'context') {
-                    return;
-                }
-
-                const point = resolveClientPoint(event, frameChain);
-                const result = runFloaterQueries('tooltip', {
-                    scope: scopeChain,
-                    element: event.target,
-                    x: point.x,
-                    y: point.y,
-                    event: event,
-                    document: doc
-                });
-
-                if (!result) {
-                    if (state.mode === 'tooltip') {
-                        hideFloater();
-                    }
-                    return;
-                }
-
-                const scopeKey = scopeChain.join('>');
-                const isSameHoverTarget =
-                    state.mode === 'tooltip' &&
-                    state.hoverElement === result.matched &&
-                    state.hoverDocument === doc &&
-                    state.hoverScopeKey === scopeKey;
-
-                if (!isSameHoverTarget) {
-                    showFloater(result.content, point.x, point.y, 'tooltip');
-                } else {
-                    setFloaterPosition(point.x, point.y);
-                }
-
-                state.hoverElement = result.matched;
-                state.hoverDocument = doc;
-                state.hoverScopeKey = scopeKey;
-            };
-        });
-
-        doc.removeEventListener('mousemove', moveHandler, true);
-        doc.addEventListener('mousemove', moveHandler, true);
-
-        const outHandler = getOrCreateHandler(runtime.docOutHandlers, doc, function() {
-            return function(event) {
-                if (state.mode !== 'tooltip' || state.hoverDocument !== doc || !state.hoverElement) {
-                    return;
-                }
-
-                const nextTarget = event.relatedTarget;
-                if (nextTarget && state.hoverElement.contains(nextTarget)) {
-                    return;
-                }
-
-                hideFloater();
-            };
-        });
-
-        doc.removeEventListener('mouseout', outHandler, true);
-        doc.addEventListener('mouseout', outHandler, true);
-
-        const leaveHandler = getOrCreateHandler(runtime.docLeaveHandlers, doc, function() {
-            return function() {
-                if (state.mode === 'tooltip' && state.hoverDocument === doc) {
-                    hideFloater();
-                }
-            };
-        });
-
-        doc.removeEventListener('mouseleave', leaveHandler, true);
-        doc.addEventListener('mouseleave', leaveHandler, true);
-
-        const clickHandler = getOrCreateHandler(runtime.docClickHandlers, doc, function() {
-            return function(event) {
-                if (doc === document && floater.contains(event.target)) {
-                    return;
-                }
-                hideFloater();
-            };
-        });
-
-        doc.removeEventListener('click', clickHandler, true);
-        doc.addEventListener('click', clickHandler, true);
-
-        const keyHandler = getOrCreateHandler(runtime.docKeyHandlers, doc, function() {
-            return function(event) {
-                if (event.key === 'Escape') {
-                    hideFloater();
-                }
-            };
-        });
-
-        doc.removeEventListener('keydown', keyHandler, true);
-        doc.addEventListener('keydown', keyHandler, true);
-
-        const iframes = Array.from(doc.querySelectorAll('iframe'));
-        iframes.forEach(function(iframeEl, index) {
-            const scopeId = iframeEl.getAttribute('data-scope-id') || iframeEl.id || iframeEl.name || ('frame-' + index);
-            const nextScope = scopeChain.concat(scopeId);
-            const nextFrameChain = frameChain.concat(iframeEl);
-
-            function bindCurrentIframeDoc() {
-                let childDoc;
-                try {
-                    childDoc = iframeEl.contentDocument;
-                } catch (error) {
-                    return;
-                }
-
-                if (!childDoc) {
-                    return;
-                }
-
-                bindDocumentContext(childDoc, nextScope, nextFrameChain);
-            }
-
-            bindCurrentIframeDoc();
-
-            if (!runtime.watchedIframes.has(iframeEl)) {
-                runtime.watchedIframes.add(iframeEl);
-                iframeEl.addEventListener('load', bindCurrentIframeDoc);
-            }
-        });
-    }
-
-    bindDocumentContext(document, [], []);
-
-    document.addEventListener('wc:frame-rendered', function(event) {
-        const detail = event.detail || {};
-        const previewFrame = document.querySelector(runtime.frameSelector);
-        const frameDoc = detail.frameDocument || (previewFrame ? previewFrame.contentDocument : null);
-        if (!previewFrame || !frameDoc) {
-            return;
-        }
-
-        bindDocumentContext(frameDoc, ['preview-frame'], [previewFrame]);
-    });
-
-    {
-        const previewFrame = document.querySelector(runtime.frameSelector);
-        const frameDoc = previewFrame ? previewFrame.contentDocument : null;
-        if (previewFrame && frameDoc) {
-            bindDocumentContext(frameDoc, ['preview-frame'], [previewFrame]);
-        }
-    }
-
-    // Event delegation for floater clicks
-    floater.addEventListener('mousedown', function(event) {
-        const leftClicked = event.button === 0;
-        const middleClicked = event.button === 1;
-        const rightClicked = event.button === 2;
-
-        const dataquery = leftClicked ? 'leftclick' :
-                        ( rightClicked ? 'rightclick' :
-                        ( middleClicked ? 'middleclick' : null ) );
-
-        if (!dataquery) return;
-
-        const clickedElement = event.target.closest('[data-' + dataquery + ']');  
-        if (!clickedElement) return;
-
-        const action = clickedElement.dataset[dataquery];
-        const actionFn = handlers.getEventFn(dataquery, action);
-        if (typeof actionFn === 'function') actionFn(event, clickedElement);
-    });
-
-    // Click outside or press Escape to hide floater
-    document.addEventListener('click', function(event) {
-        if (!floater.contains(event.target)) {
-            hideFloater();
-        }
-    });
-
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            hideFloater();
-        }
-    });
 
     window.EzFloater = {
-        hide: hideFloater,
         handlers: handlers
     };
 })();
