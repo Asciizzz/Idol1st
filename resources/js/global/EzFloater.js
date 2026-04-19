@@ -22,7 +22,7 @@
 
 (function() {
     const FLOATER_ID = 'ez-floater';
-    const FLOATER_STYLE_ID = 'wc-floater-runtime-style';
+    const FLOATER_STYLE_ID = 'ez-floater-runtime-style';
 
     // Default styles for coordination and display
     if (!document.getElementById(FLOATER_STYLE_ID)) {
@@ -35,13 +35,11 @@
                 left: 0;
                 z-index: 2147483647;
                 opacity: 0;
-                transform: translateY(4px);
                 pointer-events: none;
             }
             #ez-floater.is-visible {
                 opacity: 1;
                 visibility: visible;
-                transform: translateY(0);
                 pointer-events: auto;
             }
         `;
@@ -65,245 +63,301 @@
         hoverScopeKey: ''
     };
 
-// ----------- Your playground here -----------
-
-    const handlers = {
-        values: {
-            frameSelector: '#preview-frame',
-            docContextHandlers: new WeakMap(),
-            docClickHandlers: new WeakMap(),
-            docKeyHandlers: new WeakMap(),
-            docMoveHandlers: new WeakMap(),
-            docOutHandlers: new WeakMap(),
-            docLeaveHandlers: new WeakMap(),
-            watchedIframes: new WeakSet()
-        },
-
-        leftclicks: {
-            'change-page-properties': function(button) {
-                if (!window.WebConstruct) {
-                    return;
-                }
-
-                const pageId = button.dataset.pageId;
-                const titleInput = floater.querySelector('#floater-page-title');
-                const slugInput = floater.querySelector('#floater-page-slug');
-
-                const result = window.WebConstruct.updatePageProperties(pageId, {
-                    title: titleInput ? titleInput.value : '',
-                    slug: slugInput ? slugInput.value : ''
-                });
-
-                if (result.ok) {
-                    hideFloater();
-                }
-            },
-
-            'delete-element': function(button) {
-                if (!window.WebConstruct) {
-                    return;
-                }
-
-                const isConfirmed = button.dataset.confirmed === 'true';
-                if (!isConfirmed) {
-                    button.dataset.confirmed = 'true';
-                    button.classList.add('danger');
-                    button.textContent = 'Are you sure?';
-                    return;
-                }
-
-                const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
-                if (result.ok) {
-                    hideFloater();
-                    return;
-                }
-
-                button.textContent = result.message || 'Delete failed';
-            }
-        },
-
-        queries: {
-            '.page-item': {
-                context: function(el) {
-                    if (!window.WebConstruct) {
-                        return 'Page editor unavailable.';
-                    }
-
-                    const pageId = el.dataset.pageId;
-                    const page = window.WebConstruct.getPage(pageId);
-                    if (!page) {
-                        return 'Page not found.';
-                    }
-
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'floater-form';
-
-                    const title = document.createElement('div');
-                    title.className = 'floater-title';
-                    title.textContent = 'Edit Page Properties';
-
-                    const titleLabel = document.createElement('label');
-                    titleLabel.className = 'floater-label';
-                    titleLabel.htmlFor = 'floater-page-title';
-                    titleLabel.textContent = 'Title';
-
-                    const titleInput = document.createElement('input');
-                    titleInput.id = 'floater-page-title';
-                    titleInput.className = 'floater-input';
-                    titleInput.type = 'text';
-                    titleInput.value = page.title || '';
-
-                    const slugLabel = document.createElement('label');
-                    slugLabel.className = 'floater-label';
-                    slugLabel.htmlFor = 'floater-page-slug';
-                    slugLabel.textContent = 'Slug';
-
-                    const slugInput = document.createElement('input');
-                    slugInput.id = 'floater-page-slug';
-                    slugInput.className = 'floater-input';
-                    slugInput.type = 'text';
-                    slugInput.value = page.slug || '';
-
-                    const submitButton = document.createElement('button');
-                    submitButton.type = 'button';
-                    submitButton.className = 'floater-button';
-                    submitButton.dataset.leftclick = 'change-page-properties';
-                    submitButton.dataset.pageId = pageId;
-                    submitButton.textContent = 'Change';
-
-                    wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submitButton);
-                    return wrapper;
-                },
-                tooltip: function(el) {
-                    if (!window.WebConstruct) {
-                        return null;
-                    }
-
-                    const pageId = el.dataset.pageId;
-                    const page = window.WebConstruct.getPage(pageId);
-                    if (!page) {
-                        return null;
-                    }
-
-                    return createInfoFloater('Page', (page.title || page.slug || pageId || 'Untitled page'));
-                }
-            },
-
-            '@preview-frame [data-wc-node-id]': {
-                context: function(el) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'floater-form';
-
-                    const title = document.createElement('div');
-                    title.className = 'floater-title';
-                    title.textContent = 'Element';
-
-                    const breadcrumb = document.createElement('div');
-                    breadcrumb.className = 'floater-breadcrumb';
-                    breadcrumb.textContent = buildElementBreadcrumb(el);
-
-                    const nodeId = el.getAttribute('data-wc-node-id') || '';
-                    const deleteButton = document.createElement('button');
-                    deleteButton.type = 'button';
-                    deleteButton.className = 'floater-button';
-                    deleteButton.dataset.leftclick = 'delete-element';
-                    deleteButton.dataset.nodeId = nodeId;
-                    deleteButton.dataset.confirmed = 'false';
-                    deleteButton.textContent = 'Delete';
-
-                    wrapper.append(title, breadcrumb, deleteButton);
-                    return wrapper;
-                },
-                tooltip: function(el) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'floater-form';
-
-                    const title = document.createElement('div');
-                    title.className = 'floater-title';
-                    title.textContent = 'Element';
-
-                    const breadcrumb = document.createElement('div');
-                    breadcrumb.className = 'floater-breadcrumb';
-
-                    const crumbparts = [];
-                    let currentEl = el;
-
-                    while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                        crumbparts.push(currentEl.tagName.toLowerCase());
-                        if (currentEl.tagName.toLowerCase() === 'body') {
-                            break;
-                        }
-                        currentEl = currentEl.parentElement;
-                    }
-
-                    breadcrumb.textContent = crumbparts.reverse().join(' > ');
-
-                    wrapper.append(title, breadcrumb);
-                    return wrapper;
-                }
-            }
+    class Handler {
+        constructor() {
+            this.events = {};
+            this.queries = {};
         }
-    };
 
-    function createInfoFloater(titleText, bodyText) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'floater-form';
+        addEventFn(eventName, actionName, actionFn) {
+            if (!eventName || !actionName || typeof actionFn !== 'function') return null;
 
-        const title = document.createElement('div');
-        title.className = 'floater-title';
-        title.textContent = titleText;
+            // Event group hasn't exist
+            if (!this.events[eventName]) this.events[eventName] = {};
 
-        const body = document.createElement('div');
-        body.className = 'floater-breadcrumb';
-        body.textContent = bodyText;
+            this.events[eventName][actionName] = actionFn;
+            return actionFn;
+        }
 
-        wrapper.append(title, body);
-        return wrapper;
-    }
+        removeEventFn(eventName, actionName) {
+            const eventGroup = this.events[eventName];
+            if (!eventGroup) return false;
 
-    function normalizeQueryDefinition(definition) {
-        if (typeof definition === 'function') {
-            return {
-                context: definition,
-                tooltip: null
+            if (!actionName) {
+                delete this.events[eventName];
+                return true;
+            }
+
+            if (!Object.prototype.hasOwnProperty.call(eventGroup, actionName)) {
+                return false;
+            }
+
+            delete eventGroup[actionName];
+            if (Object.keys(eventGroup).length === 0) {
+                delete this.events[eventName];
+            }
+
+            return true;
+        }
+
+        getEventFn(eventName, actionName) {
+            const eventGroup = this.events[eventName];
+            if (!eventGroup) {
+                return null;
+            }
+            return eventGroup[actionName] || null;
+        }
+
+        addQuery(rawQuery, definition) {
+            if (!rawQuery || typeof definition !== 'object') return null;
+
+            const tokens = String(rawQuery || '').trim().split(/\s+/).filter(Boolean);
+            const scope = [];
+            const selectorTokens = [];
+
+            tokens.forEach(function(token) {
+                if (token.startsWith('@')) {
+                    scope.push(token.slice(1));
+                    return;
+                }
+                selectorTokens.push(token);
+            });
+
+            const hasContext = typeof definition.context === 'function';
+            const hasTooltip = typeof definition.tooltip === 'function';
+
+            const compiledQuery = {
+                raw: rawQuery,
+                scope: scope,
+                selector: selectorTokens.join(' '),
+                context: hasContext ? definition.context : null,
+                tooltip: hasTooltip ? definition.tooltip : null
             };
+
+            this.queries[rawQuery] = compiledQuery;
+            return compiledQuery;
         }
 
-        if (!definition || typeof definition !== 'object') {
-            return {
-                context: null,
-                tooltip: null
-            };
-        }
-
-        return {
-            context: typeof definition.context === 'function' ? definition.context : null,
-            tooltip: typeof definition.tooltip === 'function' ? definition.tooltip : null
-        };
-    }
-
-    const compiledQueries = Object.entries(handlers.queries).map(function(entry) {
-        const queryDef = normalizeQueryDefinition(entry[1]);
-        const tokens = String(entry[0] || '').trim().split(/\s+/).filter(Boolean);
-        const scope = [];
-        const selectorTokens = [];
-
-        tokens.forEach(function(token) {
-            if (token.startsWith('@')) {
-                scope.push(token.slice(1));
-                return;
+        removeQuery(rawQuery) {
+            if (!Object.prototype.hasOwnProperty.call(this.queries, rawQuery)) {
+                return false;
             }
-            selectorTokens.push(token);
+
+            delete this.queries[rawQuery];
+            return true;
+        }
+
+        getQuery(query) {
+            return this.queries[query] || null;
+        }
+
+        getCompiledQueries() {
+            return Object.values(this.queries);
+        }
+    }
+    const handlers = new Handler();
+
+    handlers.addEventFn('leftclick', 'change-page-properties', function(event, button) {
+        if (!window.WebConstruct) {
+            return;
+        }
+
+        const pageId = button.dataset.pageId;
+        const titleInput = floater.querySelector('#floater-page-title');
+        const slugInput = floater.querySelector('#floater-page-slug');
+
+        const result = window.WebConstruct.updatePageProperties(pageId, {
+            title: titleInput ? titleInput.value : '',
+            slug: slugInput ? slugInput.value : ''
         });
 
-        return {
-            raw: entry[0],
-            scope: scope,
-            selector: selectorTokens.join(' '),
-            context: queryDef.context,
-            tooltip: queryDef.tooltip
-        };
+        if (result.ok) {
+            hideFloater();
+        }
     });
+
+    handlers.addEventFn('leftclick', 'delete-element', function(event, button) {
+        if (!window.WebConstruct) {
+            return;
+        }
+
+        const isConfirmed = button.dataset.confirmed === 'true';
+        if (!isConfirmed) {
+            button.dataset.confirmed = 'true';
+            button.classList.add('danger');
+            button.textContent = 'Are you sure?';
+            return;
+        }
+
+        const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
+        if (result.ok) {
+            hideFloater();
+            return;
+        }
+
+        button.textContent = result.message || 'Delete failed';
+    });
+
+    handlers.addQuery('.page-item', {
+        context: function(el) {
+            if (!window.WebConstruct) {
+                return 'Page editor unavailable.';
+            }
+
+            const pageId = el.dataset.pageId;
+            const page = window.WebConstruct.getPage(pageId);
+            if (!page) {
+                return 'Page not found.';
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'floater-form';
+
+            const title = document.createElement('div');
+            title.className = 'floater-title';
+            title.textContent = 'Edit Page Properties';
+
+            const titleLabel = document.createElement('label');
+            titleLabel.className = 'floater-label';
+            titleLabel.htmlFor = 'floater-page-title';
+            titleLabel.textContent = 'Title';
+
+            const titleInput = document.createElement('input');
+            titleInput.id = 'floater-page-title';
+            titleInput.className = 'floater-input';
+            titleInput.type = 'text';
+            titleInput.value = page.title || '';
+
+            const slugLabel = document.createElement('label');
+            slugLabel.className = 'floater-label';
+            slugLabel.htmlFor = 'floater-page-slug';
+            slugLabel.textContent = 'Slug';
+
+            const slugInput = document.createElement('input');
+            slugInput.id = 'floater-page-slug';
+            slugInput.className = 'floater-input';
+            slugInput.type = 'text';
+            slugInput.value = page.slug || '';
+
+            const submitButton = document.createElement('button');
+            submitButton.type = 'button';
+            submitButton.className = 'floater-button';
+            submitButton.dataset.leftclick = 'change-page-properties';
+            submitButton.dataset.pageId = pageId;
+            submitButton.textContent = 'Change';
+
+            wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submitButton);
+            return wrapper;
+        },
+        tooltip: function(el) {
+            if (!window.WebConstruct) {
+                return null;
+            }
+
+            const pageId = el.dataset.pageId;
+            const page = window.WebConstruct.getPage(pageId);
+            if (!page) {
+                return null;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'floater-form';
+
+            const title = document.createElement('div');
+            title.className = 'floater-title';
+            title.textContent = 'Page';
+
+            const div1 = document.createElement('div');
+            div1.className = 'floater-breadcrumb';
+            div1.textContent = `Title: ${page.title || 'Untitled'}`
+
+            const div2 = document.createElement('div');
+            div2.className = 'floater-breadcrumb';
+            div2.textContent = `Slug: ${page.slug || 'no-slug'}`;
+
+            wrapper.append(title, div1, div2);
+
+            return wrapper;
+        }
+    });
+
+    handlers.addQuery('@preview-frame [data-wc-node-id]', {
+        context: function(el) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'floater-form';
+
+            const title = document.createElement('div');
+            title.className = 'floater-title';
+            title.textContent = 'Element';
+
+            const breadcrumb = document.createElement('div');
+            breadcrumb.className = 'floater-breadcrumb';
+
+            // Building the breadcrumb
+            const crumbparts = [];
+            let currentEl = el;
+
+            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
+                crumbparts.push(currentEl.tagName.toLowerCase());
+                if (currentEl.tagName.toLowerCase() === 'body') {
+                    break;
+                }
+                currentEl = currentEl.parentElement;
+            }
+
+            breadcrumb.textContent = crumbparts.reverse().join(' > ');
+
+            const nodeId = el.getAttribute('data-wc-node-id') || '';
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'floater-button';
+            deleteButton.dataset.leftclick = 'delete-element';
+            deleteButton.dataset.nodeId = nodeId;
+            deleteButton.dataset.confirmed = 'false';
+            deleteButton.textContent = 'Delete';
+
+            wrapper.append(title, breadcrumb, deleteButton);
+            return wrapper;
+        },
+        tooltip: function(el) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'floater-form';
+
+            const title = document.createElement('div');
+            title.className = 'floater-title';
+            title.textContent = 'Element';
+
+            const breadcrumb = document.createElement('div');
+            breadcrumb.className = 'floater-breadcrumb';
+
+            const crumbparts = [];
+            let currentEl = el;
+
+            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
+                crumbparts.push(currentEl.tagName.toLowerCase());
+                if (currentEl.tagName.toLowerCase() === 'body') {
+                    break;
+                }
+                currentEl = currentEl.parentElement;
+            }
+
+            breadcrumb.textContent = crumbparts.reverse().join(' > ');
+
+            wrapper.append(title, breadcrumb);
+            return wrapper;
+        }
+    });
+
+    const runtime = {
+        frameSelector: '#preview-frame',
+        docContextHandlers: new WeakMap(),
+        docClickHandlers: new WeakMap(),
+        docKeyHandlers: new WeakMap(),
+        docMoveHandlers: new WeakMap(),
+        docOutHandlers: new WeakMap(),
+        docLeaveHandlers: new WeakMap(),
+        watchedIframes: new WeakSet()
+    };
 
     function getOrCreateHandler(map, key, factory) {
         let handler = map.get(key);
@@ -369,11 +423,14 @@
 
     function runFloaterQueries(mode, context) {
         let target = context.element;
+        const compiledQueries = handlers.getCompiledQueries();
 
+        // If this a text node, use its parent instead (should not happen, i think)
         if (target && target.nodeType === Node.TEXT_NODE) {
             target = target.parentElement;
         }
 
+        // Not a node = GTFO
         if (!target || target.nodeType !== Node.ELEMENT_NODE) {
             return null;
         }
@@ -381,10 +438,10 @@
         for (let i = 0; i < compiledQueries.length; i += 1) {
             const query = compiledQueries[i];
 
-            if (query.scope.length !== context.scope.length) {
-                continue;
-            }
+            // Scop length not the same = not it man
+            if (query.scope.length !== context.scope.length) continue;
 
+            // Scope comparison, support '*' as well
             let scopeOk = true;
             for (let j = 0; j < query.scope.length; j += 1) {
                 if (query.scope[j] !== '*' && query.scope[j] !== context.scope[j]) {
@@ -392,18 +449,13 @@
                     break;
                 }
             }
-            if (!scopeOk) {
-                continue;
-            }
+            if (!scopeOk) continue;
 
-            if (!query.selector) {
-                continue;
-            }
+            // In case this thing is not even valid
+            if (!query.selector) continue;
 
             const matched = target.closest(query.selector);
-            if (!matched) {
-                continue;
-            }
+            if (!matched) continue;
 
             const runMode = query[mode];
             if (typeof runMode !== 'function') {
@@ -430,20 +482,27 @@
             return;
         }
 
-        const contextHandler = getOrCreateHandler(handlers.values.docContextHandlers, doc, function() {
+        const contextHandler = getOrCreateHandler(runtime.docContextHandlers, doc, function() {
             return function(event) {
-                const point = resolveClientPoint(event, frameChain);
-                const result = runFloaterQueries('context', {
-                    scope: scopeChain,
-                    element: event.target,
-                    x: point.x,
-                    y: point.y,
-                    event: event,
-                    document: doc
-                });
-
                 event.preventDefault();
                 event.stopPropagation();
+
+                let result = null;
+                let point = null;
+                try {
+                    point = resolveClientPoint(event, frameChain);
+                    result = runFloaterQueries('context', {
+                        scope: scopeChain,
+                        element: event.target,
+                        x: point.x,
+                        y: point.y,
+                        event: event,
+                        document: doc
+                    });
+                } catch (error) {
+                    hideFloater();
+                    return;
+                }
 
                 if (!result) {
                     hideFloater();
@@ -457,7 +516,7 @@
         doc.removeEventListener('contextmenu', contextHandler, true);
         doc.addEventListener('contextmenu', contextHandler, true);
 
-        const moveHandler = getOrCreateHandler(handlers.values.docMoveHandlers, doc, function() {
+        const moveHandler = getOrCreateHandler(runtime.docMoveHandlers, doc, function() {
             return function(event) {
                 if (state.mode === 'context') {
                     return;
@@ -502,7 +561,7 @@
         doc.removeEventListener('mousemove', moveHandler, true);
         doc.addEventListener('mousemove', moveHandler, true);
 
-        const outHandler = getOrCreateHandler(handlers.values.docOutHandlers, doc, function() {
+        const outHandler = getOrCreateHandler(runtime.docOutHandlers, doc, function() {
             return function(event) {
                 if (state.mode !== 'tooltip' || state.hoverDocument !== doc || !state.hoverElement) {
                     return;
@@ -520,7 +579,7 @@
         doc.removeEventListener('mouseout', outHandler, true);
         doc.addEventListener('mouseout', outHandler, true);
 
-        const leaveHandler = getOrCreateHandler(handlers.values.docLeaveHandlers, doc, function() {
+        const leaveHandler = getOrCreateHandler(runtime.docLeaveHandlers, doc, function() {
             return function() {
                 if (state.mode === 'tooltip' && state.hoverDocument === doc) {
                     hideFloater();
@@ -531,7 +590,7 @@
         doc.removeEventListener('mouseleave', leaveHandler, true);
         doc.addEventListener('mouseleave', leaveHandler, true);
 
-        const clickHandler = getOrCreateHandler(handlers.values.docClickHandlers, doc, function() {
+        const clickHandler = getOrCreateHandler(runtime.docClickHandlers, doc, function() {
             return function(event) {
                 if (doc === document && floater.contains(event.target)) {
                     return;
@@ -543,7 +602,7 @@
         doc.removeEventListener('click', clickHandler, true);
         doc.addEventListener('click', clickHandler, true);
 
-        const keyHandler = getOrCreateHandler(handlers.values.docKeyHandlers, doc, function() {
+        const keyHandler = getOrCreateHandler(runtime.docKeyHandlers, doc, function() {
             return function(event) {
                 if (event.key === 'Escape') {
                     hideFloater();
@@ -577,8 +636,8 @@
 
             bindCurrentIframeDoc();
 
-            if (!handlers.values.watchedIframes.has(iframeEl)) {
-                handlers.values.watchedIframes.add(iframeEl);
+            if (!runtime.watchedIframes.has(iframeEl)) {
+                runtime.watchedIframes.add(iframeEl);
                 iframeEl.addEventListener('load', bindCurrentIframeDoc);
             }
         });
@@ -588,7 +647,7 @@
 
     document.addEventListener('wc:frame-rendered', function(event) {
         const detail = event.detail || {};
-        const previewFrame = document.querySelector(handlers.values.frameSelector);
+        const previewFrame = document.querySelector(runtime.frameSelector);
         const frameDoc = detail.frameDocument || (previewFrame ? previewFrame.contentDocument : null);
         if (!previewFrame || !frameDoc) {
             return;
@@ -598,7 +657,7 @@
     });
 
     {
-        const previewFrame = document.querySelector(handlers.values.frameSelector);
+        const previewFrame = document.querySelector(runtime.frameSelector);
         const frameDoc = previewFrame ? previewFrame.contentDocument : null;
         if (previewFrame && frameDoc) {
             bindDocumentContext(frameDoc, ['preview-frame'], [previewFrame]);
@@ -615,12 +674,14 @@
                         ( rightClicked ? 'rightclick' :
                         ( middleClicked ? 'middleclick' : null ) );
 
+        if (!dataquery) return;
+
         const clickedElement = event.target.closest('[data-' + dataquery + ']');  
         if (!clickedElement) return;
 
         const action = clickedElement.dataset[dataquery];
-        const actionFn = handlers[dataquery + 's'][action];
-        if (typeof actionFn === 'function') actionFn(clickedElement);
+        const actionFn = handlers.getEventFn(dataquery, action);
+        if (typeof actionFn === 'function') actionFn(event, clickedElement);
     });
 
     // Click outside or press Escape to hide floater
