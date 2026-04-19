@@ -228,7 +228,7 @@ class SiteCreatorController extends Controller
             }
         }
 
-        $examplePath = public_path('webconstruct/example.json');
+        $examplePath = public_path('jsons/example.json');
         if (File::exists($examplePath)) {
             $decoded = json_decode((string) File::get($examplePath), true);
             if (is_array($decoded)) {

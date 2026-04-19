@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: 'Outfit';
-    src: url('/webconstruct/assets/Fonts/Outfit-VariableFont_wght.ttf') format('truetype');
+    src: url('/assets/Fonts/Outfit-VariableFont_wght.ttf') format('truetype');
     font-weight: 100 900;
 }
 
@@ -62,4 +62,88 @@ body {
     background: var(--danger-hover);
     border-color: var(--danger-border);
     color: var(--danger-text);
+}
+
+
+
+#ez-floater {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 12rem;
+    max-width: 24rem;
+    min-height: 2.4rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 0.55rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42);
+    z-index: 2147483647;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease;
+}
+#ez-floater.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+#ez-floater.mode-context {
+    pointer-events: auto;
+}
+#ez-floater .floater-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    width: 16rem;
+}
+#ez-floater .floater-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+#ez-floater .floater-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+#ez-floater .floater-breadcrumb {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    word-break: break-word;
+}
+#ez-floater .floater-input {
+    border: 1px solid var(--border-primary);
+    border-radius: 0.42rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    height: 2rem;
+    padding: 0 0.55rem;
+}
+#ez-floater .floater-input:focus {
+    outline: 1px solid var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+#ez-floater .floater-button {
+    border: 1px solid var(--border-primary);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 0.45rem;
+    height: 2rem;
+    padding: 0 0.7rem;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+#ez-floater .floater-button:hover {
+    background: var(--accent-hover);
+}
+#ez-floater .floater-button.danger {
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+    color: var(--danger-text);
+}
+#ez-floater .floater-button.danger:hover {
+    background: var(--danger-hover);
 }

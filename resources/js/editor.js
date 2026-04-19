@@ -421,7 +421,7 @@
     };
 
     const initialProject = window.webConstructInitialProject;
-    const initialProjectUrl = window.webConstructInitialProjectUrl || '/webconstruct/example.json';
+    const initialProjectUrl = window.webConstructInitialProjectUrl || '/jsons/example.json';
 
     if (initialProject && typeof initialProject === 'object') {
         loadProject(initialProject);
@@ -463,8 +463,8 @@
         builderAssets.elements = assets.elements || [];
         builderAssets.css = assets.css || [];
     }
-    
-    const assetsUrl = window.webConstructAssetsUrl || '/webconstruct/assets/assets.json';
+
+    const assetsUrl = window.webConstructAssetsUrl || '/jsons/assets.json';
 
     fetch(assetsUrl)
         .then(function(response) {

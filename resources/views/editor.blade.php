@@ -43,8 +43,8 @@
         window.creatorDraft = @json($draft);
         window.creatorSaveUrl = @json(route('editor.save'));
         window.webConstructInitialProject = @json($initialProject);
-        window.webConstructInitialProjectUrl = @json(url('/webconstruct/example.json'));
-        window.webConstructAssetsUrl = @json(url('/webconstruct/assets/assets.json'));
+        window.webConstructInitialProjectUrl = @json(url('/jsons/example.json'));
+        window.webConstructAssetsUrl = @json(url('/jsons/assets.json'));
     </script>
 </body>
 </html>
