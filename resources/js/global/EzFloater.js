@@ -11,7 +11,7 @@
 
 (function() {
 
-    class Handler {
+    class EzFloater {
         constructor() {
             this.events = {};
             this.queries = {};
@@ -89,6 +89,10 @@
 
     // Floater state management and utils
 
+        getFloaterStyle() {
+            return window.getComputedStyle(this.floater);
+        }
+
         setFloaterCoord(x, y) {
             const offset = 8;
             const maxLeft = window.innerWidth - this.floater.offsetWidth - offset;
@@ -111,7 +115,7 @@
             }
 
             this.state.mode = mode;
-            this.floater.classList.toggle('mode-context', mode === 'context');
+            this.floater.classList.toggle('ez-floater-mode-context', mode === 'context');
             this.floater.classList.add('ez-floater-active');
             this.setFloaterCoord(x, y);
         }
@@ -119,7 +123,7 @@
         hideFloater() {
             this.state.mode = null;
             this.floater.classList.remove('ez-floater-active');
-            this.floater.classList.remove('mode-context');
+            this.floater.classList.remove('ez-floater-mode-context');
 
             // Clear hover state
             this.state.hoverElement = null;
@@ -226,10 +230,10 @@
         /* execQuery's ctx = {
             mode: 'context' or 'tooltip',
             scope: array of scope tokens,
-            element: the original event target element
+            target: the original event target element
         } */
         execQuery(ctx) {
-            let target = ctx.element;
+            let target = ctx.target;
             if (!target) return null;
 
             const compiledQueries = handlers.getCompiledQueries();
@@ -288,7 +292,7 @@
             return null;
         }
     }
-    const handlers = new Handler();
+    const handlers = new EzFloater();
     handlers.init();
 
     const runtime = {
@@ -340,11 +344,9 @@
                 try {
                     point = resolveClientPoint(event, frameChain);
                     result = handlers.execQuery({
+                        mode: 'context',
                         scope: scopeChain,
-                        element: event.target,
-                        event: event,
-                        document: doc,
-                        mode: 'context'
+                        target: event.target
                     });
                 } catch (error) {
                     handlers.hideFloater();
@@ -372,7 +374,7 @@
                 const point = resolveClientPoint(event, frameChain);
                 const result = handlers.execQuery({
                     scope: scopeChain,
-                    element: event.target,
+                    target: event.target,
                     mode: 'tooltip'
                 });
 
