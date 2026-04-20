@@ -1,20 +1,22 @@
-/* EzFloater by Asciiz
+/*
+EzFloater
+By Asciiz
 
-+ Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shi
+# Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shi
 
-+ Guide:
+# Guide:
     + include EzFloater.js in your page (every page has a unique instance, don't worry about conflicts)
     + use window.EzFloater.handler in a different script
 
     + window.EzFloater.handler - global engine that resolves event and shi
         + addEventFn(eventName, actionName, actionFn): add a handler function for floater content with data-[eventName]=[actionName]
         + removeEventFn(eventName, actionName): remove the handler function, if actionName is not provided, remove the whole event group
-        + addQuery(rawQuery, definition): add a query for context menu or tooltip
-            + definition = {
-                delegate: true/false (default true), false means needing the exact match, while true means finding closest ancestor match as well
+        + setDisplay(name, cfg): register or update a shared display definition for context menu or tooltip
+            + cfg = {
                 context: function(element, ctx) { ... } return a wrapper element for the context menu
                 tooltip: function(element, ctx) { ... } return a wrapper element for the tooltip
             }
+        + setupQuery(rawQuery, displayName, delegate = true): add a query that points to a shared display definition
         + removeQuery(rawQuery): remove the query
 
     + To display iframe's handler.floater, do "@<the-iframe-id-but-without-#> <the iframe element, attribute, etc>"
@@ -22,7 +24,7 @@
 
     + That's pretty much it.
 
-+ Notes:
+# Notes:
     + Freely customize the floater style in your css with
         #ez-floater and #ez-floater.ez-floater-active
 
@@ -45,6 +47,7 @@
         constructor() {
             this.events = {};
             this.queries = {};
+            this.display = {};
             this.state = {
                 mode: null,
                 hoverElement: null,
@@ -208,13 +211,30 @@
             return eventGroup[actionName] || null;
         }
 
-        /* addQuery's definition = {
-            delegate: true/false (default true), false means needing the exact match, while true means finding closest ancestor match as well
-            context: function(element, ctx) { ... } return a wrapper element for the context menu
-            tooltip: function(element, ctx) { ... } return a wrapper element for the tooltip
-        }*/
-        addQuery(rawQuery, definition) {
-            if (!rawQuery || typeof definition !== 'object') return null;
+        setDisplay(name, cfg) {
+            if (typeof name !== 'string' || !name.trim() || !cfg || typeof cfg !== 'object') return null;
+
+            const displayName = name.trim();
+            const hasContext = Object.prototype.hasOwnProperty.call(cfg, 'context');
+            const hasTooltip = Object.prototype.hasOwnProperty.call(cfg, 'tooltip');
+            if (!hasContext && !hasTooltip) return null;
+
+            const currentDisplay = this.display[displayName] || { name: displayName, context: null, tooltip: null };
+
+            if (hasContext) {
+                currentDisplay.context = typeof cfg.context === 'function' ? cfg.context : null;
+            }
+
+            if (hasTooltip) {
+                currentDisplay.tooltip = typeof cfg.tooltip === 'function' ? cfg.tooltip : null;
+            }
+
+            this.display[displayName] = currentDisplay;
+            return currentDisplay;
+        }
+
+        setupQuery(rawQuery, displayName, delegate = true) {
+            if (!rawQuery || typeof displayName !== 'string' || !displayName.trim()) return null;
 
             const tokens = String(rawQuery || '').trim().split(/\s+/).filter(Boolean);
             const scope = [];
@@ -228,16 +248,14 @@
                 selectorTokens.push(token);
             });
 
-            const hasContext = typeof definition.context === 'function';
-            const hasTooltip = typeof definition.tooltip === 'function';
+            const normalizedDisplayName = displayName.trim();
 
             const compiledQuery = {
                 raw: rawQuery,
                 scope: scope,
                 selector: selectorTokens.join(' '),
-                delegate: definition.delegate !== false,
-                context: hasContext ? definition.context : null,
-                tooltip: hasTooltip ? definition.tooltip : null
+                delegate: delegate !== false,
+                display: normalizedDisplayName
             };
 
             this.queries[rawQuery] = compiledQuery;
@@ -311,8 +329,11 @@
                     : target.closest(query.selector);
                 if (!matched) continue;
 
+                const display = handler.display[query.display] || null;
+                if (!display) continue;
+
                 // Run either context or tooltip mode function, if exists
-                const runFn = ctx.mode === 'context' ? query.context : query.tooltip;
+                const runFn = ctx.mode === 'context' ? display.context : display.tooltip;
                 if (typeof runFn !== 'function') continue; // should not happen
 
                 const content = runFn(matched, ctx);

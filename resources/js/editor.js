@@ -530,7 +530,22 @@
             button.textContent = result.message || 'Delete failed';
         });
 
-        ezFloaterHandler.addQuery('.page-item', {
+        function buildBreadcrumbText(el) {
+            const crumbparts = [];
+            let currentEl = el;
+
+            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
+                crumbparts.push(currentEl.tagName.toLowerCase());
+                if (currentEl.tagName.toLowerCase() === 'body') {
+                    break;
+                }
+                currentEl = currentEl.parentElement;
+            }
+
+            return crumbparts.reverse().join(' > ');
+        }
+
+        ezFloaterHandler.setDisplay('page-item', {
             context: function(el) {
                 if (!window.WebConstruct) {
                     return 'Page editor unavailable.';
@@ -613,7 +628,7 @@
             }
         });
 
-        ezFloaterHandler.addQuery('@preview-frame [data-wc-node-id]', {
+        ezFloaterHandler.setDisplay('node', {
             context: function(el) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'floater-form';
@@ -624,20 +639,7 @@
 
                 const breadcrumb = document.createElement('div');
                 breadcrumb.className = 'floater-breadcrumb';
-
-                // Building the breadcrumb
-                const crumbparts = [];
-                let currentEl = el;
-
-                while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                    crumbparts.push(currentEl.tagName.toLowerCase());
-                    if (currentEl.tagName.toLowerCase() === 'body') {
-                        break;
-                    }
-                    currentEl = currentEl.parentElement;
-                }
-
-                breadcrumb.textContent = crumbparts.reverse().join(' > ');
+                breadcrumb.textContent = buildBreadcrumbText(el);
 
                 const nodeId = el.getAttribute('data-wc-node-id') || '';
                 const deleteButton = document.createElement('button');
@@ -662,22 +664,14 @@
                 const breadcrumb = document.createElement('div');
                 breadcrumb.className = 'floater-breadcrumb';
 
-                const crumbparts = [];
-                let currentEl = el;
-
-                while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                    crumbparts.push(currentEl.tagName.toLowerCase());
-                    if (currentEl.tagName.toLowerCase() === 'body') {
-                        break;
-                    }
-                    currentEl = currentEl.parentElement;
-                }
-
-                breadcrumb.textContent = crumbparts.reverse().join(' > ');
+                breadcrumb.textContent = buildBreadcrumbText(el);
 
                 wrapper.append(title, breadcrumb);
                 return wrapper;
             }
         });
+
+        ezFloaterHandler.setupQuery('.page-item', 'page-item');
+        ezFloaterHandler.setupQuery('@preview-frame [data-wc-node-id]', 'node');
     }
 })();
