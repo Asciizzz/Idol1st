@@ -67,9 +67,6 @@ body {
 
 
 #ez-floater {
-    position: fixed;
-    top: 0;
-    left: 0;
     min-width: 12rem;
     min-height: 2.5rem;
     padding: 0.65rem 0.75rem;
@@ -78,16 +75,10 @@ body {
     background: var(--bg-secondary);
     color: var(--text-primary);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42);
-    z-index: 2147483647;
-    opacity: 0;
-    visibility: hidden;
     transform: translateY(4px);
-    pointer-events: none;
     transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease;
 }
-#ez-floater.mode-context {
-    pointer-events: auto;
-}
+
 #ez-floater .floater-form {
     display: flex;
     flex-direction: column;

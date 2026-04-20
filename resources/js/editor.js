@@ -420,6 +420,72 @@
         deleteNode: deleteNode
     };
 
+    const initialProject = window.webConstructInitialProject;
+    const initialProjectUrl = window.webConstructInitialProjectUrl || '/jsons/example.json';
+
+    if (initialProject && typeof initialProject === 'object') {
+        loadProject(initialProject);
+    } else {
+        fetch(initialProjectUrl)
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                loadProject(data);
+            })
+            .catch(function(error) {
+                console.error('Error fetching project configuration:', error);
+                if (el.app) {
+                    el.app.textContent = 'Failed to load builder project: ' + error.message;
+                }
+            });
+    }
+
+
+})();
+
+
+// Render the editor UI, buttons and stuffs
+(function() {
+    const appEl = document.querySelector('#app');
+
+    const builderAssets = {
+        elements: [],
+        css: []
+    };
+
+    function renderAssets(assets) {
+        builderAssets.elements = assets.elements || [];
+        builderAssets.css = assets.css || [];
+    }
+
+    const assetsUrl = window.webConstructAssetsUrl || '/jsons/assets.json';
+
+    fetch(assetsUrl)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(assets) {
+            renderAssets(assets);
+        })
+        .catch(function(error) {
+            console.error('Error fetching assets:', error);
+            if (appEl) {
+                appEl.textContent = 'Failed to load assets catalog: ' + error.message;
+            }
+        });
+
+})();
+
+
+// Tool tips and context menu
+(function() {
     const ezFloaterHandler = window.EzFloater && window.EzFloater.handler;
 
     if (ezFloaterHandler) {
@@ -614,66 +680,4 @@
             }
         });
     }
-
-    const initialProject = window.webConstructInitialProject;
-    const initialProjectUrl = window.webConstructInitialProjectUrl || '/jsons/example.json';
-
-    if (initialProject && typeof initialProject === 'object') {
-        loadProject(initialProject);
-    } else {
-        fetch(initialProjectUrl)
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                loadProject(data);
-            })
-            .catch(function(error) {
-                console.error('Error fetching project configuration:', error);
-                if (el.app) {
-                    el.app.textContent = 'Failed to load builder project: ' + error.message;
-                }
-            });
-    }
-
-
-})();
-
-
-(function() {
-
-    const appEl = document.querySelector('#app');
-
-    const builderAssets = {
-        elements: [],
-        css: []
-    };
-
-    function renderAssets(assets) {
-        builderAssets.elements = assets.elements || [];
-        builderAssets.css = assets.css || [];
-    }
-
-    const assetsUrl = window.webConstructAssetsUrl || '/jsons/assets.json';
-
-    fetch(assetsUrl)
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
-            }
-            return response.json();
-        })
-        .then(function(assets) {
-            renderAssets(assets);
-        })
-        .catch(function(error) {
-            console.error('Error fetching assets:', error);
-            if (appEl) {
-                appEl.textContent = 'Failed to load assets catalog: ' + error.message;
-            }
-        });
-
 })();

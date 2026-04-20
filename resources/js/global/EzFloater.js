@@ -1,18 +1,12 @@
 /* EzFloater by Asciiz
 
-+ Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shit
-
-+ Notes:
-    + To display iframe's handler.floater, do @<the-iframe-id-but-without-#> <the iframe element, attribute, etc>
-        + For example: @screen #inside-the-screen
-    + Every iframe, regardless of iframe nest level, requires a unique id
-    + Freely customize the floater style in your css: #ez-floater and #ez-floater.ez-floater-active
++ Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shi
 
 + Guide:
     + include EzFloater.js in your page (every page has a unique instance, don't worry about conflicts)
     + use window.EzFloater.handler in a different script
 
-    + window.EzFloater.handler
+    + window.EzFloater.handler - global engine that resolves event and shi
         + addEventFn(eventName, actionName, actionFn): add a handler function for floater content with data-[eventName]=[actionName]
         + removeEventFn(eventName, actionName): remove the handler function, if actionName is not provided, remove the whole event group
         + addQuery(rawQuery, definition): add a query for context menu or tooltip
@@ -23,7 +17,26 @@
             }
         + removeQuery(rawQuery): remove the query
 
+    + To display iframe's handler.floater, do "@<the-iframe-id-but-without-#> <the iframe element, attribute, etc>"
+        + For example: @screen #inside-the-screen
+
     + That's pretty much it.
+
++ Notes:
+    + Freely customize the floater style in your css with
+        #ez-floater and #ez-floater.ez-floater-active
+
+    + Every iframe requires an id
+        + IDs don’t need to be globally unique across nested iframes because each iframe has its own document scope
+            Something like "@screen @screen .class" will work, it means
+            "looking for .class inside an iframe with id=screen,
+            which itself is inside another iframe with id=screen"
+
+    + Query must starts with all @scope tokens (if any) followed by css selector
+        + Something like @screen1 .class1 @screen2 .class2 will be interpreted to
+            scope = ['screen1', 'screen2']
+            selector = '.class1 .class2'
+
 */
 
 (function() {
@@ -70,6 +83,9 @@
                 #ez-floater.ez-floater-active {
                     opacity: 0.8;
                     visibility: visible;
+                    pointer-events: none;
+                }
+                #ez-floater.ez-floater-mode-context {
                     pointer-events: auto;
                 }
             `;
