@@ -1,8 +1,8 @@
 import '../css/global.css';
 import '../css/editor.css';
+import './global/EzFloater.js';
 import './editor.js';
 import './editorSidebar.js';
-import './global/EzFloater.js';
 
 const draft = window.creatorDraft || {};
 const saveButton = document.querySelector('#save-builder');

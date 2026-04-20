@@ -420,6 +420,201 @@
         deleteNode: deleteNode
     };
 
+    const ezFloaterHandler = window.EzFloater && window.EzFloater.handler;
+
+    if (ezFloaterHandler) {
+        ezFloaterHandler.addEventFn('leftclick', 'change-page-properties', function(event, button) {
+            if (!window.WebConstruct) {
+                return;
+            }
+
+            const pageId = button.dataset.pageId;
+            const titleInput = ezFloaterHandler.floater.querySelector('#floater-page-title');
+            const slugInput = ezFloaterHandler.floater.querySelector('#floater-page-slug');
+
+            const result = window.WebConstruct.updatePageProperties(pageId, {
+                title: titleInput ? titleInput.value : '',
+                slug: slugInput ? slugInput.value : ''
+            });
+
+            if (result.ok) {
+                ezFloaterHandler.hideFloater();
+            }
+        });
+
+        ezFloaterHandler.addEventFn('leftclick', 'delete-element', function(event, button) {
+            if (!window.WebConstruct) {
+                return;
+            }
+
+            const isConfirmed = button.dataset.confirmed === 'true';
+            if (!isConfirmed) {
+                button.dataset.confirmed = 'true';
+                button.classList.add('danger');
+                button.textContent = 'Are you sure?';
+                return;
+            }
+
+            const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
+            if (result.ok) {
+                ezFloaterHandler.hideFloater();
+                return;
+            }
+
+            button.textContent = result.message || 'Delete failed';
+        });
+
+        ezFloaterHandler.addQuery('.page-item', {
+            context: function(el) {
+                if (!window.WebConstruct) {
+                    return 'Page editor unavailable.';
+                }
+
+                const pageId = el.dataset.pageId;
+                const page = window.WebConstruct.getPage(pageId);
+                if (!page) {
+                    return 'Page not found.';
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'floater-form';
+
+                const title = document.createElement('div');
+                title.className = 'floater-title';
+                title.textContent = 'Edit Page Properties';
+
+                const titleLabel = document.createElement('label');
+                titleLabel.className = 'floater-label';
+                titleLabel.htmlFor = 'floater-page-title';
+                titleLabel.textContent = 'Title';
+
+                const titleInput = document.createElement('input');
+                titleInput.id = 'floater-page-title';
+                titleInput.className = 'floater-input';
+                titleInput.type = 'text';
+                titleInput.value = page.title || '';
+
+                const slugLabel = document.createElement('label');
+                slugLabel.className = 'floater-label';
+                slugLabel.htmlFor = 'floater-page-slug';
+                slugLabel.textContent = 'Slug';
+
+                const slugInput = document.createElement('input');
+                slugInput.id = 'floater-page-slug';
+                slugInput.className = 'floater-input';
+                slugInput.type = 'text';
+                slugInput.value = page.slug || '';
+
+                const submitButton = document.createElement('button');
+                submitButton.type = 'button';
+                submitButton.className = 'floater-button';
+                submitButton.dataset.leftclick = 'change-page-properties';
+                submitButton.dataset.pageId = pageId;
+                submitButton.textContent = 'Change';
+
+                wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submitButton);
+                return wrapper;
+            },
+            tooltip: function(el) {
+                if (!window.WebConstruct) {
+                    return null;
+                }
+
+                const pageId = el.dataset.pageId;
+                const page = window.WebConstruct.getPage(pageId);
+                if (!page) {
+                    return null;
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'floater-form';
+
+                const title = document.createElement('div');
+                title.className = 'floater-title';
+                title.textContent = 'Page';
+
+                const div1 = document.createElement('div');
+                div1.className = 'floater-breadcrumb';
+                div1.textContent = `Title: ${page.title || 'Untitled'}`
+
+                const div2 = document.createElement('div');
+                div2.className = 'floater-breadcrumb';
+                div2.textContent = `Slug: ${page.slug || 'no-slug'}`;
+
+                wrapper.append(title, div1, div2);
+
+                return wrapper;
+            }
+        });
+
+        ezFloaterHandler.addQuery('@preview-frame [data-wc-node-id]', {
+            context: function(el) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'floater-form';
+
+                const title = document.createElement('div');
+                title.className = 'floater-title';
+                title.textContent = 'Element';
+
+                const breadcrumb = document.createElement('div');
+                breadcrumb.className = 'floater-breadcrumb';
+
+                // Building the breadcrumb
+                const crumbparts = [];
+                let currentEl = el;
+
+                while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
+                    crumbparts.push(currentEl.tagName.toLowerCase());
+                    if (currentEl.tagName.toLowerCase() === 'body') {
+                        break;
+                    }
+                    currentEl = currentEl.parentElement;
+                }
+
+                breadcrumb.textContent = crumbparts.reverse().join(' > ');
+
+                const nodeId = el.getAttribute('data-wc-node-id') || '';
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'floater-button';
+                deleteButton.dataset.leftclick = 'delete-element';
+                deleteButton.dataset.nodeId = nodeId;
+                deleteButton.dataset.confirmed = 'false';
+                deleteButton.textContent = 'Delete';
+
+                wrapper.append(title, breadcrumb, deleteButton);
+                return wrapper;
+            },
+            tooltip: function(el) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'floater-form';
+
+                const title = document.createElement('div');
+                title.className = 'floater-title';
+                title.textContent = 'Element';
+
+                const breadcrumb = document.createElement('div');
+                breadcrumb.className = 'floater-breadcrumb';
+
+                const crumbparts = [];
+                let currentEl = el;
+
+                while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
+                    crumbparts.push(currentEl.tagName.toLowerCase());
+                    if (currentEl.tagName.toLowerCase() === 'body') {
+                        break;
+                    }
+                    currentEl = currentEl.parentElement;
+                }
+
+                breadcrumb.textContent = crumbparts.reverse().join(' > ');
+
+                wrapper.append(title, breadcrumb);
+                return wrapper;
+            }
+        });
+    }
+
     const initialProject = window.webConstructInitialProject;
     const initialProjectUrl = window.webConstructInitialProjectUrl || '/jsons/example.json';
 
@@ -443,8 +638,6 @@
                 }
             });
     }
-
-
 
 
 })();

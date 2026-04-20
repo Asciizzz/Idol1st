@@ -3,10 +3,27 @@
 + Cool dynamic context menus and hover tooltips that is aware of iframes and DOMs and shit
 
 + Notes:
-    + To display iframe's handlers.floater, do @<the-iframe-id-but-without-#> <the iframe element, attribute, etc>
+    + To display iframe's handler.floater, do @<the-iframe-id-but-without-#> <the iframe element, attribute, etc>
         + For example: @screen #inside-the-screen
     + Every iframe, regardless of iframe nest level, requires a unique id
     + Freely customize the floater style in your css: #ez-floater and #ez-floater.ez-floater-active
+
++ Guide:
+    + include EzFloater.js in your page (every page has a unique instance, don't worry about conflicts)
+    + use window.EzFloater.handler in a different script
+
+    + window.EzFloater.handler
+        + addEventFn(eventName, actionName, actionFn): add a handler function for floater content with data-[eventName]=[actionName]
+        + removeEventFn(eventName, actionName): remove the handler function, if actionName is not provided, remove the whole event group
+        + addQuery(rawQuery, definition): add a query for context menu or tooltip
+            + definition = {
+                delegate: true/false (default true), false means needing the exact match, while true means finding closest ancestor match as well
+                context: function(element, ctx) { ... } return a wrapper element for the context menu
+                tooltip: function(element, ctx) { ... } return a wrapper element for the tooltip
+            }
+        + removeQuery(rawQuery): remove the query
+
+    + That's pretty much it.
 */
 
 (function() {
@@ -28,7 +45,7 @@
         }
 
         init() {
-            // Create new handlers.floater element if not exist
+            // Create new handler.floater element if not exist
             this.floater = document.getElementById(this.FLOATER_ID);
             if (!this.floater) {
                 this.floater = document.createElement('div');
@@ -36,7 +53,7 @@
                 document.body.appendChild(this.floater);
             }
 
-            // Create runtime style for handlers.floater if not exist
+            // Create runtime style for handler.floater if not exist
             if (document.getElementById(this.FLOATER_STYLE_ID)) return;
 
             const style = document.createElement('style');
@@ -90,7 +107,10 @@
     // Floater state management and utils
 
         getFloaterStyle() {
-            return window.getComputedStyle(this.floater);
+            return {
+                "hidden": window.getComputedStyle(this.floater),
+                "visible": window.getComputedStyle(this.floater, '.ez-floater-active')
+            }
         }
 
         setFloaterCoord(x, y) {
@@ -236,7 +256,7 @@
             let target = ctx.target;
             if (!target) return null;
 
-            const compiledQueries = handlers.getCompiledQueries();
+            const compiledQueries = handler.getCompiledQueries();
 
             // If this a text node, use its parent instead (should not happen, i think)
             if (target && target.nodeType === Node.TEXT_NODE) {
@@ -292,27 +312,27 @@
             return null;
         }
     }
-    const handlers = new EzFloater();
-    handlers.init();
+    const handler = new EzFloater();
+    handler.init();
 
     const runtime = {
         frameSelector: '#preview-frame',
-        docContextHandlers: new WeakMap(),
-        docClickHandlers: new WeakMap(),
-        docKeyHandlers: new WeakMap(),
-        docMoveHandlers: new WeakMap(),
-        docOutHandlers: new WeakMap(),
-        docLeaveHandlers: new WeakMap(),
+        docContexthandler: new WeakMap(),
+        docClickhandler: new WeakMap(),
+        docKeyhandler: new WeakMap(),
+        docMovehandler: new WeakMap(),
+        docOuthandler: new WeakMap(),
+        docLeavehandler: new WeakMap(),
         watchedIframes: new WeakSet()
     };
 
     function getOrCreateHandler(map, key, factory) {
-        let handler = map.get(key);
-        if (!handler) {
-            handler = factory();
-            map.set(key, handler);
+        let rthandler = map.get(key);
+        if (!rthandler) {
+            rthandler = factory();
+            map.set(key, rthandler);
         }
-        return handler;
+        return rthandler;
     }
 
     // Getting the real clientX/Y by accumulating offsets from all frames in the chain
@@ -334,7 +354,7 @@
             return;
         }
 
-        const contextHandler = getOrCreateHandler(runtime.docContextHandlers, doc, function() {
+        const contextHandler = getOrCreateHandler(runtime.docContexthandler, doc, function() {
             return function(event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -343,92 +363,92 @@
                 let point = null;
                 try {
                     point = resolveClientPoint(event, frameChain);
-                    result = handlers.execQuery({
+                    result = handler.execQuery({
                         mode: 'context',
                         scope: scopeChain,
                         target: event.target
                     });
                 } catch (error) {
-                    handlers.hideFloater();
+                    handler.hideFloater();
                     return;
                 }
 
                 if (!result) {
-                    handlers.hideFloater();
+                    handler.hideFloater();
                     return;
                 }
 
-                handlers.showFloater(result.content, point.x, point.y, 'context');
+                handler.showFloater(result.content, point.x, point.y, 'context');
             };
         });
 
         doc.removeEventListener('contextmenu', contextHandler, true);
         doc.addEventListener('contextmenu', contextHandler, true);
 
-        const moveHandler = getOrCreateHandler(runtime.docMoveHandlers, doc, function() {
+        const moveHandler = getOrCreateHandler(runtime.docMovehandler, doc, function() {
             return function(event) {
-                if (handlers.state.mode === 'context') {
+                if (handler.state.mode === 'context') {
                     return;
                 }
 
                 const point = resolveClientPoint(event, frameChain);
-                const result = handlers.execQuery({
+                const result = handler.execQuery({
                     scope: scopeChain,
                     target: event.target,
                     mode: 'tooltip'
                 });
 
                 if (!result) {
-                    if (handlers.state.mode === 'tooltip') {
-                        handlers.hideFloater();
+                    if (handler.state.mode === 'tooltip') {
+                        handler.hideFloater();
                     }
                     return;
                 }
 
                 const scopeKey = scopeChain.join('>');
                 const isSameHoverTarget =
-                    handlers.state.mode === 'tooltip' &&
-                    handlers.state.hoverElement === result.matched &&
-                    handlers.state.hoverDocument === doc &&
-                    handlers.state.hoverScopeKey === scopeKey;
+                    handler.state.mode === 'tooltip' &&
+                    handler.state.hoverElement === result.matched &&
+                    handler.state.hoverDocument === doc &&
+                    handler.state.hoverScopeKey === scopeKey;
 
                 if (!isSameHoverTarget) {
-                    handlers.showFloater(result.content, point.x, point.y, 'tooltip');
+                    handler.showFloater(result.content, point.x, point.y, 'tooltip');
                 } else {
-                    handlers.setFloaterCoord(point.x, point.y);
+                    handler.setFloaterCoord(point.x, point.y);
                 }
 
-                handlers.state.hoverElement = result.matched;
-                handlers.state.hoverDocument = doc;
-                handlers.state.hoverScopeKey = scopeKey;
+                handler.state.hoverElement = result.matched;
+                handler.state.hoverDocument = doc;
+                handler.state.hoverScopeKey = scopeKey;
             };
         });
 
         doc.removeEventListener('mousemove', moveHandler, true);
         doc.addEventListener('mousemove', moveHandler, true);
 
-        const outHandler = getOrCreateHandler(runtime.docOutHandlers, doc, function() {
+        const outHandler = getOrCreateHandler(runtime.docOuthandler, doc, function() {
             return function(event) {
-                if (handlers.state.mode !== 'tooltip' || handlers.state.hoverDocument !== doc || !handlers.state.hoverElement) {
+                if (handler.state.mode !== 'tooltip' || handler.state.hoverDocument !== doc || !handler.state.hoverElement) {
                     return;
                 }
 
                 const nextTarget = event.relatedTarget;
-                if (nextTarget && handlers.state.hoverElement.contains(nextTarget)) {
+                if (nextTarget && handler.state.hoverElement.contains(nextTarget)) {
                     return;
                 }
 
-                handlers.hideFloater();
+                handler.hideFloater();
             };
         });
 
         doc.removeEventListener('mouseout', outHandler, true);
         doc.addEventListener('mouseout', outHandler, true);
 
-        const leaveHandler = getOrCreateHandler(runtime.docLeaveHandlers, doc, function() {
+        const leaveHandler = getOrCreateHandler(runtime.docLeavehandler, doc, function() {
             return function() {
-                if (handlers.state.mode === 'tooltip' && handlers.state.hoverDocument === doc) {
-                    handlers.hideFloater();
+                if (handler.state.mode === 'tooltip' && handler.state.hoverDocument === doc) {
+                    handler.hideFloater();
                 }
             };
         });
@@ -436,22 +456,22 @@
         doc.removeEventListener('mouseleave', leaveHandler, true);
         doc.addEventListener('mouseleave', leaveHandler, true);
 
-        const clickHandler = getOrCreateHandler(runtime.docClickHandlers, doc, function() {
+        const clickHandler = getOrCreateHandler(runtime.docClickhandler, doc, function() {
             return function(event) {
-                if (doc === document && handlers.floater.contains(event.target)) {
+                if (doc === document && handler.floater.contains(event.target)) {
                     return;
                 }
-                handlers.hideFloater();
+                handler.hideFloater();
             };
         });
 
         doc.removeEventListener('click', clickHandler, true);
         doc.addEventListener('click', clickHandler, true);
 
-        const keyHandler = getOrCreateHandler(runtime.docKeyHandlers, doc, function() {
+        const keyHandler = getOrCreateHandler(runtime.docKeyhandler, doc, function() {
             return function(event) {
                 if (event.key === 'Escape') {
-                    handlers.hideFloater();
+                    handler.hideFloater();
                 }
             };
         });
@@ -510,209 +530,6 @@
         }
     }
 
-
-
-
-
-    handlers.addEventFn('leftclick', 'change-page-properties', function(event, button) {
-        if (!window.WebConstruct) {
-            return;
-        }
-
-        const pageId = button.dataset.pageId;
-        const titleInput = handlers.floater.querySelector('#floater-page-title');
-        const slugInput = handlers.floater.querySelector('#floater-page-slug');
-
-        const result = window.WebConstruct.updatePageProperties(pageId, {
-            title: titleInput ? titleInput.value : '',
-            slug: slugInput ? slugInput.value : ''
-        });
-
-        if (result.ok) {
-            handlers.hideFloater();
-        }
-    });
-
-    handlers.addEventFn('leftclick', 'delete-element', function(event, button) {
-        if (!window.WebConstruct) {
-            return;
-        }
-
-        const isConfirmed = button.dataset.confirmed === 'true';
-        if (!isConfirmed) {
-            button.dataset.confirmed = 'true';
-            button.classList.add('danger');
-            button.textContent = 'Are you sure?';
-            return;
-        }
-
-        const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
-        if (result.ok) {
-            handlers.hideFloater();
-            return;
-        }
-
-        button.textContent = result.message || 'Delete failed';
-    });
-
-    handlers.addQuery('.page-item', {
-        context: function(el) {
-            if (!window.WebConstruct) {
-                return 'Page editor unavailable.';
-            }
-
-            const pageId = el.dataset.pageId;
-            const page = window.WebConstruct.getPage(pageId);
-            if (!page) {
-                return 'Page not found.';
-            }
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'floater-form';
-
-            const title = document.createElement('div');
-            title.className = 'floater-title';
-            title.textContent = 'Edit Page Properties';
-
-            const titleLabel = document.createElement('label');
-            titleLabel.className = 'floater-label';
-            titleLabel.htmlFor = 'floater-page-title';
-            titleLabel.textContent = 'Title';
-
-            const titleInput = document.createElement('input');
-            titleInput.id = 'floater-page-title';
-            titleInput.className = 'floater-input';
-            titleInput.type = 'text';
-            titleInput.value = page.title || '';
-
-            const slugLabel = document.createElement('label');
-            slugLabel.className = 'floater-label';
-            slugLabel.htmlFor = 'floater-page-slug';
-            slugLabel.textContent = 'Slug';
-
-            const slugInput = document.createElement('input');
-            slugInput.id = 'floater-page-slug';
-            slugInput.className = 'floater-input';
-            slugInput.type = 'text';
-            slugInput.value = page.slug || '';
-
-            const submitButton = document.createElement('button');
-            submitButton.type = 'button';
-            submitButton.className = 'floater-button';
-            submitButton.dataset.leftclick = 'change-page-properties';
-            submitButton.dataset.pageId = pageId;
-            submitButton.textContent = 'Change';
-
-            wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submitButton);
-            return wrapper;
-        },
-        tooltip: function(el) {
-            if (!window.WebConstruct) {
-                return null;
-            }
-
-            const pageId = el.dataset.pageId;
-            const page = window.WebConstruct.getPage(pageId);
-            if (!page) {
-                return null;
-            }
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'floater-form';
-
-            const title = document.createElement('div');
-            title.className = 'floater-title';
-            title.textContent = 'Page';
-
-            const div1 = document.createElement('div');
-            div1.className = 'floater-breadcrumb';
-            div1.textContent = `Title: ${page.title || 'Untitled'}`
-
-            const div2 = document.createElement('div');
-            div2.className = 'floater-breadcrumb';
-            div2.textContent = `Slug: ${page.slug || 'no-slug'}`;
-
-            wrapper.append(title, div1, div2);
-
-            return wrapper;
-        }
-    });
-
-    handlers.addQuery('@preview-frame [data-wc-node-id]', {
-        context: function(el) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'floater-form';
-
-            const title = document.createElement('div');
-            title.className = 'floater-title';
-            title.textContent = 'Element';
-
-            const breadcrumb = document.createElement('div');
-            breadcrumb.className = 'floater-breadcrumb';
-
-            // Building the breadcrumb
-            const crumbparts = [];
-            let currentEl = el;
-
-            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                crumbparts.push(currentEl.tagName.toLowerCase());
-                if (currentEl.tagName.toLowerCase() === 'body') {
-                    break;
-                }
-                currentEl = currentEl.parentElement;
-            }
-
-            breadcrumb.textContent = crumbparts.reverse().join(' > ');
-
-            const nodeId = el.getAttribute('data-wc-node-id') || '';
-            const deleteButton = document.createElement('button');
-            deleteButton.type = 'button';
-            deleteButton.className = 'floater-button';
-            deleteButton.dataset.leftclick = 'delete-element';
-            deleteButton.dataset.nodeId = nodeId;
-            deleteButton.dataset.confirmed = 'false';
-            deleteButton.textContent = 'Delete';
-
-            wrapper.append(title, breadcrumb, deleteButton);
-            return wrapper;
-        },
-        tooltip: function(el) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'floater-form';
-
-            const title = document.createElement('div');
-            title.className = 'floater-title';
-            title.textContent = 'Element';
-
-            const breadcrumb = document.createElement('div');
-            breadcrumb.className = 'floater-breadcrumb';
-
-            const crumbparts = [];
-            let currentEl = el;
-
-            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                crumbparts.push(currentEl.tagName.toLowerCase());
-                if (currentEl.tagName.toLowerCase() === 'body') {
-                    break;
-                }
-                currentEl = currentEl.parentElement;
-            }
-
-            breadcrumb.textContent = crumbparts.reverse().join(' > ');
-
-            wrapper.append(title, breadcrumb);
-            return wrapper;
-        }
-    });
-
-
-
-
-
-
-
-
-    window.EzFloater = {
-        handlers: handlers
-    };
+    // Unique instance every page
+    window.EzFloater = { handler: handler };
 })();
