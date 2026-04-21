@@ -486,10 +486,10 @@
 
 // Tool tips and context menu
 (function() {
-    const ezFloaterHandler = window.EzFloater && window.EzFloater.handler;
+    const ezFloaterHandler = window.EzFloater ? new window.EzFloater() : null;
 
     if (ezFloaterHandler) {
-        ezFloaterHandler.addEventFn('leftclick', 'change-page-properties', function(event, button) {
+        ezFloaterHandler.addAction('change-page-properties', function(button, event) {
             if (!window.WebConstruct) {
                 return;
             }
@@ -508,7 +508,7 @@
             }
         });
 
-        ezFloaterHandler.addEventFn('leftclick', 'delete-element', function(event, button) {
+        ezFloaterHandler.addAction('delete-element', function(button) {
             if (!window.WebConstruct) {
                 return;
             }
@@ -545,7 +545,7 @@
             return crumbparts.reverse().join(' > ');
         }
 
-        ezFloaterHandler.setDisplay('page-item', {
+        ezFloaterHandler.addDisplay('page-item', {
             context: function(el) {
                 if (!window.WebConstruct) {
                     return 'Page editor unavailable.';
@@ -589,7 +589,7 @@
                 const submitButton = document.createElement('button');
                 submitButton.type = 'button';
                 submitButton.className = 'floater-button';
-                submitButton.dataset.leftclick = 'change-page-properties';
+                submitButton.dataset.click = 'change-page-properties';
                 submitButton.dataset.pageId = pageId;
                 submitButton.textContent = 'Change';
 
@@ -628,7 +628,7 @@
             }
         });
 
-        ezFloaterHandler.setDisplay('node', {
+        ezFloaterHandler.addDisplay('node', {
             context: function(el) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'floater-form';
@@ -645,7 +645,7 @@
                 const deleteButton = document.createElement('button');
                 deleteButton.type = 'button';
                 deleteButton.className = 'floater-button';
-                deleteButton.dataset.leftclick = 'delete-element';
+                deleteButton.dataset.click = 'delete-element';
                 deleteButton.dataset.nodeId = nodeId;
                 deleteButton.dataset.confirmed = 'false';
                 deleteButton.textContent = 'Delete';
@@ -671,7 +671,11 @@
             }
         });
 
-        ezFloaterHandler.setupQuery('.page-item', 'page-item');
-        ezFloaterHandler.setupQuery('@preview-frame [data-wc-node-id]', 'node');
+        ezFloaterHandler.addQuery('.page-item', {
+            display: 'page-item'
+        });
+        ezFloaterHandler.addQuery('@preview-frame [data-wc-node-id]', {
+            display: 'node'
+        });
     }
 })();
