@@ -7,7 +7,7 @@
         "this attribute exist for information, not included in the final output": {
             "hashmap approach": "Elements are stored in a hashmap (object) with their unique id as the key. This allows for easy access and manipulation of elements based on their id. Children are stored as array of ids instead of nested objects to avoid deep nesting and make it easier to manage parent-child relationships. This does somewhat kill readability but you shouldn't be able to see this JSON file in the first place so it doesn't matter. Since readability is no longer a concern, we will focus on optimization and efficiency instead.",
             
-            "children vs text": "If an element has children, it cannot have text and vice versa. In the case both are present, children will be prioritized and text will be ignored. This should theoretically never happen since the editor will prevent this from happening. Hopefully.",
+            "children vs text": "If an element has children, it cannot have text and vice versa. In the case both are present, children will be prioritized and text will be ignored, this should theoretically never happen since editor forbids it (hopefully).",
 
             "page_counter and node_counter": "Will always increment by 1 for each new thing. This is used to generate unique ids for each page/element (p0, p1, p2 - n0, n1, n2, etc.). I trust you won't by some miracle end up with 2^53 elements in a single page or create 2^53 pages but if you do, well, what the actual f.",
 
@@ -15,7 +15,11 @@
 
             "href vs _href_id": "href is used for external links, while _href_id is used for internal links (links to other pages within the project). _href_id will reference the page's unique id (e.g., p0, p1, etc.) instead of the slug to avoid renaming slug = broken links issue. The editor will handle the conversion from page id to slug when generating the final output.",
 
-            "why tf stylesheet look so ugly": "because of JSON ofc, but like I said, we are not supposed to see this JSON file in the first place so it doesn't matter. css will be store as raw text instead of these interpreted stuff."
+            "why tf stylesheet look so ugly": "because of JSON ofc, but like I said, we are not supposed to see this JSON file in the first place so it doesn't matter. css will be store as raw text instead of interpreted bs.",
+
+            "graph attribute in nodes": "a special value used by the web constructor. The web constructor itself will have a page graph, which is a visual interactive canvas that allows users to see the structure of the page and manipulate it by dragging nodes around if they prefer that over the standard main editor view.",
+
+            "stylesheets and scripts": "are plain raw text"
         }
     },
 
@@ -33,7 +37,12 @@
                     "n0": {
                         "tag": "body",
                         "parent": null,
-                        "children": [ "n1" ]
+                        "children": [ "n1" ],
+
+
+                        "graph": {
+                            "pos": { "x": 12, "y": 34 }
+                        }
                     },
 
                     "n1": {
