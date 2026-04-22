@@ -27,9 +27,7 @@
 
     <div id="app">
         <div id="editor">
-            <div id="canvas">
-                <iframe id="preview-frame" title="Page Preview"></iframe>
-            </div>
+            <div id="canvas"></div>
         </div>
 
         <div id="sidebar-buttons" aria-label="Sidebar Sections"></div>

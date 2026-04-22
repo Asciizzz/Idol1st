@@ -39,7 +39,7 @@
 
     function frameScopeQuery(pageId) {
         if (typeof pageId !== "string" || !pageId.trim()) return null;
-        return `@ez-${pageId} [data-vs-node-id]`;
+        return `@ez-virtualsite-${pageId} [data-vs-node-id]`;
     }
 
     function syncFloaterNodeQueries() {
@@ -269,6 +269,8 @@
             },
 
             setCurrentPage(pageId) {
+                site.logEverything();
+
                 if (!site.changePage(pageId)) {
                     return { ok: false, message: "Page not found." };
                 }
@@ -387,25 +389,25 @@
             onNavigate: handleSiteNavigate,
         });
 
-        const globalStyle = document.createElement("style");
-        globalStyle.textContent = `
-            [data-vs-node-id] {
-                outline: 1px solid transparent;
-                outline-offset: -1px;
-            }
-            .ez-virtualsite-hover {
-                outline: 2px solid #ff4d4f !important;
-                outline-offset: -1px;
-            }
-            .ez-virtualsite-selected {
-                outline: 2px solid #ff1f1f !important;
-                outline-offset: -1px;
-            }
-            .ez-virtualsite-dragover {
-                outline: 2px dashed #ff7875 !important;
-                outline-offset: -1px;
-            }
-        `;
+        // const globalStyle = document.createElement("style");
+        // globalStyle.textContent = `
+        //     [data-vs-node-id] {
+        //         outline: 1px solid transparent;
+        //         outline-offset: -1px;
+        //     }
+        //     .ez-virtualsite-hover {
+        //         outline: 2px solid #ff4d4f !important;
+        //         outline-offset: -1px;
+        //     }
+        //     .ez-virtualsite-selected {
+        //         outline: 2px solid #ff1f1f !important;
+        //         outline-offset: -1px;
+        //     }
+        //     .ez-virtualsite-dragover {
+        //         outline: 2px dashed #ff7875 !important;
+        //         outline-offset: -1px;
+        //     }
+        // `;
         // site.setGlobalStyle(globalStyle);
 
         runtime.site = site;
