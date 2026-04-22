@@ -71,14 +71,14 @@
     }
 
     function handleSiteNavigate(detail = {}) {
-        const pageId = typeof detail.toPageId === "string" ? detail.toPageId : runtime.site?.getActivePageId();
+        const pageId = typeof detail.toPageId === "string" ? detail.toPageId : runtime.site?.activeID();
         if (!pageId || !runtime.site) return;
 
         syncFloaterNodeQueries();
         emit("wc:page-selected", { pageId });
         emit("wc:pages-changed", {
             pages: runtime.site.listPages(),
-            currentPageId: runtime.site.getActivePageId(),
+            currentPageId: runtime.site.activeID(),
         });
     }
 
@@ -265,7 +265,7 @@
             },
 
             getCurrentPageId() {
-                return site.getActivePageId();
+                return site.activeID();
             },
 
             setCurrentPage(pageId) {
@@ -277,7 +277,7 @@
                 emit("wc:page-selected", { pageId });
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.getActivePageId(),
+                    currentPageId: site.activeID(),
                 });
 
                 return { ok: true, pageId };
@@ -294,7 +294,7 @@
                 syncFloaterNodeQueries();
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.getActivePageId(),
+                    currentPageId: site.activeID(),
                 });
 
                 return { ok: true, pageId };
@@ -308,7 +308,7 @@
                 syncFloaterNodeQueries();
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.getActivePageId(),
+                    currentPageId: site.activeID(),
                 });
 
                 return { ok: true };
@@ -330,7 +330,7 @@
 
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.getActivePageId(),
+                    currentPageId: site.activeID(),
                 });
 
                 return { ok: true };
@@ -338,10 +338,10 @@
 
             deleteNode(nodeId) {
                 if (!site.deleteNode(nodeId)) {
-                    return { ok: false, message: "Element not found or cannot delete root." };
+                    return { ok: false, message: "Are you an idiot?" };
                 }
 
-                emit("wc:page-content-changed", { pageId: site.getActivePageId() });
+                emit("wc:page-content-changed", { pageId: site.activeID() });
                 return { ok: true };
             },
 
@@ -403,7 +403,7 @@
                 outline-offset: -1px;
             }
         `;
-        site.setGlobalStyle(globalStyle);
+        // site.setGlobalStyle(globalStyle);
 
         runtime.site = site;
         window.WebConstruct = createWebConstructAdapter(site);
@@ -412,12 +412,12 @@
 
         emit("wc:project-ready", {
             pages: site.listPages(),
-            currentPageId: site.getActivePageId(),
+            currentPageId: site.activeID(),
         });
 
         emit("wc:pages-changed", {
             pages: site.listPages(),
-            currentPageId: site.getActivePageId(),
+            currentPageId: site.activeID(),
         });
     }
 
