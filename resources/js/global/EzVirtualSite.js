@@ -50,12 +50,28 @@ By Asciiz
         #rt = {};       // key -> script runtime
         #gstyle = "";       // global CSS text
 
+        #emit(name, detail = {}) {
+            document.dispatchEvent(new CustomEvent(name, { detail }));
+        }
+
+        #emitPagesChanged() {
+            this.#emit("wc:pages-changed", {
+                pages: this.listPages(),
+                currentPageId: this.getActiveID(),
+            });
+        }
+
+        #emitPageContentChanged() {
+            this.#emit("wc:page-content-changed", { pageId: this.getActiveID() });
+        }
+
         /* -- setup -- */
 
         setGlobalStyle(s) {
             this.#gstyle = s instanceof HTMLStyleElement ? s.textContent || "" : (typeof s === "string" ? s : "");
             return this;
         }
+
         setHost(el) {
             if (!(el instanceof Element)) return null;
             if (this.#host && this.#host !== el) {
@@ -65,12 +81,14 @@ By Asciiz
             this.#host = el;
             return this;
         }
+
         setData(d) {
             if (!isObj(d)) return null;
             this.#data = clone(d);
             this.#data.scripts ||= {};
             return this;
         }
+
         init() {
             if (!(this.#host instanceof Element)) throw new Error("EzVirtualSite: invalid host");
             this.#data ||= this.#emptyData();
@@ -80,7 +98,17 @@ By Asciiz
             for (const id in this.#data.pages.page_data) this.#buildFrame(id);
             const start = this.#data.pages.page_start || this.#firstPage();
             if (start) this.changePage(start);
+
+            this.#emit("wc:project-ready", {
+                pages: this.listPages(),
+                currentPageId: this.getActiveID(),
+            });
+
             return this;
+        }
+
+        getDataJSON() {
+            return this.#data ? clone(this.#data) : null;
         }
 
         /* -- page API -- */
@@ -101,8 +129,6 @@ By Asciiz
         }
         reload(id = this.#active) { return this.load(id); }
 
-        getDataJSON() { return clone(this.#data); }
-
         changePage(id = this.#active) {
             if (!this.getPageData(id)) return false;
             const next = this.#frames[this.#key(id)];
@@ -111,6 +137,10 @@ By Asciiz
             if (this.#active) { const p = this.#frames[this.#key(this.#active)]; if (p) p.style.display = "none"; }
             next.style.display = "block";
             this.#data.pages.page_start = this.#active = id;
+
+            this.#emit("wc:page-selected", { pageId: id });
+            this.#emitPagesChanged();
+
             return true;
         }
 
@@ -123,6 +153,9 @@ By Asciiz
             };
             this.#buildFrame(id);
             this.load(id);
+
+            this.#emitPagesChanged();
+
             return id;
         }
 
@@ -137,6 +170,9 @@ By Asciiz
                 const next = this.#firstPage();
                 this.#active = next ? (this.changePage(next), next) : null;
             }
+
+            this.#emitPagesChanged();
+
             return true;
         }
 
@@ -145,6 +181,9 @@ By Asciiz
             if (!p) return false;
             if ("title" in u) p.title = isStr(u.title) ? u.title : "New Page";
             if ("slug" in u) p.slug = isStr(u.slug) ? u.slug : p.slug;
+
+            this.#emitPagesChanged();
+
             return true;
         }
 
@@ -173,13 +212,19 @@ By Asciiz
                 graph: d.graph || null
             };
             if (parent) (page.nodes[parent].children ||= []).push(id);
+
+            this.#reloadMainBody(this.#active);
+            this.#emitPageContentChanged();
             return id;
         }
 
         readNode(id) {
             const page = this.getPageData(this.#active);
             if (!page) return null;
-            const n = page.nodes[id]; if (!n) return null;
+
+            const n = page.nodes[id];
+            if (!n) return null;
+
             return {
                 page_id: this.#active, node_id: id, tag: n.tag, parent: n.parent,
                 children: n.children || [], text: n.text ?? null, attrs: n.attrs ?? null, graph: n.graph ?? null
@@ -189,10 +234,14 @@ By Asciiz
         writeNode(id, { attrs, text, graph } = {}) {
             const page = this.getPageData(this.#active);
             if (!page) return false;
+
             const n = page.nodes[id]; if (!n) return false;
             if (attrs !== undefined) n.attrs = attrs;
             if (text !== undefined) n.text = text;
             if (graph !== undefined) n.graph = graph;
+
+            this.#reloadMainBody(this.#active);
+            this.#emitPageContentChanged();
             return true;
         }
 
@@ -206,6 +255,9 @@ By Asciiz
             if (op) op.children = filterKids(op.children, childId);
             if (np) (np.children ||= []).push(childId);
             child.parent = pid;
+
+            this.#reloadMainBody(this.#active);
+            this.#emitPageContentChanged();
             return true;
         }
 
@@ -226,9 +278,15 @@ By Asciiz
                 const cascade = nid => { const n = nodes[nid]; if (!n) return; (n.children || []).forEach(cascade); delete nodes[nid]; };
                 cascade(id);
                 if (parent) parent.children = filterKids(parent.children, id);
+
+                this.#reloadMainBody(this.#active);
+                this.#emitPageContentChanged();
                 return true;
             }
             delete nodes[id];
+
+            this.#reloadMainBody(this.#active);
+            this.#emitPageContentChanged();
             return true;
         }
 
@@ -270,8 +328,20 @@ By Asciiz
                 .forEach(rid => { const el = build(rid); if (el) mount.appendChild(el); });
         }
 
+        #reloadMainBody(pageId = this.#active) {
+            const page = this.getPageData(pageId);
+            const frame = this.#frames[this.#key(pageId)];
+            if (!page || !frame) return false;
+
+            const doc = frame.contentDocument;
+            if (!doc) return false;
+
+            this.#renderNodes(doc, page);
+            return true;
+        }
+
         /* -- script runtime --
-           One delegated listener per (iframe × eventType), attached once, never re-added.
+           One delegated listener per (iframe x eventType), attached once, never re-added.
            On load/reload only rt.variables and rt.actions are refreshed — the listener
            closure reads the same rt reference so it automatically sees the new data. */
 

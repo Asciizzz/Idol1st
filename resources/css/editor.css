@@ -82,7 +82,9 @@
     position: fixed;
     bottom: 0;
     left: var(--sidebar-buttons-width);
-    width: var(--sidebar-width);
+    min-width: 30%;
+    width: max-content;
+    max-width: calc(100% - var(--sidebar-buttons-width));
     height: calc(100% - var(--main-header-height));
     z-index: 900;
 
@@ -118,6 +120,7 @@
 
 .sidebar-panel-body {
     padding: 0.9rem;
+    min-width: 100%;
 }
 
 #sidebar-content::-webkit-scrollbar {
@@ -220,6 +223,234 @@
     color: var(--text-muted);
     font-size: 0.9rem;
     font-style: italic;
+}
+
+.view-tree-root {
+    border: 1px dashed var(--border-dark);
+    border-radius: 0.55rem;
+    padding: 0.55rem 0.65rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.7rem;
+    font-size: 0.78rem;
+}
+
+.view-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    align-items: flex-start;
+}
+
+.view-node-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.view-node-children {
+    margin-left: 1rem;
+    border-left: 1px solid var(--border-primary);
+    padding-left: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.view-node-card {
+    border: 1px solid var(--border-dark);
+    border-radius: 0.55rem;
+    padding: 0.55rem;
+    background: var(--bg-accent);
+    cursor: grab;
+    user-select: none;
+    width: 18rem;
+}
+
+.view-node-card:active {
+    cursor: grabbing;
+}
+
+.view-node-card.is-drag-over,
+.view-tree-root.is-drag-over {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 1px rgba(24, 144, 255, 0.35);
+}
+
+.view-node-tag {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: lowercase;
+}
+
+.view-node-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+}
+
+.view-node-text {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    margin-top: 0.2rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.view-node-text.is-empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.view-node-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.ez-floater {
+    position: fixed;
+    z-index: 1600;
+    border: 1px solid var(--border-dark);
+    border-radius: 0.55rem;
+    background: rgba(9, 12, 20, 0.98);
+    color: var(--text-light);
+    padding: 0.55rem;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.ez-floater.ez-floater-tooltip {
+    width: 19rem;
+    pointer-events: none;
+}
+
+.ez-floater.ez-floater-context {
+    width: 23rem;
+    pointer-events: auto;
+}
+
+.view-floater-header {
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.view-floater-tag {
+    font-weight: 700;
+}
+
+.view-floater-children-count {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.view-floater-text {
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.view-floater-text.is-empty,
+.view-floater-empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.view-floater-attrs {
+    margin-top: 0.45rem;
+    border-top: 1px solid var(--border-primary);
+    padding-top: 0.45rem;
+}
+
+.view-floater-label {
+    font-size: 0.66rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.view-floater-attr-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem;
+    font-size: 0.66rem;
+}
+
+.view-floater-attr-row span:last-child {
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.view-floater-menu .view-floater-header {
+    margin-bottom: 0.35rem;
+}
+
+.view-floater-menu .view-floater-attr-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.45rem;
+}
+
+.view-floater-menu .view-floater-attr-edit-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.3rem;
+}
+
+.view-floater-button,
+.view-floater-input {
+    border: 1px solid var(--border-dark);
+    border-radius: 0.42rem;
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    height: 1.9rem;
+    padding: 0 0.55rem;
+    font-size: 0.73rem;
+}
+
+.view-floater-button {
+    cursor: pointer;
+}
+
+.view-floater-button:hover {
+    background: var(--accent-hover);
+}
+
+.view-floater-button.danger {
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+    color: var(--danger-text);
+}
+
+.view-floater-button.danger:hover {
+    background: var(--danger-hover);
+}
+
+.view-floater-menu .view-floater-input {
+    width: 100%;
+    background: var(--bg-tertiary);
+}
+
+.view-floater-menu .view-floater-text-input {
+    margin-bottom: 0.45rem;
+}
+
+.view-floater-actions {
+    margin-top: 0.55rem;
+    display: flex;
+    gap: 0.35rem;
+}
+
+.view-floater-context-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 0.55rem;
 }
 
 

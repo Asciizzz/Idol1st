@@ -14,15 +14,6 @@
             <strong>Interactive Editor</strong>
             <span id="builder-url-preview" class="creator-builder-url"></span>
         </div>
-
-        <div class="creator-builder-actions">
-            <button type="button" id="save-builder">Save Draft JSON</button>
-            <a href="{{ route('setup') }}">Back to setup</a>
-            <form method="POST" action="{{ route('signout') }}">
-                @csrf
-                <button type="submit">Sign out</button>
-            </form>
-        </div>
     </header>
 
     <div id="app">
