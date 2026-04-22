@@ -8,7 +8,7 @@ export default defineConfig({
                 'resources/css/global.css',
                 'resources/css/auth.css',
                 'resources/js/auth.js',
-                'resources/js/creatorBuilder.js',
+                'resources/js/app.js',
             ],
             refresh: true,
         }),

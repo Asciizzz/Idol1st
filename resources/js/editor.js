@@ -244,6 +244,7 @@
                 wrapper.append(title, crumb);
                 return wrapper;
             },
+            delegate: false
         });
 
         floater.addQuery(".page-item", { display: "page-item" });
@@ -382,33 +383,25 @@
 
         window.vsite = site; // for testing/debugging
 
-        site.init({
-            host: el.canvas,
-            dataJSON: data,
-            autosave: true,
-            onNavigate: handleSiteNavigate,
-        });
+        const globalStyle = document.createElement("style");
+        globalStyle.textContent = `
+            [data-vs-node-id] {
+                outline: 1px solid transparent;
+                outline-offset: -1px;
+            }
+            /* blacklist:
+                html, body
+            */
 
-        // const globalStyle = document.createElement("style");
-        // globalStyle.textContent = `
-        //     [data-vs-node-id] {
-        //         outline: 1px solid transparent;
-        //         outline-offset: -1px;
-        //     }
-        //     .ez-virtualsite-hover {
-        //         outline: 2px solid #ff4d4f !important;
-        //         outline-offset: -1px;
-        //     }
-        //     .ez-virtualsite-selected {
-        //         outline: 2px solid #ff1f1f !important;
-        //         outline-offset: -1px;
-        //     }
-        //     .ez-virtualsite-dragover {
-        //         outline: 2px dashed #ff7875 !important;
-        //         outline-offset: -1px;
-        //     }
-        // `;
-        // site.setGlobalStyle(globalStyle);
+            [data-vs-node-id]:hover {
+                outline: 2px solid #ff4d4f;
+                outline-offset: -1px;
+            }
+        `;
+        site.setGlobalStyle(globalStyle)
+            .setHost(el.canvas)
+            .setData(data)
+            .init();
 
         runtime.site = site;
         window.WebConstruct = createWebConstructAdapter(site);
