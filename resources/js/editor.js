@@ -39,7 +39,7 @@
 
     function frameScopeQuery(pageId) {
         if (typeof pageId !== "string" || !pageId.trim()) return null;
-        return `@ez-virtualpage-${pageId} [data-vs-node-id]`;
+        return `@ez-${pageId} [data-vs-node-id]`;
     }
 
     function syncFloaterNodeQueries() {
@@ -71,14 +71,14 @@
     }
 
     function handleSiteNavigate(detail = {}) {
-        const pageId = typeof detail.toPageId === "string" ? detail.toPageId : runtime.site?.activeID();
+        const pageId = typeof detail.toPageId === "string" ? detail.toPageId : runtime.site?.getActiveID();
         if (!pageId || !runtime.site) return;
 
         syncFloaterNodeQueries();
         emit("wc:page-selected", { pageId });
         emit("wc:pages-changed", {
             pages: runtime.site.listPages(),
-            currentPageId: runtime.site.activeID(),
+            currentPageId: runtime.site.getActiveID(),
         });
     }
 
@@ -265,7 +265,7 @@
             },
 
             getCurrentPageId() {
-                return site.activeID();
+                return site.getActiveID();
             },
 
             setCurrentPage(pageId) {
@@ -277,7 +277,7 @@
                 emit("wc:page-selected", { pageId });
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.activeID(),
+                    currentPageId: site.getActiveID(),
                 });
 
                 return { ok: true, pageId };
@@ -294,7 +294,7 @@
                 syncFloaterNodeQueries();
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.activeID(),
+                    currentPageId: site.getActiveID(),
                 });
 
                 return { ok: true, pageId };
@@ -308,7 +308,7 @@
                 syncFloaterNodeQueries();
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.activeID(),
+                    currentPageId: site.getActiveID(),
                 });
 
                 return { ok: true };
@@ -330,7 +330,7 @@
 
                 emit("wc:pages-changed", {
                     pages: site.listPages(),
-                    currentPageId: site.activeID(),
+                    currentPageId: site.getActiveID(),
                 });
 
                 return { ok: true };
@@ -341,7 +341,7 @@
                     return { ok: false, message: "Are you an idiot?" };
                 }
 
-                emit("wc:page-content-changed", { pageId: site.activeID() });
+                emit("wc:page-content-changed", { pageId: site.getActiveID() });
                 return { ok: true };
             },
 
@@ -377,6 +377,9 @@
 
         const data = await resolveInitialProject();
         const site = new window.EzVirtualSite();
+
+        window.vsite = site; // for testing/debugging
+
         site.init({
             host: el.canvas,
             dataJSON: data,
@@ -412,12 +415,12 @@
 
         emit("wc:project-ready", {
             pages: site.listPages(),
-            currentPageId: site.activeID(),
+            currentPageId: site.getActiveID(),
         });
 
         emit("wc:pages-changed", {
             pages: site.listPages(),
-            currentPageId: site.activeID(),
+            currentPageId: site.getActiveID(),
         });
     }
 

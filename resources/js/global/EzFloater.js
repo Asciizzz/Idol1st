@@ -231,6 +231,28 @@ Styling Example
             this.queriesByDoc.get(doc).push(q);
         }
 
+        removeQuery(selector, { display, delegate = true } = {}) {
+            const parsed = this._parse(selector);
+            const doc = this._resolve(parsed.scope);
+            if (!doc) return;
+
+            const list = this.queriesByDoc.get(doc);
+            if (!list || list.length === 0) return;
+
+            const next = list.filter(q => {
+                if (q.selector !== parsed.sel) return true;
+                if (display != null && q.display !== display) return true;
+                if (delegate != null && q.delegate !== delegate) return true;
+                return false;
+            });
+
+            if (next.length > 0) {
+                this.queriesByDoc.set(doc, next);
+            } else {
+                this.queriesByDoc.delete(doc);
+            }
+        }
+
         _attachDoc(doc, frame = null) {
             if (this.docs.has(doc)) return;
 
