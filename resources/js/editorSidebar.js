@@ -103,10 +103,60 @@
             marginBottom: "1rem",
 			render: function(panelBody) {
 				panelBody.replaceChildren();
-				const placeholder = document.createElement('div');
-				placeholder.className = 'panel-placeholder';
-				placeholder.textContent = 'Elements coming soon...';
-					panelBody.appendChild(placeholder);
+
+				const hint = document.createElement('div');
+				hint.className = 'panel-placeholder';
+				hint.textContent = 'Drag an element box into the page iframe.';
+				panelBody.appendChild(hint);
+
+				const templates = [
+					{
+						name: 'Block',
+						content: {
+							tag: 'div',
+							text: 'Block Element',
+							children: []
+						}
+					},
+					{
+						name: 'Cool Element',
+						content: {
+							tag: 'div',
+							attrs: {
+								class: 'cool-element',
+								'data-something': 'some value'
+							},
+							children: [
+								{
+									tag: 'h1',
+									text: 'I am a cool element'
+								},
+								{
+									tag: 'p',
+									text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+								}
+							]
+						}
+					}
+				];
+
+				const list = document.createElement('div');
+				list.className = 'elements-list';
+
+				templates.forEach(function(template) {
+					const card = document.createElement('button');
+					card.type = 'button';
+					card.className = 'page-action-button';
+					card.textContent = template.name;
+					card.draggable = true;
+					card.dataset.templateJson = JSON.stringify(template);
+					card.style.display = 'block';
+					card.style.width = '100%';
+					card.style.marginBottom = '0.5rem';
+					list.appendChild(card);
+				});
+
+				panelBody.appendChild(list);
 			}
 		},
 		"stylesheets": {
@@ -239,6 +289,21 @@
 		}
 	}
 
+	function handlePanelDragStart(event) {
+		const templateSource = event.target.closest('[data-template-json]');
+		if (!templateSource) {
+			return;
+		}
+
+		const templateJSON = templateSource.dataset.templateJson || '';
+		if (!templateJSON || !event.dataTransfer) {
+			return;
+		}
+
+		event.dataTransfer.setData('application/x-ezvs-template', templateJSON);
+		event.dataTransfer.effectAllowed = 'copy';
+	}
+
 	function handleSidebarButtonClick(button) {
 		const isSameButton = activeButton === button;
 		const isOpen = sidebarContent.classList.contains('is-open');
@@ -288,6 +353,7 @@
 		});
 
 		sidebarContent.addEventListener('click', handlePanelClick);
+		sidebarContent.addEventListener('dragstart', handlePanelDragStart);
 
 		document.addEventListener('wc:pages-changed', function() {
 			if (activeSection === 'pages' && sidebarContent.classList.contains('is-open')) {

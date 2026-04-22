@@ -91,6 +91,9 @@ This file intentionally keeps the logic low-level so the editor can stay separat
         #dataJSON = null;
         #autosave = false;
         #host = null;
+        #onNavigate = null;
+        #globalStyleText = "";
+        #docInteractionState = new Map();
 
         static cloneData(value) {
             if (typeof structuredClone === "function") {
@@ -131,6 +134,7 @@ This file intentionally keeps the logic low-level so the editor can stay separat
             this.#host = host;
             this.#dataJSON = inputData;
             this.#autosave = cfg.autosave === true;
+            this.#onNavigate = typeof cfg.onNavigate === "function" ? cfg.onNavigate : null;
 
             this.#validateDataJSON(this.#dataJSON);
             this.#buildPageFrames();
@@ -146,6 +150,23 @@ This file intentionally keeps the logic low-level so the editor can stay separat
         setAutosave(value) {
             this.#autosave = Boolean(value);
             return this.#autosave;
+        }
+
+        setGlobalStyle(styleElement) {
+            if (styleElement == null) {
+                this.#globalStyleText = "";
+                this.#removeGlobalStyleFromFrames();
+                return true;
+            }
+
+            const tagName = styleElement?.tagName ? styleElement.tagName.toLowerCase() : "";
+            if (tagName !== "style") {
+                return false;
+            }
+
+            this.#globalStyleText = String(styleElement.textContent || "");
+            this.#applyGlobalStyleToAllFrames();
+            return true;
         }
 
         getActivePageId() {
@@ -183,6 +204,8 @@ This file intentionally keeps the logic low-level so the editor can stay separat
             if (!frameDoc) return false;
 
             this.#ensureFrameShell(frameDoc);
+            this.#bindFrameInteractions(frameDoc, pageId);
+            this.#applyGlobalStyleToFrame(frameDoc);
 
             frameDoc.title = page.title || "";
 
@@ -324,32 +347,39 @@ This file intentionally keeps the logic low-level so the editor can stay separat
 
             if (!nodes[parentId]) return null;
 
-            const nodeId = this.#nextNodeId(page);
-            const nextNode = {
-                tag: typeof nodeData.tag === "string" && nodeData.tag.trim() ? nodeData.tag.trim() : "div",
-                parent: parentId,
-            };
-
-            if (nodeData.attrs && typeof nodeData.attrs === "object") {
-                nextNode.attrs = { ...nodeData.attrs };
-            }
-
-            if (typeof nodeData.text === "string") {
-                nextNode.text = nodeData.text;
-            }
-
-            nodes[nodeId] = nextNode;
-
-            if (!Array.isArray(nodes[parentId].children)) {
-                nodes[parentId].children = [];
-            }
-            nodes[parentId].children.push(nodeId);
+            const nodeId = this.#createNode(page, parentId, nodeData);
+            if (!nodeId) return null;
 
             if (this.#autosave) {
                 this.load(this.#activePage);
             }
 
             return nodeId;
+        }
+
+        addTemplateNode(template, parentId) {
+            const page = this.getPage(this.#activePage);
+            if (!page) return null;
+
+            const nodes = page.nodes || {};
+            const targetParentId = typeof parentId === "string" && parentId.trim()
+                ? parentId.trim()
+                : this.#rootNodeId(page);
+
+            if (!nodes[targetParentId]) return null;
+
+            const rootTemplateNode = template && typeof template === "object" && template.content
+                ? template.content
+                : template;
+
+            const createdNodeId = this.#createNodeTreeFromTemplate(page, targetParentId, rootTemplateNode);
+            if (!createdNodeId) return null;
+
+            if (this.#autosave) {
+                this.load(this.#activePage);
+            }
+
+            return createdNodeId;
         }
 
         deleteNode(nodeId, pageId = this.#activePage) {
@@ -652,6 +682,196 @@ This file intentionally keeps the logic low-level so the editor can stay separat
             frameDoc.body.replaceChildren();
         }
 
+        #globalStyleNodeId() {
+            return "ez-virtualsite-global-style";
+        }
+
+        #applyGlobalStyleToAllFrames() {
+            for (const iframe of Object.values(this.#pages)) {
+                const frameDoc = iframe?.contentDocument;
+                if (!frameDoc) continue;
+                this.#applyGlobalStyleToFrame(frameDoc);
+            }
+        }
+
+        #removeGlobalStyleFromFrames() {
+            for (const iframe of Object.values(this.#pages)) {
+                const frameDoc = iframe?.contentDocument;
+                if (!frameDoc) continue;
+
+                const existing = frameDoc.getElementById(this.#globalStyleNodeId());
+                if (existing) existing.remove();
+            }
+        }
+
+        #applyGlobalStyleToFrame(frameDoc) {
+            if (!frameDoc?.head) return;
+
+            const existing = frameDoc.getElementById(this.#globalStyleNodeId());
+            if (!this.#globalStyleText) {
+                if (existing) existing.remove();
+                return;
+            }
+
+            const styleNode = existing || frameDoc.createElement("style");
+            styleNode.id = this.#globalStyleNodeId();
+            styleNode.textContent = this.#globalStyleText;
+
+            if (!existing) {
+                frameDoc.head.appendChild(styleNode);
+            }
+        }
+
+        #bindFrameInteractions(frameDoc, pageId) {
+            if (!frameDoc || frameDoc.__ezVirtualSiteInteractionsBound) return;
+
+            frameDoc.__ezVirtualSiteInteractionsBound = true;
+            this.#docInteractionState.set(frameDoc, {
+                pageId,
+                hoverNode: null,
+                selectedNode: null,
+                dragoverNode: null,
+            });
+
+            const closestNode = (target) => {
+                if (!target) return null;
+                const elementTarget = target.nodeType === Node.ELEMENT_NODE ? target : target.parentElement;
+                if (!elementTarget || !elementTarget.closest) return null;
+                return elementTarget.closest("[data-vs-node-id]");
+            };
+
+            const setHover = (node) => {
+                const state = this.#docInteractionState.get(frameDoc);
+                if (!state) return;
+                if (state.hoverNode === node) return;
+
+                if (state.hoverNode) state.hoverNode.classList.remove("ez-virtualsite-hover");
+                state.hoverNode = node;
+                if (state.hoverNode) state.hoverNode.classList.add("ez-virtualsite-hover");
+            };
+
+            const setSelected = (node) => {
+                const state = this.#docInteractionState.get(frameDoc);
+                if (!state) return;
+                if (state.selectedNode === node) return;
+
+                if (state.selectedNode) state.selectedNode.classList.remove("ez-virtualsite-selected");
+                state.selectedNode = node;
+                if (state.selectedNode) state.selectedNode.classList.add("ez-virtualsite-selected");
+            };
+
+            const setDragover = (node) => {
+                const state = this.#docInteractionState.get(frameDoc);
+                if (!state) return;
+                if (state.dragoverNode === node) return;
+
+                if (state.dragoverNode) state.dragoverNode.classList.remove("ez-virtualsite-dragover");
+                state.dragoverNode = node;
+                if (state.dragoverNode) state.dragoverNode.classList.add("ez-virtualsite-dragover");
+            };
+
+            frameDoc.addEventListener("mousemove", (event) => {
+                setHover(closestNode(event.target));
+            }, true);
+
+            frameDoc.addEventListener("mouseleave", () => {
+                setHover(null);
+                setDragover(null);
+            }, true);
+
+            frameDoc.addEventListener("click", (event) => {
+                const node = closestNode(event.target);
+                if (node) setSelected(node);
+
+                const elementTarget = event.target?.nodeType === Node.ELEMENT_NODE ? event.target : event.target?.parentElement;
+                const anchor = elementTarget?.closest?.("a[data-href-id], a[data_href_id]") || null;
+                if (!anchor) return;
+
+                const targetPageId = anchor.getAttribute("data-href-id") || anchor.getAttribute("data_href_id") || "";
+                if (!targetPageId || !this.getPage(targetPageId)) return;
+
+                event.preventDefault();
+                const fromPageId = this.#activePage;
+                if (!this.setActivePage(targetPageId)) return;
+
+                if (typeof this.#onNavigate === "function") {
+                    this.#onNavigate({ fromPageId, toPageId: targetPageId, source: "_href_id" });
+                }
+            }, true);
+
+            frameDoc.addEventListener("dragstart", (event) => {
+                const node = closestNode(event.target);
+                if (!node) return;
+
+                const nodeId = node.getAttribute("data-vs-node-id") || "";
+                if (!nodeId) return;
+
+                event.dataTransfer?.setData("application/x-ezvs-node", JSON.stringify({ nodeId, pageId }));
+                event.dataTransfer?.setData("text/plain", nodeId);
+                if (event.dataTransfer) {
+                    event.dataTransfer.effectAllowed = "move";
+                }
+            }, true);
+
+            frameDoc.addEventListener("dragover", (event) => {
+                const node = closestNode(event.target);
+                if (!node) {
+                    setDragover(null);
+                    return;
+                }
+
+                event.preventDefault();
+                if (event.dataTransfer) {
+                    event.dataTransfer.dropEffect = "copy";
+                }
+                setDragover(node);
+            }, true);
+
+            frameDoc.addEventListener("drop", (event) => {
+                const node = closestNode(event.target);
+                if (!node) {
+                    setDragover(null);
+                    return;
+                }
+
+                event.preventDefault();
+
+                const parentId = node.getAttribute("data-vs-node-id") || "";
+                let changed = false;
+
+                const templateData = event.dataTransfer?.getData("application/x-ezvs-template") || "";
+                if (templateData) {
+                    try {
+                        const parsedTemplate = JSON.parse(templateData);
+                        changed = Boolean(this.addTemplateNode(parsedTemplate, parentId));
+                    } catch (error) {
+                        changed = false;
+                    }
+                }
+
+                if (!changed) {
+                    const nodeData = event.dataTransfer?.getData("application/x-ezvs-node") || "";
+                    if (nodeData) {
+                        try {
+                            const parsedNode = JSON.parse(nodeData);
+                            const draggingNodeId = parsedNode?.nodeId;
+                            if (typeof draggingNodeId === "string" && draggingNodeId) {
+                                changed = this.reparentNode(draggingNodeId, parentId);
+                            }
+                        } catch (error) {
+                            changed = false;
+                        }
+                    }
+                }
+
+                if (changed && this.#autosave) {
+                    this.load(this.#activePage);
+                }
+
+                setDragover(null);
+            }, true);
+        }
+
         #frameIdForPage(pageId) {
             return `ez-virtualpage-${pageId}`;
         }
@@ -776,6 +996,7 @@ This file intentionally keeps the logic low-level so the editor can stay separat
             this.#applyNodeAttributes(element, node.attrs || {});
             element.setAttribute("data-vs-node-id", nodeId);
             element.setAttribute("data-wc-node-id", nodeId);
+            element.setAttribute("draggable", "true");
 
             const children = Array.isArray(node.children) ? node.children : [];
             for (const childId of children) {
@@ -795,9 +1016,15 @@ This file intentionally keeps the logic low-level so the editor can stay separat
         #applyNodeAttributes(element, attrs) {
             for (const [name, value] of Object.entries(attrs)) {
                 if (name === "_href_id") {
-                    const resolved = this.#resolveHrefId(value);
-                    if (resolved) {
-                        element.setAttribute("href", resolved);
+                    const targetPageId = typeof value === "string" ? value.trim() : "";
+                    if (targetPageId) {
+                        element.setAttribute("data-href-id", targetPageId);
+                        element.setAttribute("data_href_id", targetPageId);
+
+                        const resolved = this.#resolveHrefId(targetPageId);
+                        if (resolved && element.tagName.toLowerCase() === "a") {
+                            element.setAttribute("href", resolved);
+                        }
                     }
                     continue;
                 }
@@ -828,6 +1055,58 @@ This file intentionally keeps the logic low-level so the editor can stay separat
 
             page.node_counter = nextIndex + 1;
             return nodeId;
+        }
+
+        #createNode(page, parentId, nodeData) {
+            const nodes = page.nodes || {};
+            if (!nodes[parentId]) return null;
+
+            const nodeId = this.#nextNodeId(page);
+            const nextNode = {
+                tag: typeof nodeData?.tag === "string" && nodeData.tag.trim() ? nodeData.tag.trim() : "div",
+                parent: parentId,
+            };
+
+            if (nodeData?.attrs && typeof nodeData.attrs === "object" && !Array.isArray(nodeData.attrs)) {
+                nextNode.attrs = { ...nodeData.attrs };
+            }
+
+            if (typeof nodeData?.text === "string") {
+                nextNode.text = nodeData.text;
+            }
+
+            nodes[nodeId] = nextNode;
+
+            if (!Array.isArray(nodes[parentId].children)) {
+                nodes[parentId].children = [];
+            }
+            nodes[parentId].children.push(nodeId);
+
+            return nodeId;
+        }
+
+        #createNodeTreeFromTemplate(page, parentId, templateNode) {
+            if (!templateNode || typeof templateNode !== "object") return null;
+
+            const nodeData = {
+                tag: templateNode.tag,
+                attrs: templateNode.attrs && typeof templateNode.attrs === "object" ? templateNode.attrs : undefined,
+                text: typeof templateNode.text === "string" ? templateNode.text : undefined,
+            };
+
+            const createdNodeId = this.#createNode(page, parentId, nodeData);
+            if (!createdNodeId) return null;
+
+            const children = Array.isArray(templateNode.children) ? templateNode.children : [];
+            for (const childTemplate of children) {
+                this.#createNodeTreeFromTemplate(page, createdNodeId, childTemplate);
+            }
+
+            if (children.length > 0) {
+                delete page.nodes[createdNodeId].text;
+            }
+
+            return createdNodeId;
         }
 
         #deleteNodeSubtree(nodes, nodeId) {
