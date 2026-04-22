@@ -1,6 +1,6 @@
 /*
-EzVirtualSite (Optimized Rewrite)
-By Asciiz (refactored)
+EzVirtualSite
+By Asciiz
 
 # Lightweight virtual multi-page runtime using iframe rendering.
 
