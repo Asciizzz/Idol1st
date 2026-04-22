@@ -272,6 +272,7 @@
     function buildPageContext(pageId, pageData) {
         const wrapper = document.createElement('div');
         wrapper.className = 'floater-form';
+        wrapper.dataset.pageId = pageId;
 
         appendLine(wrapper, 'floater-title', 'Edit Page');
 
@@ -304,7 +305,85 @@
         submit.dataset.pageId = pageId;
         submit.textContent = 'Apply';
 
-        wrapper.append(titleLabel, titleInput, slugLabel, slugInput, submit);
+        const include = pageData.include && typeof pageData.include === 'object' ? pageData.include : { css: [], js: [] };
+        const cssTags = Array.isArray(include.css) ? include.css : [];
+        const jsTags = Array.isArray(include.js) ? include.js : [];
+
+        const includeLabelCss = document.createElement('div');
+        includeLabelCss.className = 'floater-label';
+        includeLabelCss.textContent = 'Include CSS';
+
+        const cssTagList = document.createElement('div');
+        cssTagList.className = 'floater-tag-list';
+        cssTagList.dataset.tagList = 'css';
+
+        cssTags.forEach(function(name) {
+            const tag = document.createElement('button');
+            tag.type = 'button';
+            tag.className = 'floater-chip';
+            tag.dataset.click = 'remove-page-include';
+            tag.dataset.includeType = 'css';
+            tag.dataset.includeName = name;
+            tag.dataset.pageId = pageId;
+            tag.textContent = `${name} x`;
+            cssTagList.appendChild(tag);
+        });
+
+        const addCss = document.createElement('button');
+        addCss.type = 'button';
+        addCss.className = 'floater-chip floater-chip-add';
+        addCss.dataset.click = 'toggle-page-include-picker';
+        addCss.dataset.includeType = 'css';
+        addCss.dataset.pageId = pageId;
+        addCss.textContent = '+ css';
+        cssTagList.appendChild(addCss);
+
+        const includeLabelJs = document.createElement('div');
+        includeLabelJs.className = 'floater-label';
+        includeLabelJs.textContent = 'Include JS';
+
+        const jsTagList = document.createElement('div');
+        jsTagList.className = 'floater-tag-list';
+        jsTagList.dataset.tagList = 'js';
+
+        jsTags.forEach(function(name) {
+            const tag = document.createElement('button');
+            tag.type = 'button';
+            tag.className = 'floater-chip';
+            tag.dataset.click = 'remove-page-include';
+            tag.dataset.includeType = 'js';
+            tag.dataset.includeName = name;
+            tag.dataset.pageId = pageId;
+            tag.textContent = `${name} x`;
+            jsTagList.appendChild(tag);
+        });
+
+        const addJs = document.createElement('button');
+        addJs.type = 'button';
+        addJs.className = 'floater-chip floater-chip-add';
+        addJs.dataset.click = 'toggle-page-include-picker';
+        addJs.dataset.includeType = 'js';
+        addJs.dataset.pageId = pageId;
+        addJs.textContent = '+ js';
+        jsTagList.appendChild(addJs);
+
+        const picker = document.createElement('div');
+        picker.className = 'floater-include-picker';
+        picker.dataset.includePicker = 'true';
+        picker.hidden = true;
+
+        wrapper.append(
+            titleLabel,
+            titleInput,
+            slugLabel,
+            slugInput,
+            submit,
+            includeLabelCss,
+            cssTagList,
+            includeLabelJs,
+            jsTagList,
+            picker
+        );
         return wrapper;
     }
 
@@ -380,6 +459,114 @@
             button.classList.remove('danger');
             button.textContent = 'Delete';
             floater.hide();
+        });
+
+        floater.addAction('toggle-page-include-picker', function(button) {
+            const currentSite = site();
+            if (!currentSite) {
+                return;
+            }
+
+            const pageId = button.dataset.pageId;
+            const includeType = button.dataset.includeType;
+            if (!pageId || (includeType !== 'css' && includeType !== 'js')) {
+                return;
+            }
+
+            const menu = button.closest('.floater-form');
+            const picker = menu ? menu.querySelector('[data-include-picker="true"]') : null;
+            if (!picker) {
+                return;
+            }
+
+            if (!picker.hidden && picker.dataset.includeType === includeType) {
+                picker.hidden = true;
+                picker.replaceChildren();
+                return;
+            }
+
+            const pageIncludes = currentSite.getPageIncludes(pageId) || { css: [], js: [] };
+            const included = new Set(Array.isArray(pageIncludes[includeType]) ? pageIncludes[includeType] : []);
+            const allNames = includeType === 'css'
+                ? (typeof currentSite.listStylesheets === 'function' ? currentSite.listStylesheets() : Object.keys((currentSite.getDataJSON() || {}).stylesheets || {}))
+                : Object.keys((currentSite.getDataJSON() || {}).scripts || {});
+
+            picker.hidden = false;
+            picker.dataset.includeType = includeType;
+            picker.dataset.pageId = pageId;
+            picker.replaceChildren();
+
+            const title = document.createElement('div');
+            title.className = 'floater-picker-title';
+            title.textContent = includeType === 'css' ? 'Pick stylesheet' : 'Pick script';
+            picker.appendChild(title);
+
+            const options = allNames.filter(function(name) { return !included.has(name); });
+            if (!options.length) {
+                const empty = document.createElement('div');
+                empty.className = 'floater-picker-empty';
+                empty.textContent = 'Nothing to add';
+                picker.appendChild(empty);
+                return;
+            }
+
+            options.forEach(function(name) {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'floater-picker-option';
+                option.dataset.click = 'add-page-include';
+                option.dataset.pageId = pageId;
+                option.dataset.includeType = includeType;
+                option.dataset.includeName = name;
+                option.textContent = name;
+                picker.appendChild(option);
+            });
+        });
+
+        floater.addAction('add-page-include', function(button) {
+            const currentSite = site();
+            if (!currentSite) {
+                return;
+            }
+
+            const pageId = button.dataset.pageId;
+            const includeType = button.dataset.includeType;
+            const includeName = button.dataset.includeName;
+            if (!pageId || !includeName) {
+                return;
+            }
+
+            currentSite.addPageInclude(includeType, includeName, pageId);
+
+            const pageData = currentSite.getPageData(pageId);
+            const menu = button.closest('.floater-form');
+            if (menu && pageData) {
+                const next = buildPageContext(pageId, pageData);
+                menu.replaceWith(next);
+            }
+        });
+
+        floater.addAction('remove-page-include', function(button) {
+            const currentSite = site();
+            if (!currentSite) {
+                return;
+            }
+
+            const pageId = button.dataset.pageId;
+            const includeType = button.dataset.includeType;
+            const includeName = button.dataset.includeName;
+            if (!pageId || !includeName) {
+                return;
+            }
+
+            currentSite.removePageInclude(includeType, includeName, pageId);
+
+            const pageData = currentSite.getPageData(pageId);
+            const menu = button.closest('.floater-form');
+            if (menu && pageData) {
+                const next = buildPageContext(pageId, pageData);
+                menu.replaceWith(next);
+            }
         });
 
         floater.addAction('delete-node', function(button) {

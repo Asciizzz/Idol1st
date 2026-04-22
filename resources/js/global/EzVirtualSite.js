@@ -22,6 +22,15 @@ By Asciiz
     reparentNode(childId, newParentId)
     deleteNode(id, reparentChildren=false)
 
+# Stylesheets:
+    listStylesheets()   getStylesheet(name)
+    setStylesheet(name, cssData)   removeStylesheet(name)
+
+# Includes (active page by default):
+    getPageIncludes(id?)
+    addPageInclude(type, name, id?)
+    removePageInclude(type, name, id?)
+
 # Scripts:
     addScript(name, scriptData)   removeScript(name)   getScript(name)
 
@@ -85,6 +94,7 @@ By Asciiz
         setData(d) {
             if (!isObj(d)) return null;
             this.#data = clone(d);
+            this.#data.stylesheets ||= {};
             this.#data.scripts ||= {};
             return this;
         }
@@ -121,12 +131,7 @@ By Asciiz
             if (!doc) return false;
 
             doc.title = page.title || "";
-            this.#styleEl(doc, "ez-virtualsite-global-style").textContent = this.#gstyle;
-            this.#styleEl(doc, "ez-virtualsite-style").textContent = (page.include?.css || [])
-                .map(n => { const a = this.#data.stylesheets?.[n]; return a ? 
-                        `/* ${n} */\n${typeof a === "string" ? a :
-                        this.#css(a)}` : ""; })
-                .filter(Boolean).join("\n\n");
+            this.#renderStyle(doc, page);
             this.#renderNodes(doc, page);
             this.#applyScripts(frame, id, page);
             return true;
@@ -198,6 +203,59 @@ By Asciiz
             return Object.entries(this.#data.pages.page_data).map(([id, p]) => ({
                 id, title: p.title, slug: p.slug
             }));
+        }
+
+        getPageIncludes(id = this.#active) {
+            const page = this.getPageData(id);
+            if (!page) return null;
+            page.include ||= { css: [], js: [] };
+            page.include.css ||= [];
+            page.include.js ||= [];
+            return clone(page.include);
+        }
+
+        addPageInclude(type, name, id = this.#active) {
+            const page = this.getPageData(id);
+            if (!page || !isStr(name) || (type !== "css" && type !== "js")) return false;
+
+            page.include ||= { css: [], js: [] };
+            page.include.css ||= [];
+            page.include.js ||= [];
+
+            const list = page.include[type];
+            if (!Array.isArray(list)) return false;
+            if (list.includes(name)) return true;
+
+            list.push(name);
+
+            if (type === "css") this.#reloadMainStyle(id);
+            else this.load(id);
+
+            this.#emitPageContentChanged();
+            return true;
+        }
+
+        removePageInclude(type, name, id = this.#active) {
+            const page = this.getPageData(id);
+            if (!page || !isStr(name) || (type !== "css" && type !== "js")) return false;
+
+            page.include ||= { css: [], js: [] };
+            page.include.css ||= [];
+            page.include.js ||= [];
+
+            const list = page.include[type];
+            if (!Array.isArray(list)) return false;
+
+            const next = list.filter(n => n !== name);
+            if (next.length === list.length) return true;
+
+            page.include[type] = next;
+
+            if (type === "css") this.#reloadMainStyle(id);
+            else this.load(id);
+
+            this.#emitPageContentChanged();
+            return true;
         }
 
 
@@ -299,6 +357,42 @@ By Asciiz
             return true;
         }
 
+        /* -- stylesheet API -- */
+
+        listStylesheets() {
+            return Object.keys(this.#data.stylesheets || {});
+        }
+
+        getStylesheet(name) {
+            if (!isStr(name)) return null;
+            const cssData = this.#data.stylesheets?.[name];
+            return cssData === undefined ? null : clone(cssData);
+        }
+
+        setStylesheet(name, cssData) {
+            if (!isStr(name) || (!isObj(cssData) && typeof cssData !== "string")) return false;
+            this.#data.stylesheets ||= {};
+            this.#data.stylesheets[name] = clone(cssData);
+            this.#reloadMainStyle(this.#active);
+            this.#emitPageContentChanged();
+            return true;
+        }
+
+        removeStylesheet(name) {
+            if (!isStr(name) || !this.#data.stylesheets?.[name]) return false;
+            delete this.#data.stylesheets[name];
+
+            Object.values(this.#data.pages.page_data || {}).forEach(page => {
+                page.include ||= { css: [], js: [] };
+                page.include.css ||= [];
+                page.include.css = page.include.css.filter(n => n !== name);
+            });
+
+            this.#reloadMainStyle(this.#active);
+            this.#emitPageContentChanged();
+            return true;
+        }
+
         /* -- script API -- */
 
         addScript(name, data) {
@@ -355,6 +449,18 @@ By Asciiz
             if (!doc) return false;
 
             this.#renderNodes(doc, page);
+            return true;
+        }
+
+        #reloadMainStyle(pageId = this.#active) {
+            const page = this.getPageData(pageId);
+            const frame = this.#frames[this.#key(pageId)];
+            if (!page || !frame) return false;
+
+            const doc = frame.contentDocument;
+            if (!doc) return false;
+
+            this.#renderStyle(doc, page);
             return true;
         }
 

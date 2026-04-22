@@ -9,6 +9,10 @@
     let activeButton = null;
     let activeSection = null;
     let viewFloaterReady = false;
+    const styleState = {
+        activeName: null,
+        saveTimer: null,
+    };
 
     const viewMenuTimers = new WeakMap();
 
@@ -523,6 +527,277 @@
         panelBody.appendChild(list);
     }
 
+    function parseCssStringToObject(cssText) {
+        if (typeof cssText !== 'string' || !cssText.trim()) {
+            return {};
+        }
+
+        const output = {};
+        cssText.split('}').forEach(function(block) {
+            const parts = block.split('{');
+            if (parts.length < 2) {
+                return;
+            }
+
+            const selector = (parts[0] || '').trim();
+            const body = (parts[1] || '').trim();
+            if (!selector || !body) {
+                return;
+            }
+
+            const rules = {};
+            body.split(';').forEach(function(decl) {
+                const idx = decl.indexOf(':');
+                if (idx < 1) {
+                    return;
+                }
+
+                const prop = decl.slice(0, idx).trim();
+                const value = decl.slice(idx + 1).trim();
+                if (!prop || !value) {
+                    return;
+                }
+
+                rules[prop] = value;
+            });
+
+            if (Object.keys(rules).length) {
+                output[selector] = rules;
+            }
+        });
+
+        return output;
+    }
+
+    function stylesheetToObject(cssData) {
+        if (cssData && typeof cssData === 'object' && !Array.isArray(cssData)) {
+            const normalized = {};
+            Object.entries(cssData).forEach(function(entry) {
+                const selector = String(entry[0] || '').trim();
+                const rules = entry[1];
+                if (!selector || !rules || typeof rules !== 'object') {
+                    return;
+                }
+
+                normalized[selector] = {};
+                Object.entries(rules).forEach(function(ruleEntry) {
+                    const prop = String(ruleEntry[0] || '').trim();
+                    const value = String(ruleEntry[1] || '').trim();
+                    if (!prop || !value) {
+                        return;
+                    }
+                    normalized[selector][prop] = value;
+                });
+            });
+            return normalized;
+        }
+
+        return parseCssStringToObject(cssData);
+    }
+
+    function getStylesheetByName(name) {
+        const site = vsite();
+        if (!site || !name) {
+            return {};
+        }
+
+        if (typeof site.getStylesheet === 'function') {
+            return stylesheetToObject(site.getStylesheet(name));
+        }
+
+        const data = site.getDataJSON ? site.getDataJSON() : null;
+        return stylesheetToObject(data && data.stylesheets ? data.stylesheets[name] : {});
+    }
+
+    function createStylePropRow(prop, value) {
+        const row = document.createElement('div');
+        row.className = 'style-prop-row';
+
+        const propInput = document.createElement('input');
+        propInput.type = 'text';
+        propInput.className = 'style-input';
+        propInput.placeholder = 'property';
+        propInput.dataset.role = 'style-prop';
+        propInput.value = prop || '';
+
+        const valueInput = document.createElement('input');
+        valueInput.type = 'text';
+        valueInput.className = 'style-input';
+        valueInput.placeholder = 'value';
+        valueInput.dataset.role = 'style-value';
+        valueInput.value = value || '';
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'page-action-button danger';
+        remove.dataset.action = 'remove-style-prop';
+        remove.textContent = 'x';
+
+        row.append(propInput, valueInput, remove);
+        return row;
+    }
+
+    function createStyleSelectorCard(selector, rules) {
+        const card = document.createElement('div');
+        card.className = 'style-selector-card';
+
+        const header = document.createElement('div');
+        header.className = 'style-selector-head';
+
+        const selectorInput = document.createElement('input');
+        selectorInput.type = 'text';
+        selectorInput.className = 'style-input style-selector-input';
+        selectorInput.placeholder = 'selector query';
+        selectorInput.dataset.role = 'style-selector';
+        selectorInput.value = selector || '';
+
+        const removeSelector = document.createElement('button');
+        removeSelector.type = 'button';
+        removeSelector.className = 'page-action-button danger';
+        removeSelector.dataset.action = 'remove-style-selector';
+        removeSelector.textContent = 'x';
+
+        header.append(selectorInput, removeSelector);
+
+        const props = document.createElement('div');
+        props.className = 'style-prop-list';
+        props.dataset.role = 'style-prop-list';
+
+        Object.entries(rules || {}).forEach(function(entry) {
+            props.appendChild(createStylePropRow(entry[0], entry[1]));
+        });
+
+        const addProp = document.createElement('button');
+        addProp.type = 'button';
+        addProp.className = 'page-action-button';
+        addProp.dataset.action = 'add-style-prop';
+        addProp.textContent = '+ property';
+
+        card.append(header, props, addProp);
+        return card;
+    }
+
+    function collectStyleEditorData(panelBody) {
+        const output = {};
+
+        panelBody.querySelectorAll('.style-selector-card').forEach(function(card) {
+            const selectorInput = card.querySelector('[data-role="style-selector"]');
+            const selector = selectorInput ? selectorInput.value.trim() : '';
+            if (!selector) {
+                return;
+            }
+
+            const rules = {};
+            card.querySelectorAll('.style-prop-row').forEach(function(row) {
+                const propInput = row.querySelector('[data-role="style-prop"]');
+                const valueInput = row.querySelector('[data-role="style-value"]');
+                const prop = propInput ? propInput.value.trim() : '';
+                const value = valueInput ? valueInput.value.trim() : '';
+                if (prop && value) {
+                    rules[prop] = value;
+                }
+            });
+
+            output[selector] = rules;
+        });
+
+        return output;
+    }
+
+    function queueStylesheetSave(panelBody) {
+        if (!styleState.activeName) {
+            return;
+        }
+
+        if (styleState.saveTimer) {
+            clearTimeout(styleState.saveTimer);
+        }
+
+        styleState.saveTimer = setTimeout(function() {
+            const site = vsite();
+            if (!site || typeof site.setStylesheet !== 'function') {
+                return;
+            }
+
+            const nextData = collectStyleEditorData(panelBody);
+            site.setStylesheet(styleState.activeName, nextData);
+            styleState.saveTimer = null;
+        }, 180);
+    }
+
+    function renderStylesPanel(panelBody) {
+        const site = vsite();
+        if (!site) {
+            panelBody.replaceChildren();
+            return;
+        }
+
+        panelBody.replaceChildren();
+
+        const listNames = typeof site.listStylesheets === 'function'
+            ? site.listStylesheets()
+            : Object.keys((site.getDataJSON() || {}).stylesheets || {});
+
+        if (!styleState.activeName) {
+            const title = document.createElement('div');
+            title.className = 'styles-header';
+            title.textContent = 'Choose a stylesheet';
+
+            const createButton = document.createElement('button');
+            createButton.type = 'button';
+            createButton.className = 'pages-create-button';
+            createButton.dataset.action = 'create-stylesheet';
+            createButton.textContent = '+ New Stylesheet';
+
+            const list = document.createElement('div');
+            list.className = 'styles-file-list';
+
+            listNames.forEach(function(name) {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'styles-file-item';
+                item.dataset.action = 'open-stylesheet';
+                item.dataset.styleName = name;
+                item.textContent = name;
+                list.appendChild(item);
+            });
+
+            panelBody.append(title, createButton, list);
+            return;
+        }
+
+        const top = document.createElement('div');
+        top.className = 'styles-editor-top';
+
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'page-action-button';
+        back.dataset.action = 'close-stylesheet-editor';
+        back.textContent = 'Back';
+
+        const name = document.createElement('div');
+        name.className = 'styles-editor-name';
+        name.textContent = styleState.activeName;
+
+        top.append(back, name);
+
+        const selectorList = document.createElement('div');
+        selectorList.className = 'style-selector-list';
+
+        const styleData = getStylesheetByName(styleState.activeName);
+        Object.entries(styleData).forEach(function(entry) {
+            selectorList.appendChild(createStyleSelectorCard(entry[0], entry[1]));
+        });
+
+        const addSelector = document.createElement('button');
+        addSelector.type = 'button';
+        addSelector.className = 'pages-create-button';
+        addSelector.dataset.action = 'add-style-selector';
+        addSelector.textContent = '+ Selector';
+
+        panelBody.append(top, selectorList, addSelector);
+    }
+
     const sections = {
         pages: { icon: 'Pg', label: 'Pages', title: 'Pages', render: renderPagesPanel },
         view: {
@@ -553,8 +828,9 @@
             icon: 'Cs',
             label: 'Styles',
             title: 'Stylesheets',
-            width: '20%',
-            render: function(panelBody) { renderPlaceholder(panelBody, 'Stylesheets editor coming soon...'); }
+            width: '48%',
+            minWidth: '42%',
+            render: renderStylesPanel
         },
         scripts: {
             icon: 'Js',
@@ -647,6 +923,84 @@
             if (site && pageId) {
                 site.removePage(pageId);
             }
+        },
+        'open-stylesheet': function(target) {
+            styleState.activeName = target.dataset.styleName || null;
+            const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+            if (panelBody) {
+                renderStylesPanel(panelBody);
+            }
+        },
+        'close-stylesheet-editor': function() {
+            styleState.activeName = null;
+            const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+            if (panelBody) {
+                renderStylesPanel(panelBody);
+            }
+        },
+        'create-stylesheet': function() {
+            const site = vsite();
+            if (!site || typeof site.setStylesheet !== 'function') {
+                return;
+            }
+
+            let index = 1;
+            const names = typeof site.listStylesheets === 'function'
+                ? site.listStylesheets()
+                : Object.keys((site.getDataJSON() || {}).stylesheets || {});
+            while (names.includes(`style-${index}`)) {
+                index += 1;
+            }
+
+            const newName = `style-${index}`;
+            site.setStylesheet(newName, {});
+            styleState.activeName = newName;
+
+            const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+            if (panelBody) {
+                renderStylesPanel(panelBody);
+            }
+        },
+        'add-style-selector': function(target) {
+            const panelBody = target.closest('.sidebar-panel-body');
+            const list = panelBody ? panelBody.querySelector('.style-selector-list') : null;
+            if (!panelBody || !list) {
+                return;
+            }
+
+            list.appendChild(createStyleSelectorCard('', {}));
+            queueStylesheetSave(panelBody);
+        },
+        'remove-style-selector': function(target) {
+            const panelBody = target.closest('.sidebar-panel-body');
+            const card = target.closest('.style-selector-card');
+            if (!panelBody || !card) {
+                return;
+            }
+
+            card.remove();
+            queueStylesheetSave(panelBody);
+        },
+        'add-style-prop': function(target) {
+            const panelBody = target.closest('.sidebar-panel-body');
+            const card = target.closest('.style-selector-card');
+            const list = card ? card.querySelector('[data-role="style-prop-list"]') : null;
+            if (!panelBody || !list) {
+                return;
+            }
+
+            list.appendChild(createStylePropRow('', ''));
+            queueStylesheetSave(panelBody);
+        },
+        'remove-style-prop': function(target) {
+            const panelBody = target.closest('.sidebar-panel-body');
+            const row = target.closest('.style-prop-row');
+            if (!panelBody || !row) {
+                return;
+            }
+
+            row.remove();
+            queueStylesheetSave(panelBody);
         }
     };
 
@@ -659,6 +1013,21 @@
         const handler = handlers[actionButton.dataset.action];
         if (handler) {
             handler(actionButton);
+        }
+    }
+
+    function handlePanelInput(event) {
+        if (activeSection !== 'stylesheets' || !sidebarContent.classList.contains('is-open')) {
+            return;
+        }
+
+        if (!event.target.closest('.sidebar-panel-body[data-section="stylesheets"]')) {
+            return;
+        }
+
+        const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+        if (panelBody) {
+            queueStylesheetSave(panelBody);
         }
     }
 
@@ -781,6 +1150,7 @@
         });
 
         sidebarContent.addEventListener('click', handlePanelClick);
+        sidebarContent.addEventListener('input', handlePanelInput);
         sidebarContent.addEventListener('dragstart', handlePanelDragStart);
         sidebarContent.addEventListener('dragover', handlePanelDragOver);
         sidebarContent.addEventListener('dragleave', handlePanelDragLeave);
@@ -814,6 +1184,13 @@
         document.addEventListener('wc:page-content-changed', function() {
             if (activeSection === 'view' && sidebarContent.classList.contains('is-open')) {
                 rerenderViewPanel();
+            }
+
+            if (activeSection === 'stylesheets' && sidebarContent.classList.contains('is-open')) {
+                const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+                if (panelBody) {
+                    renderStylesPanel(panelBody);
+                }
             }
         });
     }
