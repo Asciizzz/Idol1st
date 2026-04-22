@@ -384,6 +384,7 @@ Styling Example
                 if (!f) return null;
                 try { doc = f.contentDocument; } catch { return null; }
             }
+
             return doc;
         }
 

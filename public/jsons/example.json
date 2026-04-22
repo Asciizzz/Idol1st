@@ -24,24 +24,11 @@
             "p0": {
                 "title": "Hololie",
                 "slug": "hololie",
-
-                "node_root": "n0",
                 "node_counter": 4,
                 "nodes": {
-                    "n0": {
-                        "tag": "body",
-                        "parent": null,
-                        "children": [ "n1" ],
-
-
-                        "graph": {
-                            "pos": { "x": 12, "y": 34 }
-                        }
-                    },
-
                     "n1": {
                         "tag": "div",
-                        "parent": "n0",
+                        "parent": null,
                         "children": [ "n2", "n3" ]
                     },
 
@@ -75,23 +62,16 @@
                 "title": "Talents",
                 "slug": "hololie/talents",
 
-                "node_root": "n0",
-                "node_counter": 2,
+                "node_counter": 3,
                 "nodes": {
-                    "n0": {
-                        "tag": "body",
-                        "parent": null,
-                        "children": [ "n1", "n2" ]
-                    },
-
                     "n1": {
                         "tag": "p",
-                        "parent": "n0",
+                        "parent": null,
                         "text": "Here are the talents under Hololie!"
                     },
                     "n2": {
                         "tag": "a",
-                        "parent": "n0",
+                        "parent": null,
                         "attrs": {
                             "_href_id": "p0"
                         }
@@ -136,7 +116,33 @@
     },
 
     "scripts": {
-        "welcome.js": "console.log('Welcome to Hololie!');",
-        "talents.js": "console.log('Meet our amazing talents!');"
+        "welcome.js": {
+            "variables": {
+                "welcomeMessage": "Welcome to Hololie! We are excited to have you here."
+            },
+            "actions": {    
+                "click-on-welcome": "console.log(`Welcome to Hololie! You clicked on ${event.target.tagName}`)",
+                "alert-on-welcome": "console.log(variables.welcomeMessage)"
+            },
+            "events": {
+                "onload": [
+                    { "selector": "window", "action": "alert-on-welcome" }
+                ],
+                "click": [
+                    { "selector": "#welcome-heading", "action": "click-on-welcome" }
+                ]
+            }
+        },
+        "talents.js": {
+            "variables": {},
+            "actions": {
+                "click-on-talents": "console.log(`Meet our amazing talents! You clicked on ${event.target.tagName}`)"
+            },
+            "events": {
+                "click": [
+                    { "selector": "#talents-link", "action": "click-on-talents" }
+                ]
+            }
+        }
     }
 }

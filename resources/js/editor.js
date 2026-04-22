@@ -63,6 +63,7 @@
 
         for (const query of nextQueries) {
             if (!runtime.nodeQueryKeys.has(query)) {
+                console.log("[editor] Adding floater node query:", query);
                 runtime.floater.addQuery(query, { display: "node" });
             }
         }
@@ -101,7 +102,7 @@
             });
 
             if (result.ok) {
-                floater.hideFloater();
+                floater.hide();
             }
         });
 
@@ -119,7 +120,7 @@
 
             const result = window.WebConstruct.deleteNode(nodeId);
             if (result.ok) {
-                floater.hideFloater();
+                floater.hide();
                 return;
             }
 
@@ -131,7 +132,7 @@
                 if (!window.WebConstruct) return "Page API unavailable.";
 
                 const pageId = pageItem.dataset.pageId;
-                const page = window.WebConstruct.getPage(pageId);
+                const page = window.WebConstruct.getPageData(pageId);
                 if (!page) return "Page not found.";
 
                 const wrapper = document.createElement("div");
@@ -177,7 +178,7 @@
                 if (!window.WebConstruct) return null;
 
                 const pageId = pageItem.dataset.pageId;
-                const page = window.WebConstruct.getPage(pageId);
+                const page = window.WebConstruct.getPageData(pageId);
                 if (!page) return null;
 
                 const wrapper = document.createElement("div");
@@ -261,8 +262,8 @@
                 return site.listPages();
             },
 
-            getPage(pageId) {
-                return site.getPage(pageId);
+            getPageData(pageId) {
+                return site.getPageData(pageId);
             },
 
             getCurrentPageId() {
@@ -270,8 +271,6 @@
             },
 
             setCurrentPage(pageId) {
-                site.logEverything();
-
                 if (!site.changePage(pageId)) {
                     return { ok: false, message: "Page not found." };
                 }
