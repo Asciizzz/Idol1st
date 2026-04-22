@@ -269,7 +269,7 @@
             },
 
             setCurrentPage(pageId) {
-                if (!site.setActivePage(pageId)) {
+                if (!site.changePage(pageId)) {
                     return { ok: false, message: "Page not found." };
                 }
 
