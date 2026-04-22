@@ -116,12 +116,16 @@ By Asciiz
         load(id = this.#active) {
             const page = this.getPageData(id), frame = this.#frames[this.#key(id)];
             if (!page || !frame) return false;
+
             const doc = frame.contentDocument;
             if (!doc) return false;
+
             doc.title = page.title || "";
-            this.#styleEl(doc, "ez-vs-global-style").textContent = this.#gstyle;
-            this.#styleEl(doc, "ez-vs-style").textContent = (page.include?.css || [])
-                .map(n => { const a = this.#data.stylesheets?.[n]; return a ? `/* ${n} */\n${typeof a === "string" ? a : this.#css(a)}` : ""; })
+            this.#styleEl(doc, "ez-virtualsite-global-style").textContent = this.#gstyle;
+            this.#styleEl(doc, "ez-virtualsite-style").textContent = (page.include?.css || [])
+                .map(n => { const a = this.#data.stylesheets?.[n]; return a ? 
+                        `/* ${n} */\n${typeof a === "string" ? a :
+                        this.#css(a)}` : ""; })
                 .filter(Boolean).join("\n\n");
             this.#renderNodes(doc, page);
             this.#applyScripts(frame, id, page);
@@ -275,7 +279,12 @@ By Asciiz
                     if (parent) (parent.children ||= []).push(cid);
                 }
             } else {
-                const cascade = nid => { const n = nodes[nid]; if (!n) return; (n.children || []).forEach(cascade); delete nodes[nid]; };
+                const cascade = nid => { 
+                    const n = nodes[nid];
+                    if (!n) return;
+                    (n.children || []).forEach(cascade);
+                    delete nodes[nid];
+                };
                 cascade(id);
                 if (parent) parent.children = filterKids(parent.children, id);
 
@@ -308,7 +317,7 @@ By Asciiz
         /* -- rendering -- */
 
         #renderNodes(doc, page) {
-            const mount = doc.getElementById("ez-vs-main") || doc.body; if (!mount) return;
+            const mount = doc.getElementById("ez-virtualsite-main") || doc.body; if (!mount) return;
             mount.replaceChildren();
             const { nodes } = page, cache = new Map(), visiting = new Set();
             const build = id => {
@@ -326,6 +335,15 @@ By Asciiz
             Object.keys(nodes)
                 .filter(id => { const pid = nodes[id]?.parent; return !isStr(pid) || !nodes[pid]; })
                 .forEach(rid => { const el = build(rid); if (el) mount.appendChild(el); });
+        }
+
+        #renderStyle(doc, page) {
+            this.#styleEl(doc, "ez-virtualsite-global-style").textContent = this.#gstyle;
+            this.#styleEl(doc, "ez-virtualsite-style").textContent = (page.include?.css || [])
+                .map(n => { const a = this.#data.stylesheets?.[n]; return a ? 
+                        `/* ${n} */\n${typeof a === "string" ? a :
+                        this.#css(a)}` : ""; })
+                .filter(Boolean).join("\n\n");
         }
 
         #reloadMainBody(pageId = this.#active) {
@@ -435,7 +453,7 @@ By Asciiz
             this.#host.appendChild(f); this.#frames[k] = f;
             const doc = f.contentDocument; if (!doc) return false;
             doc.open();
-            doc.write(`<!DOCTYPE html><html><head><style id="ez-vs-global-style"></style><style id="ez-vs-style"></style></head><body id="ez-vs-main"></body></html>`);
+            doc.write(`<!DOCTYPE html><html><head><style id="ez-virtualsite-global-style"></style><style id="ez-virtualsite-style"></style></head><body id="ez-virtualsite-main"></body></html>`);
             doc.close();
             return true;
         }
