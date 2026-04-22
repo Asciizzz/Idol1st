@@ -11,15 +11,15 @@
 
             "page_counter and node_counter": "Will always increment by 1 for each new thing. This is used to generate unique ids for each page/element (p0, p1, p2 - n0, n1, n2, etc.). I trust you won't by some miracle end up with 2^53 elements in a single page or create 2^53 pages but if you do, well, what the actual f.",
 
-            "attributes with prefix _ (e.g., _href_id)": "These attributes are special editor attributes, instead of being passed straight to DOM, they will be processed by the editor to generate the correct output. For example, _href_id will be converted to href with the correct slug as its value when generating the final output. This is pretty cool because it allows us to do some other cool stuff, like literal if-then-else construction or something idk.",
+            "attributes with prefix _ (e.g., _href_id)": "These attributes are special editor attributes, instead of being passed straight to DOM, they will be processed by the editor runtime. For example, _href_id is handled as internal page navigation metadata. This is pretty cool because it allows us to do some other cool stuff, like literal if-then-else construction or something idk.",
 
             "href vs _href_id": "href is used for external links, while _href_id is used for internal links (links to other pages within the project). _href_id will reference the page's unique id (e.g., p0, p1, etc.) instead of the slug to avoid renaming slug = broken links issue. The editor will handle the conversion from page id to slug when generating the final output.",
 
-            "why tf stylesheet look so ugly": "because of JSON ofc, but like I said, we are not supposed to see this JSON file in the first place so it doesn't matter. css will be store as raw text instead of interpreted bs.",
+            "why tf stylesheet look so ugly": "because of JSON ofc, but like I said, we are not supposed to see this JSON file in the first place so it doesn't matter. css is stored as selector-map objects for easier patching and template generation.",
 
             "graph attribute in nodes": "a special value used by the web constructor. The web constructor itself will have a page graph, which is a visual interactive canvas that allows users to see the structure of the page and manipulate it by dragging nodes around if they prefer that over the standard main editor view.",
 
-            "stylesheets and scripts": "are plain raw text"
+            "stylesheets and scripts": "stylesheets are selector-mapped objects (legacy raw css string still supported), scripts are plain raw text"
         }
     },
 
@@ -31,7 +31,7 @@
                 "title": "Hololie",
                 "slug": "hololie",
 
-                "node_start": "n0",
+                "node_root": "n0",
                 "node_counter": 4,
                 "nodes": {
                     "n0": {
@@ -113,11 +113,31 @@
     },
 
     "stylesheets": {
-        "global.css": "*{ margin: 0; padding: 0; box-sizing: border-box;} body { font-family: Arial, sans-serif; }",
+        "global.css": {
+            "*": {
+                "margin": "0",
+                "padding": "0",
+                "box-sizing": "border-box"
+            },
+            "body": {
+                "font-family": "Arial, sans-serif"
+            }
+        },
 
-        "welcome.css": "body { background: #f0f0f0; } #welcome-heading { color: #0077cc; }",
+        "welcome.css": {
+            "body": {
+                "background": "#f0f0f0"
+            },
+            "#welcome-heading": {
+                "color": "#0077cc"
+            }
+        },
 
-        "talents.css": "p { color: #333; }"
+        "talents.css": {
+            "p": {
+                "color": "#333"
+            }
+        }
     },
 
     "scripts": {

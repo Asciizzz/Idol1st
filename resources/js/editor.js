@@ -1,681 +1,409 @@
 (function() {
     const el = {
-        app: document.querySelector('#app'),
-        canvas: document.querySelector('#canvas'),
-        previewFrame: document.querySelector('#preview-frame')
+        app: document.querySelector("#app"),
+        canvas: document.querySelector("#canvas"),
     };
-
-    const projectJSON = {
-        project: {},
-        pages: {},
-        stylesheets: {},
-        scripts: {}
-    };
-
-    let currentPageId = null;
-    let hoveredFrameElement = null;
 
     function emit(name, detail) {
         document.dispatchEvent(new CustomEvent(name, { detail: detail || {} }));
     }
 
     function slugify(input) {
-        return String(input || 'new-page')
+        return String(input || "new-page")
             .toLowerCase()
             .trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9\/_-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^[-/]+|[-/]+$/g, '') || 'new-page';
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9\/_-]/g, "")
+            .replace(/-+/g, "-")
+            .replace(/^[-/]+|[-/]+$/g, "") || "new-page";
     }
 
-    function ensurePagesShape() {
-        if (!projectJSON.pages || typeof projectJSON.pages !== 'object') {
-            projectJSON.pages = {};
+    function buildBreadcrumbText(elm) {
+        const parts = [];
+        let current = elm;
+
+        while (current && current.nodeType === Node.ELEMENT_NODE) {
+            parts.push(current.tagName.toLowerCase());
+            if (current.tagName.toLowerCase() === "body") break;
+            current = current.parentElement;
         }
-        if (!projectJSON.pages.page_data || typeof projectJSON.pages.page_data !== 'object') {
-            projectJSON.pages.page_data = {};
-        }
-        if (!Number.isInteger(projectJSON.pages.page_counter)) {
-            projectJSON.pages.page_counter = 0;
-        }
+
+        return parts.reverse().join(" > ");
     }
 
-    function getPageById(pageId) {
-        ensurePagesShape();
-        return projectJSON.pages.page_data[pageId] || null;
-    }
-
-    function listPages() {
-        ensurePagesShape();
-
-        return Object.entries(projectJSON.pages.page_data).map(function(entry) {
-            const pageId = entry[0];
-            const page = entry[1] || {};
-            return {
-                id: pageId,
-                title: page.title || '(untitled)',
-                slug: page.slug || ''
-            };
-        });
-    }
-
-    function buildNodeTree(doc, nodes, nodeId) {
-        const node = nodes[nodeId];
-        if (!node) {
-            return null;
-        }
-
-        const isBodyRoot = node.tag === 'body' && node.parent === null;
-        const element = isBodyRoot ? doc.body : doc.createElement(node.tag || 'div');
-
-        const attrs = node.attrs || {};
-        Object.keys(attrs).forEach(function(attrName) {
-            if (attrName.startsWith('_')) {
-                return;
-            }
-            element.setAttribute(attrName, attrs[attrName]);
-        });
-
-        element.setAttribute('data-wc-node-id', nodeId);
-
-        const children = node.children || [];
-        children.forEach(function(childId) {
-            const childEl = buildNodeTree(doc, nodes, childId);
-            if (childEl && childEl !== doc.body) {
-                element.appendChild(childEl);
-            }
-        });
-
-        if (children.length === 0 && node.text) {
-            element.textContent = node.text;
-        }
-
-        return element;
-    }
-
-    function injectEditorRuntimeStyles(frameDoc) {
-        const existing = frameDoc.getElementById('wc-editor-runtime-style');
-        if (existing) {
-            return;
-        }
-
-        const styleEl = frameDoc.createElement('style');
-        styleEl.id = 'wc-editor-runtime-style';
-        styleEl.textContent = '.wc-hover-outline { outline: 2px solid #ff3b3b !important; outline-offset: -1px; }';
-        frameDoc.head.appendChild(styleEl);
-    }
-
-    function clearFrameHoverOutline() {
-        if (hoveredFrameElement) {
-            hoveredFrameElement.classList.remove('wc-hover-outline');
-            hoveredFrameElement = null;
-        }
-    }
-
-    function setFrameHoverOutline(target) {
-        if (!target || target.nodeType !== 1) {
-            return;
-        }
-
-        const tagName = target.tagName ? target.tagName.toLowerCase() : '';
-        if (tagName === 'html' || tagName === 'body') {
-            clearFrameHoverOutline();
-            return;
-        }
-
-        if (hoveredFrameElement === target) {
-            return;
-        }
-
-        clearFrameHoverOutline();
-        hoveredFrameElement = target;
-        hoveredFrameElement.classList.add('wc-hover-outline');
-    }
-
-    function bindFrameEditorInteractions(frameDoc) {
-        if (!frameDoc || frameDoc.__wcEditorInteractionsBound) {
-            return;
-        }
-
-        frameDoc.__wcEditorInteractionsBound = true;
-
-        frameDoc.addEventListener('mouseover', function(event) {
-            setFrameHoverOutline(event.target);
-        });
-
-        frameDoc.addEventListener('mouseleave', function() {
-            clearFrameHoverOutline();
-        });
-    }
-
-    function deleteNodeSubtree(nodes, nodeId) {
-        const node = nodes[nodeId];
-        if (!node) {
-            return;
-        }
-
-        const children = Array.isArray(node.children) ? node.children.slice() : [];
-        children.forEach(function(childId) {
-            deleteNodeSubtree(nodes, childId);
-        });
-
-        delete nodes[nodeId];
-    }
-
-    function renderPageToCanvas(pageId) {
-        const page = getPageById(pageId);
-        if (!page || !el.previewFrame) {
-            return;
-        }
-
-        const frameDoc = el.previewFrame.contentDocument;
-        if (!frameDoc) {
-            return;
-        }
-
-        frameDoc.open();
-        frameDoc.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');
-        frameDoc.close();
-
-        const nodes = page.nodes || {};
-        const nodeStartId = page.node_start;
-        if (!nodeStartId || !nodes[nodeStartId]) {
-            return;
-        }
-
-        const bodyNode = nodes[nodeStartId];
-        const bodyAttrs = (bodyNode && bodyNode.attrs) || {};
-        Object.keys(bodyAttrs).forEach(function(attrName) {
-            if (attrName.startsWith('_')) {
-                return;
-            }
-            frameDoc.body.setAttribute(attrName, bodyAttrs[attrName]);
-        });
-        frameDoc.body.setAttribute('data-wc-node-id', nodeStartId);
-
-        const bodyChildren = bodyNode.children || [];
-        bodyChildren.forEach(function(childId) {
-            const childEl = buildNodeTree(frameDoc, nodes, childId);
-            if (childEl && childEl !== frameDoc.body) {
-                frameDoc.body.appendChild(childEl);
-            }
-        });
-
-        if (bodyChildren.length === 0 && bodyNode.text) {
-            frameDoc.body.textContent = bodyNode.text;
-        }
-
-        const pageIncludes = page.include || {};
-        const cssList = pageIncludes.css || [];
-        const jsList = pageIncludes.js || [];
-
-        cssList.forEach(function(cssName) {
-            const cssContent = projectJSON.stylesheets[cssName];
-            if (typeof cssContent !== 'string') {
-                return;
-            }
-            const styleEl = frameDoc.createElement('style');
-            styleEl.setAttribute('data-asset', cssName);
-            styleEl.textContent = cssContent;
-            frameDoc.head.appendChild(styleEl);
-        });
-
-        jsList.forEach(function(jsName) {
-            const jsContent = projectJSON.scripts[jsName];
-            if (typeof jsContent !== 'string') {
-                return;
-            }
-            const scriptEl = frameDoc.createElement('script');
-            scriptEl.setAttribute('data-asset', jsName);
-            scriptEl.textContent = jsContent;
-            frameDoc.body.appendChild(scriptEl);
-        });
-
-        if (page.title) {
-            frameDoc.title = page.title;
-        }
-
-        injectEditorRuntimeStyles(frameDoc);
-        bindFrameEditorInteractions(frameDoc);
-        emit('wc:frame-rendered', { pageId: pageId, frameDocument: frameDoc });
-    }
-
-    function setCurrentPage(pageId) {
-        if (!getPageById(pageId)) {
-            return { ok: false, message: 'Page not found.' };
-        }
-
-        currentPageId = pageId;
-        projectJSON.pages.page_start = pageId;
-        renderPageToCanvas(pageId);
-        emit('wc:page-selected', { pageId: pageId });
-        emit('wc:pages-changed', { pages: listPages(), currentPageId: currentPageId });
-
-        return { ok: true, pageId: pageId };
-    }
-
-    function createPage(titleInput, slugInput) {
-        ensurePagesShape();
-
-        const title = String(titleInput || 'New Page').trim() || 'New Page';
-        const slug = slugify(slugInput || title);
-
-        let nextCounter = Number(projectJSON.pages.page_counter) || 0;
-        let pageId = 'p' + nextCounter;
-
-        while (projectJSON.pages.page_data[pageId]) {
-            nextCounter += 1;
-            pageId = 'p' + nextCounter;
-        }
-
-        projectJSON.pages.page_data[pageId] = {
-            title: title,
-            slug: slug,
-            node_start: 'n0',
-            node_counter: 1,
-            nodes: {
-                n0: {
-                    tag: 'body',
-                    parent: null,
-                    children: []
-                }
-            },
-            include: {
-                css: [],
-                js: []
-            }
-        };
-
-        projectJSON.pages.page_counter = nextCounter + 1;
-        if (!projectJSON.pages.page_start) {
-            projectJSON.pages.page_start = pageId;
-        }
-
-        setCurrentPage(pageId);
-        return { ok: true, pageId: pageId };
-    }
-
-    function deletePage(pageId) {
-        ensurePagesShape();
-
-        if (!projectJSON.pages.page_data[pageId]) {
-            return { ok: false, message: 'Page not found.' };
-        }
-
-        const pageIds = Object.keys(projectJSON.pages.page_data);
-        if (pageIds.length <= 1) {
-            return { ok: false, message: 'At least one page must remain.' };
-        }
-
-        delete projectJSON.pages.page_data[pageId];
-
-        if (projectJSON.pages.page_start === pageId) {
-            projectJSON.pages.page_start = Object.keys(projectJSON.pages.page_data)[0] || null;
-        }
-
-        if (currentPageId === pageId) {
-            currentPageId = projectJSON.pages.page_start;
-            if (currentPageId) {
-                renderPageToCanvas(currentPageId);
-            } else {
-                if (el.previewFrame && el.previewFrame.contentDocument) {
-                    const frameDoc = el.previewFrame.contentDocument;
-                    frameDoc.open();
-                    frameDoc.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');
-                    frameDoc.close();
-                }
-            }
-        }
-
-        emit('wc:pages-changed', { pages: listPages(), currentPageId: currentPageId });
-        return { ok: true };
-    }
-
-    function updatePageProperties(pageId, updates) {
-        const page = getPageById(pageId);
-        if (!page) {
-            return { ok: false, message: 'Page not found.' };
-        }
-
-        const nextTitle = String((updates && updates.title) || page.title || '').trim();
-        const nextSlug = slugify((updates && updates.slug) || page.slug || nextTitle || 'new-page');
-
-        if (!nextTitle) {
-            return { ok: false, message: 'Title is required.' };
-        }
-
-        page.title = nextTitle;
-        page.slug = nextSlug;
-
-        emit('wc:pages-changed', { pages: listPages(), currentPageId: currentPageId });
-        return { ok: true };
-    }
-
-    function deleteNode(nodeId) {
-        const page = getPageById(currentPageId);
-        if (!page) {
-            return { ok: false, message: 'No active page.' };
-        }
-
-        const nodes = page.nodes || {};
-        const targetNode = nodes[nodeId];
-        if (!targetNode) {
-            return { ok: false, message: 'Element not found.' };
-        }
-
-        if (targetNode.parent === null) {
-            return { ok: false, message: 'Cannot delete body root.' };
-        }
-
-        const parentNode = nodes[targetNode.parent];
-        if (parentNode && Array.isArray(parentNode.children)) {
-            parentNode.children = parentNode.children.filter(function(childId) {
-                return childId !== nodeId;
-            });
-        }
-
-        deleteNodeSubtree(nodes, nodeId);
-        renderPageToCanvas(currentPageId);
-        emit('wc:page-content-changed', { pageId: currentPageId });
-
-        return { ok: true };
-    }
-
-    function loadProject(data) {
-        projectJSON.project = data.project || {};
-        projectJSON.pages = data.pages || {};
-        projectJSON.stylesheets = data.stylesheets || {};
-        projectJSON.scripts = data.scripts || {};
-
-        ensurePagesShape();
-
-        currentPageId = projectJSON.pages.page_start;
-        if (!currentPageId || !projectJSON.pages.page_data[currentPageId]) {
-            currentPageId = Object.keys(projectJSON.pages.page_data)[0] || null;
-            projectJSON.pages.page_start = currentPageId;
-        }
-
-        if (currentPageId) {
-            renderPageToCanvas(currentPageId);
-        }
-
-        emit('wc:project-ready', { pages: listPages(), currentPageId: currentPageId });
-        emit('wc:pages-changed', { pages: listPages(), currentPageId: currentPageId });
-    }
-
-    window.WebConstruct = {
-        getProjectJSON: function() {
-            return projectJSON;
-        },
-        getPages: listPages,
-        getPage: getPageById,
-        getCurrentPageId: function() {
-            return currentPageId;
-        },
-        setCurrentPage: setCurrentPage,
-        createPage: createPage,
-        deletePage: deletePage,
-        updatePageProperties: updatePageProperties,
-        deleteNode: deleteNode
+    const runtime = {
+        site: null,
+        floater: null,
+        nodeQueryKeys: new Set(),
     };
 
-    const initialProject = window.webConstructInitialProject;
-    const initialProjectUrl = window.webConstructInitialProjectUrl || '/jsons/example.json';
-
-    if (initialProject && typeof initialProject === 'object') {
-        loadProject(initialProject);
-    } else {
-        fetch(initialProjectUrl)
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                loadProject(data);
-            })
-            .catch(function(error) {
-                console.error('Error fetching project configuration:', error);
-                if (el.app) {
-                    el.app.textContent = 'Failed to load builder project: ' + error.message;
-                }
-            });
+    function frameScopeQuery(pageId) {
+        if (typeof pageId !== "string" || !pageId.trim()) return null;
+        return `@ez-virtualpage-${pageId} [data-vs-node-id]`;
     }
 
+    function syncFloaterNodeQueries() {
+        if (!runtime.floater) return;
+        if (!runtime.site) return;
 
-})();
+        const pages = runtime.site.listPages();
+        const nextQueries = new Set();
 
+        for (const page of pages) {
+            const query = frameScopeQuery(page.id);
+            if (!query) continue;
+            nextQueries.add(query);
+        }
 
-// Render the editor UI, buttons and stuffs
-(function() {
-    const appEl = document.querySelector('#app');
+        for (const query of runtime.nodeQueryKeys) {
+            if (!nextQueries.has(query)) {
+                runtime.floater.removeQuery(query);
+            }
+        }
 
-    const builderAssets = {
-        elements: [],
-        css: []
-    };
+        for (const query of nextQueries) {
+            if (!runtime.nodeQueryKeys.has(query)) {
+                runtime.floater.addQuery(query, { display: "node" });
+            }
+        }
 
-    function renderAssets(assets) {
-        builderAssets.elements = assets.elements || [];
-        builderAssets.css = assets.css || [];
+        runtime.nodeQueryKeys = nextQueries;
     }
 
-    const assetsUrl = window.webConstructAssetsUrl || '/jsons/assets.json';
+    function handleSiteNavigate(detail = {}) {
+        const pageId = typeof detail.toPageId === "string" ? detail.toPageId : runtime.site?.getActivePageId();
+        if (!pageId || !runtime.site) return;
 
-    fetch(assetsUrl)
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
-            }
-            return response.json();
-        })
-        .then(function(assets) {
-            renderAssets(assets);
-        })
-        .catch(function(error) {
-            console.error('Error fetching assets:', error);
-            if (appEl) {
-                appEl.textContent = 'Failed to load assets catalog: ' + error.message;
-            }
+        syncFloaterNodeQueries();
+        emit("wc:page-selected", { pageId });
+        emit("wc:pages-changed", {
+            pages: runtime.site.listPages(),
+            currentPageId: runtime.site.getActivePageId(),
         });
+    }
 
-})();
+    function setupFloater() {
+        if (!window.EzFloater) return;
 
+        const floater = new window.EzFloater();
+        runtime.floater = floater;
 
-// Tool tips and context menu
-(function() {
-    const ezFloaterHandler = window.EzFloater ? new window.EzFloater() : null;
-
-    if (ezFloaterHandler) {
-        ezFloaterHandler.addAction('change-page-properties', function(button, event) {
-            if (!window.WebConstruct) {
-                return;
-            }
+        floater.addAction("change-page-properties", (button) => {
+            if (!window.WebConstruct) return;
 
             const pageId = button.dataset.pageId;
-            const titleInput = ezFloaterHandler.floater.querySelector('#floater-page-title');
-            const slugInput = ezFloaterHandler.floater.querySelector('#floater-page-slug');
+            const titleInput = floater.floater.querySelector("#floater-page-title");
+            const slugInput = floater.floater.querySelector("#floater-page-slug");
 
             const result = window.WebConstruct.updatePageProperties(pageId, {
-                title: titleInput ? titleInput.value : '',
-                slug: slugInput ? slugInput.value : ''
+                title: titleInput ? titleInput.value : "",
+                slug: slugInput ? slugInput.value : "",
             });
 
             if (result.ok) {
-                ezFloaterHandler.hideFloater();
+                floater.hideFloater();
             }
         });
 
-        ezFloaterHandler.addAction('delete-element', function(button) {
-            if (!window.WebConstruct) {
-                return;
-            }
+        floater.addAction("delete-node", (button) => {
+            if (!window.WebConstruct) return;
 
-            const isConfirmed = button.dataset.confirmed === 'true';
+            const nodeId = button.dataset.nodeId;
+            const isConfirmed = button.dataset.confirmed === "true";
             if (!isConfirmed) {
-                button.dataset.confirmed = 'true';
-                button.classList.add('danger');
-                button.textContent = 'Are you sure?';
+                button.dataset.confirmed = "true";
+                button.classList.add("danger");
+                button.textContent = "Are you sure?";
                 return;
             }
 
-            const result = window.WebConstruct.deleteNode(button.dataset.nodeId);
+            const result = window.WebConstruct.deleteNode(nodeId);
             if (result.ok) {
-                ezFloaterHandler.hideFloater();
+                floater.hideFloater();
                 return;
             }
 
-            button.textContent = result.message || 'Delete failed';
+            button.textContent = result.message || "Delete failed";
         });
 
-        function buildBreadcrumbText(el) {
-            const crumbparts = [];
-            let currentEl = el;
+        floater.addDisplay("page-item", {
+            context(pageItem) {
+                if (!window.WebConstruct) return "Page API unavailable.";
 
-            while (currentEl && currentEl.nodeType === Node.ELEMENT_NODE) {
-                crumbparts.push(currentEl.tagName.toLowerCase());
-                if (currentEl.tagName.toLowerCase() === 'body') {
-                    break;
+                const pageId = pageItem.dataset.pageId;
+                const page = window.WebConstruct.getPage(pageId);
+                if (!page) return "Page not found.";
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "floater-form";
+
+                const title = document.createElement("div");
+                title.className = "floater-title";
+                title.textContent = "Edit Page";
+
+                const titleLabel = document.createElement("label");
+                titleLabel.className = "floater-label";
+                titleLabel.htmlFor = "floater-page-title";
+                titleLabel.textContent = "Title";
+
+                const titleInput = document.createElement("input");
+                titleInput.id = "floater-page-title";
+                titleInput.className = "floater-input";
+                titleInput.type = "text";
+                titleInput.value = page.title || "";
+
+                const slugLabel = document.createElement("label");
+                slugLabel.className = "floater-label";
+                slugLabel.htmlFor = "floater-page-slug";
+                slugLabel.textContent = "Slug";
+
+                const slugInput = document.createElement("input");
+                slugInput.id = "floater-page-slug";
+                slugInput.className = "floater-input";
+                slugInput.type = "text";
+                slugInput.value = page.slug || "";
+
+                const submit = document.createElement("button");
+                submit.type = "button";
+                submit.className = "floater-button";
+                submit.dataset.click = "change-page-properties";
+                submit.dataset.pageId = pageId;
+                submit.textContent = "Apply";
+
+                wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submit);
+                return wrapper;
+            },
+            tooltip(pageItem) {
+                if (!window.WebConstruct) return null;
+
+                const pageId = pageItem.dataset.pageId;
+                const page = window.WebConstruct.getPage(pageId);
+                if (!page) return null;
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "floater-form";
+
+                const title = document.createElement("div");
+                title.className = "floater-title";
+                title.textContent = "Page";
+
+                const rowTitle = document.createElement("div");
+                rowTitle.className = "floater-breadcrumb";
+                rowTitle.textContent = `Title: ${page.title || "Untitled"}`;
+
+                const rowSlug = document.createElement("div");
+                rowSlug.className = "floater-breadcrumb";
+                rowSlug.textContent = `Slug: ${page.slug || "no-slug"}`;
+
+                wrapper.append(title, rowTitle, rowSlug);
+                return wrapper;
+            },
+        });
+
+        floater.addDisplay("node", {
+            context(nodeElm) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "floater-form";
+
+                const title = document.createElement("div");
+                title.className = "floater-title";
+                title.textContent = "Element";
+
+                const crumb = document.createElement("div");
+                crumb.className = "floater-breadcrumb";
+                crumb.textContent = buildBreadcrumbText(nodeElm);
+
+                const nodeId = nodeElm.getAttribute("data-vs-node-id") || "";
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "floater-button";
+                deleteButton.dataset.click = "delete-node";
+                deleteButton.dataset.nodeId = nodeId;
+                deleteButton.dataset.confirmed = "false";
+                deleteButton.textContent = "Delete";
+
+                wrapper.append(title, crumb, deleteButton);
+                return wrapper;
+            },
+            tooltip(nodeElm) {
+                if (nodeElm.tagName.toLowerCase() === "body") {
+                    return null;
                 }
-                currentEl = currentEl.parentElement;
-            }
 
-            return crumbparts.reverse().join(' > ');
+                const wrapper = document.createElement("div");
+                wrapper.className = "floater-form";
+
+                const title = document.createElement("div");
+                title.className = "floater-title";
+                title.textContent = "Element";
+
+                const crumb = document.createElement("div");
+                crumb.className = "floater-breadcrumb";
+                crumb.textContent = buildBreadcrumbText(nodeElm);
+
+                wrapper.append(title, crumb);
+                return wrapper;
+            },
+        });
+
+        floater.addQuery(".page-item", { display: "page-item" });
+        syncFloaterNodeQueries();
+    }
+
+    function createWebConstructAdapter(site) {
+        return {
+            getProjectJSON() {
+                return site.getDataJSON();
+            },
+
+            getPages() {
+                return site.listPages();
+            },
+
+            getPage(pageId) {
+                return site.getPage(pageId);
+            },
+
+            getCurrentPageId() {
+                return site.getActivePageId();
+            },
+
+            setCurrentPage(pageId) {
+                if (!site.setActivePage(pageId)) {
+                    return { ok: false, message: "Page not found." };
+                }
+
+                syncFloaterNodeQueries();
+                emit("wc:page-selected", { pageId });
+                emit("wc:pages-changed", {
+                    pages: site.listPages(),
+                    currentPageId: site.getActivePageId(),
+                });
+
+                return { ok: true, pageId };
+            },
+
+            createPage(titleInput, slugInput) {
+                const title = String(titleInput || "New Page").trim() || "New Page";
+                const slug = slugify(slugInput || title);
+                const pageId = site.addPage({ title, slug });
+                if (!pageId) {
+                    return { ok: false, message: "Failed to create page." };
+                }
+
+                syncFloaterNodeQueries();
+                emit("wc:pages-changed", {
+                    pages: site.listPages(),
+                    currentPageId: site.getActivePageId(),
+                });
+
+                return { ok: true, pageId };
+            },
+
+            deletePage(pageId) {
+                if (!site.removePage(pageId)) {
+                    return { ok: false, message: "Page not found or cannot remove last page." };
+                }
+
+                syncFloaterNodeQueries();
+                emit("wc:pages-changed", {
+                    pages: site.listPages(),
+                    currentPageId: site.getActivePageId(),
+                });
+
+                return { ok: true };
+            },
+
+            updatePageProperties(pageId, updates) {
+                const payload = {
+                    title: String((updates && updates.title) || "").trim(),
+                    slug: slugify((updates && updates.slug) || ""),
+                };
+
+                if (!payload.title) {
+                    return { ok: false, message: "Title is required." };
+                }
+
+                if (!site.updatePage(pageId, payload)) {
+                    return { ok: false, message: "Page not found." };
+                }
+
+                emit("wc:pages-changed", {
+                    pages: site.listPages(),
+                    currentPageId: site.getActivePageId(),
+                });
+
+                return { ok: true };
+            },
+
+            deleteNode(nodeId) {
+                if (!site.deleteNode(nodeId)) {
+                    return { ok: false, message: "Element not found or cannot delete root." };
+                }
+
+                emit("wc:page-content-changed", { pageId: site.getActivePageId() });
+                return { ok: true };
+            },
+
+            getHierarchy(nodeId, format) {
+                return site.getHierarchy(nodeId, format);
+            },
+        };
+    }
+
+    async function resolveInitialProject() {
+        const initialProject = window.webConstructInitialProject;
+        if (initialProject && typeof initialProject === "object") {
+            return initialProject;
         }
 
-        ezFloaterHandler.addDisplay('page-item', {
-            context: function(el) {
-                if (!window.WebConstruct) {
-                    return 'Page editor unavailable.';
-                }
+        const initialProjectUrl = window.webConstructInitialProjectUrl || "/jsons/example.json";
+        const response = await fetch(initialProjectUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
 
-                const pageId = el.dataset.pageId;
-                const page = window.WebConstruct.getPage(pageId);
-                if (!page) {
-                    return 'Page not found.';
-                }
+        return response.json();
+    }
 
-                const wrapper = document.createElement('div');
-                wrapper.className = 'floater-form';
+    async function bootstrapEditor() {
+        if (!window.EzVirtualSite) {
+            throw new Error("EzVirtualSite is not loaded.");
+        }
 
-                const title = document.createElement('div');
-                title.className = 'floater-title';
-                title.textContent = 'Edit Page Properties';
+        if (!el.canvas) {
+            throw new Error("Editor canvas host not found.");
+        }
 
-                const titleLabel = document.createElement('label');
-                titleLabel.className = 'floater-label';
-                titleLabel.htmlFor = 'floater-page-title';
-                titleLabel.textContent = 'Title';
-
-                const titleInput = document.createElement('input');
-                titleInput.id = 'floater-page-title';
-                titleInput.className = 'floater-input';
-                titleInput.type = 'text';
-                titleInput.value = page.title || '';
-
-                const slugLabel = document.createElement('label');
-                slugLabel.className = 'floater-label';
-                slugLabel.htmlFor = 'floater-page-slug';
-                slugLabel.textContent = 'Slug';
-
-                const slugInput = document.createElement('input');
-                slugInput.id = 'floater-page-slug';
-                slugInput.className = 'floater-input';
-                slugInput.type = 'text';
-                slugInput.value = page.slug || '';
-
-                const submitButton = document.createElement('button');
-                submitButton.type = 'button';
-                submitButton.className = 'floater-button';
-                submitButton.dataset.click = 'change-page-properties';
-                submitButton.dataset.pageId = pageId;
-                submitButton.textContent = 'Change';
-
-                wrapper.append(title, titleLabel, titleInput, slugLabel, slugInput, submitButton);
-                return wrapper;
-            },
-            tooltip: function(el) {
-                if (!window.WebConstruct) {
-                    return null;
-                }
-
-                const pageId = el.dataset.pageId;
-                const page = window.WebConstruct.getPage(pageId);
-                if (!page) {
-                    return null;
-                }
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'floater-form';
-
-                const title = document.createElement('div');
-                title.className = 'floater-title';
-                title.textContent = 'Page';
-
-                const div1 = document.createElement('div');
-                div1.className = 'floater-breadcrumb';
-                div1.textContent = `Title: ${page.title || 'Untitled'}`
-
-                const div2 = document.createElement('div');
-                div2.className = 'floater-breadcrumb';
-                div2.textContent = `Slug: ${page.slug || 'no-slug'}`;
-
-                wrapper.append(title, div1, div2);
-
-                return wrapper;
-            }
+        const data = await resolveInitialProject();
+        const site = new window.EzVirtualSite();
+        site.init({
+            host: el.canvas,
+            dataJSON: data,
+            autosave: true,
+            onNavigate: handleSiteNavigate,
         });
 
-        ezFloaterHandler.addDisplay('node', {
-            context: function(el) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'floater-form';
+        runtime.site = site;
+        window.WebConstruct = createWebConstructAdapter(site);
 
-                const title = document.createElement('div');
-                title.className = 'floater-title';
-                title.textContent = 'Element';
+        setupFloater();
 
-                const breadcrumb = document.createElement('div');
-                breadcrumb.className = 'floater-breadcrumb';
-                breadcrumb.textContent = buildBreadcrumbText(el);
-
-                const nodeId = el.getAttribute('data-wc-node-id') || '';
-                const deleteButton = document.createElement('button');
-                deleteButton.type = 'button';
-                deleteButton.className = 'floater-button';
-                deleteButton.dataset.click = 'delete-element';
-                deleteButton.dataset.nodeId = nodeId;
-                deleteButton.dataset.confirmed = 'false';
-                deleteButton.textContent = 'Delete';
-
-                wrapper.append(title, breadcrumb, deleteButton);
-                return wrapper;
-            },
-            tooltip: function(el) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'floater-form';
-
-                const title = document.createElement('div');
-                title.className = 'floater-title';
-                title.textContent = 'Element';
-
-                const breadcrumb = document.createElement('div');
-                breadcrumb.className = 'floater-breadcrumb';
-
-                breadcrumb.textContent = buildBreadcrumbText(el);
-
-                wrapper.append(title, breadcrumb);
-                return wrapper;
-            }
+        emit("wc:project-ready", {
+            pages: site.listPages(),
+            currentPageId: site.getActivePageId(),
         });
 
-        ezFloaterHandler.addQuery('.page-item', {
-            display: 'page-item'
-        });
-        ezFloaterHandler.addQuery('@preview-frame [data-wc-node-id]', {
-            display: 'node'
+        emit("wc:pages-changed", {
+            pages: site.listPages(),
+            currentPageId: site.getActivePageId(),
         });
     }
+
+    bootstrapEditor().catch((error) => {
+        console.error("[editor] Failed to initialize:", error);
+        if (el.app) {
+            el.app.textContent = `Failed to initialize editor: ${error.message}`;
+        }
+    });
 })();
