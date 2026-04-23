@@ -11,10 +11,7 @@
     let viewFloaterReady = false;
     const styleState = {
         activeName: null,
-        saveTimer: null,
     };
-
-    const viewMenuTimers = new WeakMap();
 
     function esc(value) {
         return String(value)
@@ -117,25 +114,7 @@
         rerenderViewPanel();
     }
 
-    function queueViewMenuSync(menu) {
-        if (!menu) {
-            return;
-        }
-
-        const currentTimer = viewMenuTimers.get(menu);
-        if (currentTimer) {
-            clearTimeout(currentTimer);
-        }
-
-        const timer = setTimeout(function() {
-            syncViewMenu(menu);
-            viewMenuTimers.delete(menu);
-        }, 180);
-
-        viewMenuTimers.set(menu, timer);
-    }
-
-    function createAttrInputRow(attr, onChange) {
+    function createAttrInputRow(attr) {
         const row = document.createElement('div');
         row.className = 'view-floater-attr-edit-row';
 
@@ -150,11 +129,6 @@
         value.className = 'view-floater-input';
         value.placeholder = 'value';
         value.value = attr && typeof attr.value === 'string' ? attr.value : '';
-
-        if (typeof onChange === 'function') {
-            key.addEventListener('input', onChange);
-            value.addEventListener('input', onChange);
-        }
 
         const remove = document.createElement('button');
         remove.type = 'button';
@@ -223,11 +197,6 @@
         wrapper.appendChild(attrsBlock);
 
         if (mode === 'context') {
-            const scheduleSync = function(event) {
-                const menu = event && event.target ? event.target.closest('.view-floater-menu') : null;
-                queueViewMenuSync(menu);
-            };
-
             const textLabel = document.createElement('div');
             textLabel.className = 'view-floater-label';
             textLabel.textContent = 'Text Content';
@@ -236,7 +205,6 @@
             textInput.type = 'text';
             textInput.className = 'view-floater-input view-floater-text-input';
             textInput.value = node.text;
-            textInput.addEventListener('input', scheduleSync);
 
             const attrsEditorLabel = document.createElement('div');
             attrsEditorLabel.className = 'view-floater-label';
@@ -247,7 +215,7 @@
             attrsList.dataset.attrList = 'true';
 
             attrsToRows(node.attrs).forEach(function(row) {
-                attrsList.appendChild(createAttrInputRow(row, scheduleSync));
+                attrsList.appendChild(createAttrInputRow(row));
             });
 
             const addAttrButton = document.createElement('button');
@@ -271,6 +239,24 @@
             return;
         }
 
+        if (!floater.__viewMenuSyncOnHide) {
+            const originalHide = typeof floater.hide === 'function' ? floater.hide.bind(floater) : null;
+            if (originalHide) {
+                floater.hide = function() {
+                    if (this.state && this.state.mode === 'context' && this.node) {
+                        const menu = this.node.querySelector('.view-floater-menu[data-node-id]');
+                        if (menu) {
+                            syncViewMenu(menu);
+                        }
+                    }
+
+                    originalHide();
+                };
+            }
+
+            floater.__viewMenuSyncOnHide = true;
+        }
+
         floater.addAction('add-view-attr', function(button) {
             const menu = button.closest('.view-floater-menu');
             const list = menu ? menu.querySelector('[data-attr-list="true"]') : null;
@@ -278,21 +264,57 @@
                 return;
             }
 
-            const scheduleSync = function(event) {
-                const currentMenu = event && event.target ? event.target.closest('.view-floater-menu') : menu;
-                queueViewMenuSync(currentMenu);
-            };
-
-            list.appendChild(createAttrInputRow({ key: '', value: '' }, scheduleSync));
+            list.appendChild(createAttrInputRow({ key: '', value: '' }));
         });
 
         floater.addAction('remove-view-attr', function(button) {
-            const menu = button.closest('.view-floater-menu');
             const row = button.closest('.view-floater-attr-edit-row');
             if (row) {
                 row.remove();
-                syncViewMenu(menu);
             }
+        });
+
+        floater.addAction('rename-stylesheet', function(button) {
+            const menu = button.closest('.view-floater-menu');
+            const input = menu ? menu.querySelector('[data-role="stylesheet-name"]') : null;
+            const fromName = button.dataset.styleName || (menu ? menu.dataset.styleName : '');
+            const toName = input ? input.value : '';
+
+            const result = renameStylesheet(fromName, toName);
+            if (!result.ok) {
+                button.textContent = result.message;
+                return;
+            }
+
+            const floaterInstance = getViewFloater();
+            if (floaterInstance && typeof floaterInstance.hide === 'function') {
+                floaterInstance.hide();
+            }
+
+            rerenderStylesPanelIfOpen();
+        });
+
+        floater.addAction('delete-stylesheet', function(button) {
+            const styleName = button.dataset.styleName || '';
+            if (!styleName) {
+                return;
+            }
+
+            if (!window.confirm(`Delete stylesheet "${styleName}"?`)) {
+                return;
+            }
+
+            if (!deleteStylesheet(styleName)) {
+                button.textContent = 'Delete failed';
+                return;
+            }
+
+            const floaterInstance = getViewFloater();
+            if (floaterInstance && typeof floaterInstance.hide === 'function') {
+                floaterInstance.hide();
+            }
+
+            rerenderStylesPanelIfOpen();
         });
 
         floater.addDisplay('view-node', {
@@ -311,7 +333,19 @@
             },
         });
 
+        floater.addDisplay('stylesheet-item', {
+            context(element) {
+                const styleName = element && element.dataset ? element.dataset.styleName : '';
+                if (!styleName) {
+                    return null;
+                }
+
+                return buildStylesheetContextMenu(styleName);
+            },
+        });
+
         floater.addQuery('.view-node-card[data-node-id]', { display: 'view-node' });
+        floater.addQuery('.styles-file-item[data-style-name]', { display: 'stylesheet-item' });
         viewFloaterReady = true;
     }
 
@@ -683,8 +717,10 @@
         panelBody.querySelectorAll('.style-selector-card').forEach(function(card) {
             const selectorInput = card.querySelector('[data-role="style-selector"]');
             const selector = selectorInput ? selectorInput.value.trim() : '';
-            if (!selector) {
-                return;
+            const normalizedSelector = selector || '<empty>';
+
+            if (selectorInput && !selector) {
+                selectorInput.value = normalizedSelector;
             }
 
             const rules = {};
@@ -695,34 +731,141 @@
                 const value = valueInput ? valueInput.value.trim() : '';
                 if (prop && value) {
                     rules[prop] = value;
+                    return;
                 }
+
+                row.remove();
             });
 
-            output[selector] = rules;
+            output[normalizedSelector] = rules;
         });
 
         return output;
     }
 
-    function queueStylesheetSave(panelBody) {
-        if (!styleState.activeName) {
+    function applyStylesheetChanges(panelBody) {
+        const site = vsite();
+        if (!site || typeof site.setStylesheet !== 'function' || !styleState.activeName || !panelBody) {
             return;
         }
 
-        if (styleState.saveTimer) {
-            clearTimeout(styleState.saveTimer);
+        const nextData = collectStyleEditorData(panelBody);
+        site.setStylesheet(styleState.activeName, nextData);
+    }
+
+    function rerenderStylesPanelIfOpen() {
+        if (activeSection !== 'stylesheets' || !sidebarContent.classList.contains('is-open')) {
+            return;
         }
 
-        styleState.saveTimer = setTimeout(function() {
-            const site = vsite();
-            if (!site || typeof site.setStylesheet !== 'function') {
-                return;
-            }
+        const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
+        if (panelBody) {
+            renderStylesPanel(panelBody);
+        }
+    }
 
-            const nextData = collectStyleEditorData(panelBody);
-            site.setStylesheet(styleState.activeName, nextData);
-            styleState.saveTimer = null;
-        }, 180);
+    function renameStylesheet(oldName, nextName) {
+        const site = vsite();
+        const from = typeof oldName === 'string' ? oldName.trim() : '';
+        const to = typeof nextName === 'string' ? nextName.trim() : '';
+
+        if (!site || typeof site.setStylesheet !== 'function' || typeof site.removeStylesheet !== 'function') {
+            return { ok: false, message: 'Stylesheet API unavailable' };
+        }
+
+        if (!from || !to) {
+            return { ok: false, message: 'Name is required' };
+        }
+
+        if (from === to) {
+            return { ok: true, name: from };
+        }
+
+        const existing = typeof site.listStylesheets === 'function'
+            ? site.listStylesheets()
+            : Object.keys((site.getDataJSON() || {}).stylesheets || {});
+        if (existing.includes(to)) {
+            return { ok: false, message: 'Name already exists' };
+        }
+
+        const styleData = typeof site.getStylesheet === 'function'
+            ? site.getStylesheet(from)
+            : ((site.getDataJSON() || {}).stylesheets || {})[from];
+        if (!styleData) {
+            return { ok: false, message: 'Stylesheet not found' };
+        }
+
+        if (!site.setStylesheet(to, styleData)) {
+            return { ok: false, message: 'Rename failed' };
+        }
+
+        if (typeof site.listPages === 'function' && typeof site.getPageIncludes === 'function' && typeof site.addPageInclude === 'function') {
+            site.listPages().forEach(function(page) {
+                const includes = site.getPageIncludes(page.id) || { css: [] };
+                const cssIncludes = Array.isArray(includes.css) ? includes.css : [];
+                if (cssIncludes.includes(from)) {
+                    site.addPageInclude('css', to, page.id);
+                }
+            });
+        }
+
+        if (!site.removeStylesheet(from)) {
+            return { ok: false, message: 'Rename cleanup failed' };
+        }
+
+        if (styleState.activeName === from) {
+            styleState.activeName = to;
+        }
+
+        return { ok: true, name: to };
+    }
+
+    function deleteStylesheet(name) {
+        const site = vsite();
+        const stylesheetName = typeof name === 'string' ? name.trim() : '';
+        if (!site || typeof site.removeStylesheet !== 'function' || !stylesheetName) {
+            return false;
+        }
+
+        const removed = site.removeStylesheet(stylesheetName);
+        if (removed && styleState.activeName === stylesheetName) {
+            styleState.activeName = null;
+        }
+
+        return removed;
+    }
+
+    function buildStylesheetContextMenu(styleName) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'view-floater-menu';
+        wrapper.dataset.styleName = styleName || '';
+
+        const label = document.createElement('div');
+        label.className = 'view-floater-label';
+        label.textContent = 'Stylesheet';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'view-floater-input';
+        input.dataset.role = 'stylesheet-name';
+        input.value = styleName || '';
+
+        const renameButton = document.createElement('button');
+        renameButton.type = 'button';
+        renameButton.className = 'view-floater-button';
+        renameButton.dataset.click = 'rename-stylesheet';
+        renameButton.dataset.styleName = styleName || '';
+        renameButton.textContent = 'Rename';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'view-floater-button danger';
+        deleteButton.dataset.click = 'delete-stylesheet';
+        deleteButton.dataset.styleName = styleName || '';
+        deleteButton.textContent = 'Delete';
+
+        wrapper.append(label, input, renameButton, deleteButton);
+        return wrapper;
     }
 
     function renderStylesPanel(panelBody) {
@@ -739,6 +882,8 @@
             : Object.keys((site.getDataJSON() || {}).stylesheets || {});
 
         if (!styleState.activeName) {
+            panelBody.classList.remove('is-styles-editor');
+
             const title = document.createElement('div');
             title.className = 'styles-header';
             title.textContent = 'Choose a stylesheet';
@@ -766,6 +911,8 @@
             return;
         }
 
+        panelBody.classList.add('is-styles-editor');
+
         const top = document.createElement('div');
         top.className = 'styles-editor-top';
 
@@ -777,9 +924,20 @@
 
         const name = document.createElement('div');
         name.className = 'styles-editor-name';
-        name.textContent = styleState.activeName;
+        name.textContent = styleState.activeName.endsWith('.css')
+            ? styleState.activeName
+            : `${styleState.activeName}.css`;
 
-        top.append(back, name);
+        const applyButton = document.createElement('button');
+        applyButton.type = 'button';
+        applyButton.className = 'pages-create-button';
+        applyButton.dataset.action = 'apply-stylesheet';
+        applyButton.textContent = 'Apply';
+
+        top.append(back, name, applyButton);
+
+        const scrollBody = document.createElement('div');
+        scrollBody.className = 'styles-editor-scroll';
 
         const selectorList = document.createElement('div');
         selectorList.className = 'style-selector-list';
@@ -795,7 +953,9 @@
         addSelector.dataset.action = 'add-style-selector';
         addSelector.textContent = '+ Selector';
 
-        panelBody.append(top, selectorList, addSelector);
+        scrollBody.append(selectorList, addSelector);
+
+        panelBody.append(top, scrollBody);
     }
 
     const sections = {
@@ -828,8 +988,8 @@
             icon: 'Cs',
             label: 'Styles',
             title: 'Stylesheets',
-            width: '48%',
-            minWidth: '42%',
+            minWidth: '20%',
+            width: '20%',
             render: renderStylesPanel
         },
         scripts: {
@@ -969,38 +1129,39 @@
             }
 
             list.appendChild(createStyleSelectorCard('', {}));
-            queueStylesheetSave(panelBody);
         },
         'remove-style-selector': function(target) {
-            const panelBody = target.closest('.sidebar-panel-body');
             const card = target.closest('.style-selector-card');
-            if (!panelBody || !card) {
+            if (!card) {
                 return;
             }
 
             card.remove();
-            queueStylesheetSave(panelBody);
         },
         'add-style-prop': function(target) {
-            const panelBody = target.closest('.sidebar-panel-body');
             const card = target.closest('.style-selector-card');
             const list = card ? card.querySelector('[data-role="style-prop-list"]') : null;
-            if (!panelBody || !list) {
+            if (!list) {
                 return;
             }
 
             list.appendChild(createStylePropRow('', ''));
-            queueStylesheetSave(panelBody);
         },
         'remove-style-prop': function(target) {
-            const panelBody = target.closest('.sidebar-panel-body');
             const row = target.closest('.style-prop-row');
-            if (!panelBody || !row) {
+            if (!row) {
                 return;
             }
 
             row.remove();
-            queueStylesheetSave(panelBody);
+        },
+        'apply-stylesheet': function(target) {
+            const panelBody = target.closest('.sidebar-panel-body[data-section="stylesheets"]');
+            if (!panelBody) {
+                return;
+            }
+
+            applyStylesheetChanges(panelBody);
         }
     };
 
@@ -1013,21 +1174,6 @@
         const handler = handlers[actionButton.dataset.action];
         if (handler) {
             handler(actionButton);
-        }
-    }
-
-    function handlePanelInput(event) {
-        if (activeSection !== 'stylesheets' || !sidebarContent.classList.contains('is-open')) {
-            return;
-        }
-
-        if (!event.target.closest('.sidebar-panel-body[data-section="stylesheets"]')) {
-            return;
-        }
-
-        const panelBody = sidebarContent.querySelector('.sidebar-panel-body[data-section="stylesheets"]');
-        if (panelBody) {
-            queueStylesheetSave(panelBody);
         }
     }
 
@@ -1150,7 +1296,6 @@
         });
 
         sidebarContent.addEventListener('click', handlePanelClick);
-        sidebarContent.addEventListener('input', handlePanelInput);
         sidebarContent.addEventListener('dragstart', handlePanelDragStart);
         sidebarContent.addEventListener('dragover', handlePanelDragOver);
         sidebarContent.addEventListener('dragleave', handlePanelDragLeave);

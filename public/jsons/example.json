@@ -53,8 +53,8 @@
                 },
 
                 "include": {
-                    "css": [ "global.css", "welcome.css" ],
-                    "js": [ "welcome.js" ]
+                    "css": [ "global", "welcome" ],
+                    "js": [ "welcome" ]
                 }
             },
 
@@ -80,15 +80,15 @@
                 },
 
                 "include": {
-                    "css": [ "global.css", "talents.css" ],
-                    "js": [ "talents.js" ]
+                    "css": [ "global", "talents" ],
+                    "js": [ "talents" ]
                 }
             }
         }
     },
 
     "stylesheets": {
-        "global.css": {
+        "global": {
             "*": {
                 "margin": "0",
                 "padding": "0",
@@ -99,7 +99,7 @@
             }
         },
 
-        "welcome.css": {
+        "welcome": {
             "body": {
                 "background": "#f0f0f0"
             },
@@ -116,7 +116,7 @@
     },
 
     "scripts": {
-        "welcome.js": {
+        "welcome": {
             "variables": {
                 "welcomeMessage": "Welcome to Hololie! We are excited to have you here."
             },
@@ -133,7 +133,7 @@
                 ]
             }
         },
-        "talents.js": {
+        "talents": {
             "variables": {},
             "actions": {
                 "click-on-talents": "console.log(`Meet our amazing talents! You clicked on ${event.target.tagName}`)"
