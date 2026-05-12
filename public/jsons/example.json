@@ -108,7 +108,7 @@
             }
         },
 
-        "talents.css": {
+        "talents": {
             "p": {
                 "color": "#333"
             }

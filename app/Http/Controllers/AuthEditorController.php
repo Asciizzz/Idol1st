@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -26,20 +24,7 @@ class AuthEditorController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        if (!Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
-            return back()
-                ->withErrors(['email' => 'Invalid email or password.'])
-                ->onlyInput('email');
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->route('setup');
+        return redirect()->route('editor');
     }
 
     public function showSignup(): View
@@ -49,21 +34,7 @@ class AuthEditorController extends Controller
 
     public function signup(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        $user = User::query()->create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('setup');
+        return redirect()->route('editor');
     }
 
     public function showSetup(Request $request): View
@@ -105,11 +76,7 @@ class AuthEditorController extends Controller
 
     public function showEditor(Request $request): View|RedirectResponse
     {
-        $draft = $request->session()->get('site_draft');
-
-        if (!is_array($draft) || $draft === []) {
-            return redirect()->route('setup');
-        }
+        $draft = $this->resolveDraft($request);
 
         $initialProject = $this->resolveInitialBuilderProject($request, $draft);
 
@@ -121,14 +88,7 @@ class AuthEditorController extends Controller
 
     public function saveEditor(Request $request): JsonResponse
     {
-        $draft = $request->session()->get('site_draft');
-
-        if (!is_array($draft) || $draft === []) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'No setup draft found.',
-            ], 422);
-        }
+        $draft = $this->resolveDraft($request);
 
         if ($request->has('project_json')) {
             $validated = $request->validate([
@@ -206,16 +166,36 @@ class AuthEditorController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('auth');
+        return redirect()->route('editor');
     }
 
     private function buildDraftFileName(Request $request, array $draft): string
     {
+        $ownerId = Auth::id() ? (string) Auth::id() : ('guest-' . substr(hash('sha256', (string) $request->session()->getId()), 0, 12));
         $safeSlug = preg_replace('/[^a-z0-9-]/', '-', strtolower((string) ($draft['subdomain'] ?? '')));
         $safeSlug = trim((string) $safeSlug, '-');
         $safeSlug = $safeSlug !== '' ? $safeSlug : 'untitled';
 
-        return sprintf('%s_%s.json', (string) $request->user()->id, $safeSlug);
+        return sprintf('%s_%s.json', $ownerId, $safeSlug);
+    }
+
+    private function resolveDraft(Request $request): array
+    {
+        $draft = $request->session()->get('site_draft');
+        if (is_array($draft) && $draft !== []) {
+            return $draft;
+        }
+
+        return [
+            'site_type' => 'idol',
+            'project_name' => 'Example Project',
+            'subdomain' => 'example',
+            'domain' => 'example.idol1st.app',
+            'project_path' => 'home',
+            'template_key' => 'spotlight',
+            'theme_color' => '#ff4d4f',
+            'owner_user_id' => Auth::id() ? (string) Auth::id() : 'guest',
+        ];
     }
 
     private function resolveInitialBuilderProject(Request $request, array $draft): array

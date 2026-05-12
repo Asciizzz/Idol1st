@@ -34,6 +34,11 @@ By Asciiz
 # Scripts:
     addScript(name, scriptData)   removeScript(name)   getScript(name)
 
+# Custom Data:
+    setCustomData(path, value)
+    getCustomData(path?, fallback?)
+    removeCustomData(path)
+
 # Script data shape:
     { 
         variables:{}, actions:{ name:"code with `variables` + `event`" },
@@ -50,6 +55,16 @@ By Asciiz
     const clone = v => typeof structuredClone === "function"
         ? structuredClone(v) : JSON.parse(JSON.stringify(v));
     const filterKids = (arr, id) => (arr || []).filter(c => c !== id);
+    const toPath = p => Array.isArray(p)
+        ? p.map(x => String(x).trim()).filter(Boolean)
+        : String(p ?? "").split(".").map(x => x.trim()).filter(Boolean);
+    const normalizeAssetName = (name, type = "") => {
+        if (!isStr(name)) return "";
+        let out = String(name).trim();
+        if (type === "css") out = out.replace(/\.css$/i, "");
+        if (type === "js") out = out.replace(/\.js$/i, "");
+        return out.trim();
+    };
 
     class EzVirtualSite {
         #frames = {};       // key -> iframe
@@ -64,14 +79,14 @@ By Asciiz
         }
 
         #emitPagesChanged() {
-            this.#emit("wc:pages-changed", {
+            this.#emit("ezvs:pages-changed", {
                 pages: this.listPages(),
                 currentPageId: this.getActiveID(),
             });
         }
 
         #emitPageContentChanged() {
-            this.#emit("wc:page-content-changed", { pageId: this.getActiveID() });
+            this.#emit("ezvs:page-content-changed", { pageId: this.getActiveID() });
         }
 
         /* -- setup -- */
@@ -96,6 +111,8 @@ By Asciiz
             this.#data = clone(d);
             this.#data.stylesheets ||= {};
             this.#data.scripts ||= {};
+            this.#data.custom ||= {};
+            this.#normalizeAssets();
             return this;
         }
 
@@ -109,7 +126,7 @@ By Asciiz
             const start = this.#data.pages.page_start || this.#firstPage();
             if (start) this.changePage(start);
 
-            this.#emit("wc:project-ready", {
+            this.#emit("ezvs:project-ready", {
                 pages: this.listPages(),
                 currentPageId: this.getActiveID(),
             });
@@ -147,7 +164,7 @@ By Asciiz
             next.style.display = "block";
             this.#data.pages.page_start = this.#active = id;
 
-            this.#emit("wc:page-selected", { pageId: id });
+            this.#emit("ezvs:page-selected", { pageId: id });
             this.#emitPagesChanged();
 
             return true;
@@ -216,7 +233,9 @@ By Asciiz
 
         addPageInclude(type, name, id = this.#active) {
             const page = this.getPageData(id);
-            if (!page || !isStr(name) || (type !== "css" && type !== "js")) return false;
+            if (!page || (type !== "css" && type !== "js")) return false;
+            const normalizedName = normalizeAssetName(name, type);
+            if (!normalizedName) return false;
 
             page.include ||= { css: [], js: [] };
             page.include.css ||= [];
@@ -224,9 +243,9 @@ By Asciiz
 
             const list = page.include[type];
             if (!Array.isArray(list)) return false;
-            if (list.includes(name)) return true;
+            if (list.includes(normalizedName)) return true;
 
-            list.push(name);
+            list.push(normalizedName);
 
             if (type === "css") this.#reloadMainStyle(id);
             else this.load(id);
@@ -237,7 +256,9 @@ By Asciiz
 
         removePageInclude(type, name, id = this.#active) {
             const page = this.getPageData(id);
-            if (!page || !isStr(name) || (type !== "css" && type !== "js")) return false;
+            if (!page || (type !== "css" && type !== "js")) return false;
+            const normalizedName = normalizeAssetName(name, type);
+            if (!normalizedName) return false;
 
             page.include ||= { css: [], js: [] };
             page.include.css ||= [];
@@ -246,7 +267,7 @@ By Asciiz
             const list = page.include[type];
             if (!Array.isArray(list)) return false;
 
-            const next = list.filter(n => n !== name);
+            const next = list.filter(n => n !== normalizedName);
             if (next.length === list.length) return true;
 
             page.include[type] = next;
@@ -364,28 +385,31 @@ By Asciiz
         }
 
         getStylesheet(name) {
-            if (!isStr(name)) return null;
-            const cssData = this.#data.stylesheets?.[name];
+            const normalizedName = normalizeAssetName(name, "css");
+            if (!normalizedName) return null;
+            const cssData = this.#data.stylesheets?.[normalizedName];
             return cssData === undefined ? null : clone(cssData);
         }
 
         setStylesheet(name, cssData) {
-            if (!isStr(name) || (!isObj(cssData) && typeof cssData !== "string")) return false;
+            const normalizedName = normalizeAssetName(name, "css");
+            if (!normalizedName || (!isObj(cssData) && typeof cssData !== "string")) return false;
             this.#data.stylesheets ||= {};
-            this.#data.stylesheets[name] = clone(cssData);
+            this.#data.stylesheets[normalizedName] = clone(cssData);
             this.#reloadMainStyle(this.#active);
             this.#emitPageContentChanged();
             return true;
         }
 
         removeStylesheet(name) {
-            if (!isStr(name) || !this.#data.stylesheets?.[name]) return false;
-            delete this.#data.stylesheets[name];
+            const normalizedName = normalizeAssetName(name, "css");
+            if (!normalizedName || !this.#data.stylesheets?.[normalizedName]) return false;
+            delete this.#data.stylesheets[normalizedName];
 
             Object.values(this.#data.pages.page_data || {}).forEach(page => {
                 page.include ||= { css: [], js: [] };
                 page.include.css ||= [];
-                page.include.css = page.include.css.filter(n => n !== name);
+                page.include.css = page.include.css.filter(n => n !== normalizedName);
             });
 
             this.#reloadMainStyle(this.#active);
@@ -396,17 +420,82 @@ By Asciiz
         /* -- script API -- */
 
         addScript(name, data) {
-            if (!isStr(name) || !isObj(data)) return false;
-            this.#data.scripts[name] = clone(data);
+            const normalizedName = normalizeAssetName(name, "js");
+            if (!normalizedName || !isObj(data)) return false;
+            this.#data.scripts[normalizedName] = clone(data);
             return true;
         }
 
         removeScript(name) {
-            if (!this.#data.scripts[name]) return false;
-            delete this.#data.scripts[name]; return true;
+            const normalizedName = normalizeAssetName(name, "js");
+            if (!normalizedName || !this.#data.scripts[normalizedName]) return false;
+            delete this.#data.scripts[normalizedName]; return true;
         }
 
-        getScript(name) { return this.#data.scripts[name] ? clone(this.#data.scripts[name]) : null; }
+        getScript(name) {
+            const normalizedName = normalizeAssetName(name, "js");
+            return normalizedName && this.#data.scripts[normalizedName] ? clone(this.#data.scripts[normalizedName]) : null;
+        }
+
+        /* -- custom data API -- */
+
+        setCustomData(path, value) {
+            const parts = toPath(path);
+            if (parts.length === 0) return false;
+
+            this.#data.custom ||= {};
+            let current = this.#data.custom;
+
+            for (let i = 0; i < parts.length - 1; i++) {
+                const key = parts[i];
+                if (!isObj(current[key])) current[key] = {};
+                current = current[key];
+            }
+
+            current[parts[parts.length - 1]] = clone(value);
+            this.#emit("ezvs:custom-data-changed", { path: parts.join(".") });
+            return true;
+        }
+
+        getCustomData(path = null, fallback = null) {
+            this.#data.custom ||= {};
+
+            if (path === null || path === undefined || path === "") {
+                return clone(this.#data.custom);
+            }
+
+            const parts = toPath(path);
+            if (parts.length === 0) return clone(this.#data.custom);
+
+            let current = this.#data.custom;
+            for (const key of parts) {
+                if (!isObj(current) || !(key in current)) {
+                    return fallback;
+                }
+                current = current[key];
+            }
+
+            return clone(current);
+        }
+
+        removeCustomData(path) {
+            const parts = toPath(path);
+            if (parts.length === 0) return false;
+
+            this.#data.custom ||= {};
+            let current = this.#data.custom;
+            for (let i = 0; i < parts.length - 1; i++) {
+                const key = parts[i];
+                if (!isObj(current[key])) return false;
+                current = current[key];
+            }
+
+            const leaf = parts[parts.length - 1];
+            if (!(leaf in current)) return false;
+            delete current[leaf];
+            this.#emit("ezvs:custom-data-changed", { path: parts.join(".") });
+            return true;
+        }
 
         /* -- rendering -- */
 
@@ -565,13 +654,45 @@ By Asciiz
         }
         #firstPage() { return Object.keys(this.#data.pages.page_data)[0] || null; }
 
+        #normalizeAssets() {
+            const nextStyles = {};
+            for (const [rawName, styleData] of Object.entries(this.#data.stylesheets || {})) {
+                const normalizedName = normalizeAssetName(rawName, "css");
+                if (!normalizedName) continue;
+                nextStyles[normalizedName] = styleData;
+            }
+            this.#data.stylesheets = nextStyles;
+
+            const nextScripts = {};
+            for (const [rawName, scriptData] of Object.entries(this.#data.scripts || {})) {
+                const normalizedName = normalizeAssetName(rawName, "js");
+                if (!normalizedName) continue;
+                nextScripts[normalizedName] = scriptData;
+            }
+            this.#data.scripts = nextScripts;
+
+            Object.values(this.#data.pages?.page_data || {}).forEach(page => {
+                page.include ||= { css: [], js: [] };
+                page.include.css = Array.from(
+                    new Set((Array.isArray(page.include.css) ? page.include.css : [])
+                        .map(name => normalizeAssetName(name, "css"))
+                        .filter(Boolean))
+                );
+                page.include.js = Array.from(
+                    new Set((Array.isArray(page.include.js) ? page.include.js : [])
+                        .map(name => normalizeAssetName(name, "js"))
+                        .filter(Boolean))
+                );
+            });
+        }
+
         #emptyData() {
             return {
                 pages: {
                     page_start: "p0", page_counter: 1, page_data: {
                         p0: { title: "New Page", slug: "new-page", node_counter: 0, nodes: {}, include: { css: [], js: [] } }
                     }
-                }, stylesheets: {}, scripts: {}
+                }, stylesheets: {}, scripts: {}, custom: {}
             };
         }
     }
