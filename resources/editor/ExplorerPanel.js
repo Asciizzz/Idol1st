@@ -60,7 +60,7 @@ export class ExplorerPanel {
 
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'side-nav-button is-active';
+        button.className = 'side-nav-button';
         button.dataset.sideKey = 'explorer';
         button.innerHTML = `
             <span class="side-nav-icon">
@@ -137,6 +137,10 @@ export class ExplorerPanel {
         this.panelElement.classList.add('is-open');
         this.panelElement.setAttribute('aria-hidden', 'false');
         this.layoutRoot.classList.add('has-open-sidebar');
+        const navButton = this.navElement.querySelector('.side-nav-button');
+        if (navButton) {
+            navButton.classList.add('is-active');
+        }
         this.refreshTree();
     }
 
@@ -145,6 +149,10 @@ export class ExplorerPanel {
         this.panelElement.classList.remove('is-open');
         this.panelElement.setAttribute('aria-hidden', 'true');
         this.layoutRoot.classList.remove('has-open-sidebar');
+        const navButton = this.navElement.querySelector('.side-nav-button');
+        if (navButton) {
+            navButton.classList.remove('is-active');
+        }
         this.closeCreateMenu();
         this.handleResizeEnd();
     }
@@ -1318,10 +1326,13 @@ export class ExplorerPanel {
         }
 
         const delta = event.clientX - this.startPointerX;
-        const minWidth = 260;
-        const maxWidth = Math.floor(window.innerWidth * 0.4);
-        const nextWidth = Math.max(minWidth, Math.min(maxWidth, this.startPanelWidth + delta));
-        this.layoutRoot.style.setProperty('--editor-panel-width', `${nextWidth}px`);
+        const viewportWidth = Math.max(window.innerWidth, 1);
+        const startPanelPx = (this.startPanelWidth / 100) * viewportWidth;
+        const minPanelPx = viewportWidth * 0.05;
+        const maxPanelPx = viewportWidth * 0.4;
+        const nextPanelPx = Math.max(minPanelPx, Math.min(maxPanelPx, startPanelPx + delta));
+        const nextPanelVw = (nextPanelPx / viewportWidth) * 100;
+        this.layoutRoot.style.setProperty('--editor-panel-width', `${nextPanelVw}vw`);
     };
 
     handleResizeEnd = (event) => {
@@ -1361,7 +1372,24 @@ export class ExplorerPanel {
 
     getCurrentPanelWidth() {
         const computed = window.getComputedStyle(this.layoutRoot).getPropertyValue('--editor-panel-width').trim();
-        const parsed = Number.parseFloat(computed.replace('px', ''));
-        return Number.isFinite(parsed) ? parsed : 336;
+        if (!computed) {
+            return 20;
+        }
+
+        const parsed = Number.parseFloat(computed);
+        if (!Number.isFinite(parsed)) {
+            return 20;
+        }
+
+        if (computed.endsWith('vw')) {
+            return parsed;
+        }
+
+        if (computed.endsWith('px')) {
+            const viewportWidth = Math.max(window.innerWidth, 1);
+            return (parsed / viewportWidth) * 100;
+        }
+
+        return parsed;
     }
 }

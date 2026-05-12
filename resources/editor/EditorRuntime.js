@@ -13,6 +13,7 @@ export class EditorRuntime {
         this.handleFrameDragLeave = this.handleFrameDragLeave.bind(this);
         this.handleFrameDrop = this.handleFrameDrop.bind(this);
         this.handleFrameDragEnd = this.handleFrameDragEnd.bind(this);
+        this.handleFrameClick = this.handleFrameClick.bind(this);
     }
 
     async init() {
@@ -97,11 +98,13 @@ export class EditorRuntime {
         });
 
         document.addEventListener('ezvs:page-selected', function(event) {
+            runtime.refreshSelectionDecorations();
             bus.emit(BUS.PAGE_SELECTED, event.detail || {});
         });
 
         document.addEventListener('ezvs:page-content-changed', function(event) {
             runtime.refreshFrameBindings();
+            runtime.refreshSelectionDecorations();
             bus.emit(BUS.PAGE_CONTENT_CHANGED, event.detail || {});
             bus.emit(BUS.STYLES_CHANGED, event.detail || {});
             bus.emit(BUS.SCRIPTS_CHANGED, event.detail || {});
@@ -133,8 +136,11 @@ export class EditorRuntime {
             doc.addEventListener('dragleave', runtime.handleFrameDragLeave);
             doc.addEventListener('drop', runtime.handleFrameDrop);
             doc.addEventListener('dragend', runtime.handleFrameDragEnd);
+            doc.addEventListener('click', runtime.handleFrameClick);
             runtime.ensureFrameNodesDraggable(doc);
         });
+
+        this.refreshSelectionDecorations();
     }
 
     ensureFrameNodesDraggable(doc) {
@@ -144,6 +150,30 @@ export class EditorRuntime {
 
         doc.querySelectorAll('[data-vs-node-id]').forEach(function(element) {
             element.setAttribute('draggable', 'true');
+        });
+    }
+
+    refreshSelectionDecorations() {
+        if (!this.site) {
+            return;
+        }
+
+        const selectedNodeId = this.getActiveNodeId();
+        this.site.listPages().forEach((page) => {
+            const frame = this.site.getPageFrame(page.id);
+            const doc = frame ? frame.contentDocument : null;
+            if (!doc || typeof doc.querySelectorAll !== 'function') {
+                return;
+            }
+
+            doc.querySelectorAll('[data-vs-node-id]').forEach((element) => {
+                const nodeId = element.getAttribute('data-vs-node-id');
+                if (selectedNodeId && nodeId === selectedNodeId) {
+                    element.setAttribute('data-vs-selected', 'true');
+                    return;
+                }
+                element.removeAttribute('data-vs-selected');
+            });
         });
     }
 
@@ -204,10 +234,99 @@ export class EditorRuntime {
         this.clearDropTargets(doc);
     }
 
+    handleFrameClick(event) {
+        const nodeElement = this.getEventNodeElement(event);
+        const nodeId = nodeElement ? nodeElement.getAttribute('data-vs-node-id') : null;
+        if (nodeId) {
+            this.selectNode(nodeId);
+        } else {
+            this.selectRoot();
+        }
+    }
+
     getEventNodeElement(event) {
         return event && event.target && event.target.closest
             ? event.target.closest('[data-vs-node-id]')
             : null;
+    }
+
+    getActiveNodeId() {
+        if (!this.site || typeof this.site.getActiveNodeId !== 'function') {
+            return null;
+        }
+        return this.site.getActiveNodeId();
+    }
+
+    setActiveNodeId(nodeId) {
+        if (!this.site || typeof this.site.setActiveNodeId !== 'function') {
+            return false;
+        }
+        const changed = this.site.setActiveNodeId(nodeId);
+        if (changed) {
+            this.refreshSelectionDecorations();
+        }
+        return changed;
+    }
+
+    selectRoot() {
+        return this.setActiveNodeId(null);
+    }
+
+    selectNode(nodeId) {
+        if (!nodeId) {
+            return this.selectRoot();
+        }
+        return this.setActiveNodeId(String(nodeId));
+    }
+
+    getSelectedParentForAdd() {
+        const nodeId = this.getActiveNodeId();
+        return nodeId || null;
+    }
+
+    addNodeUnderSelection(definition = {}) {
+        if (!this.site) {
+            return null;
+        }
+        const parent = this.getSelectedParentForAdd();
+        const payload = {
+            ...definition,
+            parent: parent || undefined,
+        };
+        const nodeId = this.site.addNode(payload);
+        if (nodeId) {
+            this.selectNode(nodeId);
+        }
+        return nodeId;
+    }
+
+    deleteSelectedNode(mode) {
+        if (!this.site) {
+            return false;
+        }
+        const selectedNodeId = this.getActiveNodeId();
+        if (!selectedNodeId) {
+            return false;
+        }
+        const selectedNode = this.site.readNode(selectedNodeId);
+        if (!selectedNode) {
+            return false;
+        }
+
+        const keepChildren = mode === 'single';
+        const parentNodeId = selectedNode.parent || null;
+        const deleted = this.site.deleteNode(selectedNodeId, keepChildren);
+        if (!deleted) {
+            return false;
+        }
+
+        if (parentNodeId && this.site.readNode(parentNodeId)) {
+            this.selectNode(parentNodeId);
+            return true;
+        }
+
+        this.selectRoot();
+        return true;
     }
 
     toggleDropTarget(event, isActive) {
@@ -255,6 +374,11 @@ export class EditorRuntime {
 
             [data-vs-node-id]:hover {
                 outline: 2px solid #f97316;
+                outline-offset: -1px;
+            }
+
+            [data-vs-node-id][data-vs-selected="true"] {
+                outline: 2px solid #facc15;
                 outline-offset: -1px;
             }
 

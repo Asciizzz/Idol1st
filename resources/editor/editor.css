@@ -1,8 +1,8 @@
 .editor-layout {
     --editor-header-height: 3.5rem;
     --editor-statusbar-height: 1.7rem;
-    --editor-nav-width: 4.75rem;
-    --editor-panel-width: 21rem;
+    --editor-nav-width: 3rem;
+    --editor-panel-width: 20vw;
     --editor-accent: #f97316;
     --editor-accent-soft: rgba(249, 115, 22, 0.18);
     --editor-border: #2a2a2a;
@@ -113,48 +113,45 @@
     flex-direction: column;
     gap: 0.35rem;
     align-items: center;
-    padding: 0.7rem 0.45rem;
+    padding: 0.35rem 0.2rem;
 }
 
 .side-nav-button {
     width: 100%;
     border: 0;
-    border-radius: 0.65rem;
+    border-radius: 0.35rem;
     background: transparent;
     color: var(--editor-text-2);
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.5rem 0.35rem;
+    justify-content: center;
+    padding: 0.45rem 0.2rem;
+    min-height: 2.2rem;
 }
 
 .side-nav-button:hover,
 .side-nav-button.is-active {
-    background: rgba(39, 39, 42, 0.55);
+    background: rgba(57, 57, 62, 0.75);
     color: var(--editor-text-1);
 }
 
 .side-nav-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 1px solid var(--editor-border);
-    border-radius: 0.45rem;
+    width: 1.05rem;
+    height: 1.05rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #111113;
 }
 
 .side-nav-icon svg {
-    width: 1rem;
-    height: 1rem;
+    width: 100%;
+    height: 100%;
     fill: currentColor;
 }
 
 .side-nav-label {
-    font-size: 0.67rem;
+    display: none;
 }
 
 #editor-main {
@@ -171,6 +168,7 @@
     top: var(--editor-header-height);
     left: var(--editor-nav-width);
     width: 0;
+    min-width: 0;
     height: calc(100vh - var(--editor-header-height) - var(--editor-statusbar-height));
     overflow: hidden;
     border-right: 1px solid transparent;
@@ -194,6 +192,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-width: 10vw;
 }
 
 .explorer-header {
@@ -446,7 +445,7 @@
 #editor-sidebar-resize {
     position: fixed;
     top: var(--editor-header-height);
-    left: calc(var(--editor-nav-width) + var(--editor-panel-width) - 2px);
+    left: calc(var(--editor-nav-width) + var(--editor-panel-width) - 3px);
     width: 6px;
     height: calc(100vh - var(--editor-header-height) - var(--editor-statusbar-height));
     cursor: col-resize;
@@ -685,6 +684,7 @@
 
 .render-page {
     height: 100%;
+    position: relative;
 }
 
 .render-page-pane {
@@ -695,6 +695,168 @@
 .render-page-pane.is-active {
     display: block;
     height: 100%;
+}
+
+.render-page-pane-visual {
+    position: relative;
+}
+
+.page-view-tools {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.25rem;
+    z-index: 140;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 7.35rem;
+}
+
+.page-view-tool-button {
+    border: 1px solid #2d2d33;
+    border-radius: 0.45rem;
+    background: rgba(12, 12, 14, 0.92);
+    color: #d4d4da;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.page-view-tool-button:hover {
+    border-color: #5a5a63;
+    color: #f4f4f6;
+}
+
+.page-view-tool-button.is-active {
+    border-color: #facc15;
+    color: #fff6cd;
+    background: rgba(58, 47, 15, 0.6);
+}
+
+.page-view-tool-button span {
+    font-size: 0.74rem;
+    line-height: 1.1;
+}
+
+.page-view-tool-button small {
+    color: #94949d;
+    font-size: 0.62rem;
+    line-height: 1.1;
+}
+
+.page-tool-popup-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 145;
+    pointer-events: none;
+}
+
+.page-tool-popup-layer[hidden] {
+    display: none !important;
+}
+
+.page-tool-popup {
+    position: fixed;
+    width: 12.5rem;
+    max-height: 20rem;
+    overflow: auto;
+    border: 1px solid #2f2f36;
+    border-radius: 0.38rem;
+    background: #0f0f11;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.48);
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    pointer-events: auto;
+}
+
+.page-tool-popup header {
+    color: #b6b6be;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.32rem;
+}
+
+.page-tool-popup-group {
+    color: #9b9ba5;
+    font-size: 0.64rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.32rem;
+}
+
+.page-tool-popup-separator {
+    border-top: 1px solid #2a2a30;
+    margin: 0.15rem 0;
+}
+
+.page-tool-popup-item {
+    border: 1px solid transparent;
+    border-radius: 0.28rem;
+    background: transparent;
+    color: #e2e2e9;
+    min-height: 1.82rem;
+    padding: 0.22rem 0.38rem;
+    text-align: left;
+    font-size: 0.71rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.page-tool-popup-item:hover {
+    border-color: #3a3a44;
+    background: #1c1c22;
+}
+
+.page-tool-popup-item.has-submenu::after {
+    content: ">";
+    color: #8f8f97;
+}
+
+.page-tool-popup-item.is-danger {
+    color: #ffcdcd;
+}
+
+.page-tool-search-input {
+    border: 1px solid #33333b;
+    border-radius: 0.28rem;
+    background: #151519;
+    color: #f4f4f7;
+    height: 1.9rem;
+    padding: 0 0.45rem;
+    font-size: 0.72rem;
+}
+
+.page-tool-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.page-tool-search-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.page-tool-search-item small {
+    color: #8d8d96;
+    font-size: 0.62rem;
+}
+
+.page-tool-search-empty {
+    color: #8b8b94;
+    font-size: 0.72rem;
+    padding: 0.45rem 0.35rem;
 }
 
 .render-page-pane-graph {
@@ -824,7 +986,7 @@
 
 @media (max-width: 980px) {
     .editor-layout {
-        --editor-panel-width: 17rem;
+        --editor-panel-width: 20vw;
     }
 
     .editor-header-url {

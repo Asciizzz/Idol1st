@@ -156,7 +156,9 @@ By Asciiz
         reload(id = this.#active) { return this.load(id); }
 
         changePage(id = this.#active) {
-            if (!this.getPageData(id)) return false;
+            const page = this.getPageData(id);
+            if (!page) return false;
+            this.#normalizePageActiveSelection(page);
             const next = this.#frames[this.#key(id)];
             if (!next) return false;
             this.load(id);
@@ -175,7 +177,7 @@ By Asciiz
             this.#data.pages.page_data[id] = {
                 title: isStr(title) ? title : "New Page",
                 slug: isStr(slug) ? slug : `new-page-${id}`,
-                node_counter: 0, nodes: {}, include: { css: [], js: [] }
+                node_counter: 0, nodes: {}, include: { css: [], js: [] }, active_node_id: null
             };
             this.#buildFrame(id);
             this.load(id);
@@ -214,8 +216,39 @@ By Asciiz
         }
 
         getPageFrame(id = this.#active) { return this.#frames[this.#key(id)] || null; }
-        getPageData(id = this.#active) { return this.#data?.pages.page_data[id] || null; }
+        getPageData(id = this.#active) {
+            const page = this.#data?.pages?.page_data?.[id] || null;
+            if (!page) {
+                return null;
+            }
+            this.#normalizePageShape(page);
+            this.#normalizePageActiveSelection(page);
+            return page;
+        }
         getActiveID() { return this.#active; }
+        getActiveNodeId(id = this.#active) {
+            const page = this.getPageData(id);
+            if (!page) {
+                return null;
+            }
+            return page.active_node_id ?? null;
+        }
+        setActiveNodeId(nodeId, id = this.#active) {
+            const page = this.getPageData(id);
+            if (!page) {
+                return false;
+            }
+            if (nodeId === null || nodeId === undefined || nodeId === "") {
+                page.active_node_id = null;
+                return true;
+            }
+            const normalizedNodeId = String(nodeId);
+            if (!page.nodes[normalizedNodeId]) {
+                return false;
+            }
+            page.active_node_id = normalizedNodeId;
+            return true;
+        }
         listPages() {
             return Object.entries(this.#data.pages.page_data).map(([id, p]) => ({
                 id, title: p.title, slug: p.slug
@@ -297,6 +330,7 @@ By Asciiz
             if (parent) (page.nodes[parent].children ||= []).push(id);
 
             this.#reloadMainBody(this.#active);
+            this.#normalizePageActiveSelection(page);
             this.#emitPageContentChanged();
             return id;
         }
@@ -324,6 +358,7 @@ By Asciiz
             if (graph !== undefined) n.graph = graph;
 
             this.#reloadMainBody(this.#active);
+            this.#normalizePageActiveSelection(page);
             this.#emitPageContentChanged();
             return true;
         }
@@ -340,6 +375,7 @@ By Asciiz
             child.parent = pid;
 
             this.#reloadMainBody(this.#active);
+            this.#normalizePageActiveSelection(page);
             this.#emitPageContentChanged();
             return true;
         }
@@ -368,12 +404,14 @@ By Asciiz
                 if (parent) parent.children = filterKids(parent.children, id);
 
                 this.#reloadMainBody(this.#active);
+                this.#normalizePageActiveSelection(page);
                 this.#emitPageContentChanged();
                 return true;
             }
             delete nodes[id];
 
             this.#reloadMainBody(this.#active);
+            this.#normalizePageActiveSelection(page);
             this.#emitPageContentChanged();
             return true;
         }
@@ -672,6 +710,7 @@ By Asciiz
             this.#data.scripts = nextScripts;
 
             Object.values(this.#data.pages?.page_data || {}).forEach(page => {
+                this.#normalizePageShape(page);
                 page.include ||= { css: [], js: [] };
                 page.include.css = Array.from(
                     new Set((Array.isArray(page.include.css) ? page.include.css : [])
@@ -683,14 +722,42 @@ By Asciiz
                         .map(name => normalizeAssetName(name, "js"))
                         .filter(Boolean))
                 );
+                this.#normalizePageActiveSelection(page);
             });
+        }
+
+        #normalizePageShape(page) {
+            if (!isObj(page)) {
+                return;
+            }
+            page.nodes ||= {};
+            page.include ||= { css: [], js: [] };
+            page.include.css ||= [];
+            page.include.js ||= [];
+            if (!("active_node_id" in page)) {
+                page.active_node_id = null;
+            }
+        }
+
+        #normalizePageActiveSelection(page) {
+            if (!isObj(page)) {
+                return;
+            }
+            this.#normalizePageShape(page);
+            const nodeId = page.active_node_id;
+            if (nodeId === null || nodeId === undefined || nodeId === "") {
+                page.active_node_id = null;
+                return;
+            }
+            const normalizedNodeId = String(nodeId);
+            page.active_node_id = page.nodes[normalizedNodeId] ? normalizedNodeId : null;
         }
 
         #emptyData() {
             return {
                 pages: {
                     page_start: "p0", page_counter: 1, page_data: {
-                        p0: { title: "New Page", slug: "new-page", node_counter: 0, nodes: {}, include: { css: [], js: [] } }
+                        p0: { title: "New Page", slug: "new-page", node_counter: 0, nodes: {}, include: { css: [], js: [] }, active_node_id: null }
                     }
                 }, stylesheets: {}, scripts: {}, custom: {}
             };
