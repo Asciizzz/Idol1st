@@ -1,0 +1,170 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://idol1st.local/schema/project-json.schema.json",
+  "title": "VirtualSite Project JSON",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "pages", "stylesheets", "scripts"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "domain": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "pages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_start", "page_counter", "page_data"],
+      "properties": {
+        "page_start": { "type": ["string", "null"], "pattern": "^p[0-9]+$" },
+        "page_counter": { "type": "integer", "minimum": 0 },
+        "page_data": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/page"
+          },
+          "propertyNames": {
+            "pattern": "^p[0-9]+$"
+          }
+        }
+      }
+    },
+    "stylesheets": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/stylesheet"
+      },
+      "propertyNames": {
+        "pattern": "^[^\\s]+$"
+      }
+    },
+    "scripts": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/script"
+      },
+      "propertyNames": {
+        "pattern": "^[^\\s]+$"
+      }
+    },
+    "custom": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "slug", "node_counter", "nodes", "include", "active_node_id"],
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "node_counter": { "type": "integer", "minimum": 0 },
+        "active_node_id": {
+          "type": ["string", "null"],
+          "pattern": "^n[0-9]+$"
+        },
+        "nodes": {
+          "type": "object",
+          "propertyNames": { "pattern": "^n[0-9]+$" },
+          "additionalProperties": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "include": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["css", "js"],
+          "properties": {
+            "css": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "js": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "parent"],
+      "properties": {
+        "tag": { "type": "string", "minLength": 1 },
+        "parent": {
+          "type": ["string", "null"],
+          "pattern": "^n[0-9]+$"
+        },
+        "children": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^n[0-9]+$" },
+          "uniqueItems": true
+        },
+        "attrs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        },
+        "text": { "type": "string" },
+        "graph": {
+          "type": ["object", "array", "string", "number", "boolean", "null"]
+        }
+      }
+    },
+    "stylesheet": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": ["string", "number"]
+            }
+          }
+        }
+      ]
+    },
+    "script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variables", "actions", "events"],
+      "properties": {
+        "variables": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "actions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["selector", "action"],
+              "properties": {
+                "selector": { "type": "string", "minLength": 1 },
+                "action": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

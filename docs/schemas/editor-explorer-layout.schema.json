@@ -1,0 +1,47 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://idol1st.local/schema/editor-explorer-layout.schema.json",
+  "title": "Editor Explorer Layout",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["folders", "placements", "collapsed", "nextFolderCounter"],
+  "properties": {
+    "folders": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/folder"
+      }
+    },
+    "placements": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "propertyNames": {
+        "pattern": "^(page|style|script):"
+      }
+    },
+    "collapsed": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "nextFolderCounter": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "folder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "parentId", "locked"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "parentId": { "type": "string" },
+        "locked": { "type": "boolean" }
+      }
+    }
+  }
+}
