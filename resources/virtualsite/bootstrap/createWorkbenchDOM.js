@@ -33,7 +33,7 @@ export function createWorkbenchDOM(host) {
     header.className = 'vsb-header';
     header.innerHTML = `
         <div class="vsb-header-left">
-            <span class="vsb-header-kicker">Live Builder</span>
+            <span class="vsb-header-kicker">Idol1st</span>
             <strong class="vsb-header-title">VirtualSite Editor</strong>
             <span class="vsb-header-domain" data-role="domain-preview"></span>
         </div>

@@ -70,7 +70,6 @@ export class SettingsPanel {
                     <button type="button" class="vsb-btn vsb-btn-primary" data-role="theme-apply">Apply</button>
                     <button type="button" class="vsb-btn is-danger" data-role="theme-delete">Delete Selected</button>
                 </div>
-                <div class="vsb-inline-help">Default Dark and Default Light are protected.</div>
             </section>
             <section class="vsb-panel-group">
                 <h3>Custom Theme JSON</h3>
