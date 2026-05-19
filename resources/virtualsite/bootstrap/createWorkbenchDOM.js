@@ -72,33 +72,8 @@ export function createWorkbenchDOM(host) {
     const workspace = document.createElement('div');
     workspace.className = 'vsb-workspace';
 
-    const toolRail = document.createElement('aside');
-    toolRail.className = 'vsb-tool-rail';
-    toolRail.setAttribute('aria-label', 'Viewport Tools');
-    toolRail.innerHTML = `
-        <button type="button" class="vsb-tool-btn is-active" data-tool-mode="select" title="Select Mode (Shift+W)">
-            <span class="vsb-tool-btn-icon">&#9678;</span>
-            <span class="vsb-tool-btn-text">Select</span>
-        </button>
-        <button type="button" class="vsb-tool-btn" data-tool-mode="add" title="Add Node Mode (Shift+A)">
-            <span class="vsb-tool-btn-icon">+</span>
-            <span class="vsb-tool-btn-text">Add</span>
-        </button>
-        <button type="button" class="vsb-tool-btn" data-tool-mode="delete" title="Delete Mode (Shift+D)">
-            <span class="vsb-tool-btn-icon">&#9003;</span>
-            <span class="vsb-tool-btn-text" data-delete-mode-label>delete</span>
-        </button>
-    `;
-
     const stage = document.createElement('section');
     stage.className = 'vsb-stage';
-
-    const stageHeader = document.createElement('div');
-    stageHeader.className = 'vsb-stage-header';
-    stageHeader.innerHTML = `
-        <div class="vsb-stage-title" data-role="stage-title">Page</div>
-        <div class="vsb-stage-actions" data-role="stage-actions"></div>
-    `;
 
     const stageBody = document.createElement('div');
     stageBody.className = 'vsb-stage-body';
@@ -109,23 +84,10 @@ export function createWorkbenchDOM(host) {
     const auxHost = document.createElement('div');
     auxHost.className = 'vsb-aux-host';
 
-    const inspectorResizer = document.createElement('div');
-    inspectorResizer.className = 'vsb-inspector-resizer';
-    inspectorResizer.setAttribute('role', 'separator');
-    inspectorResizer.setAttribute('aria-orientation', 'vertical');
-    inspectorResizer.setAttribute('aria-label', 'Resize inspector panel');
-
-    const inspectorPanel = document.createElement('aside');
-    inspectorPanel.className = 'vsb-inspector-panel';
-    inspectorPanel.innerHTML = `
-        <div class="vsb-inspector-header" data-role="inspector-title">Node Inspector</div>
-        <div class="vsb-inspector-content" data-role="inspector-content"></div>
-    `;
-
     stageBody.append(iframeHost, auxHost);
-    stage.append(stageHeader, stageBody);
+    stage.append(stageBody);
 
-    workspace.append(toolRail, stage, inspectorResizer, inspectorPanel);
+    workspace.append(stage);
     main.append(tabs, workspace);
     body.append(sidePanelNav, sidePanel, sidePanelResizer, main);
 
@@ -135,6 +97,15 @@ export function createWorkbenchDOM(host) {
         <span class="vsb-status-chip">Ready</span>
         <span class="vsb-status-chip" data-role="save-status">Idle.</span>
     `;
+
+    const stageHeader = document.createElement('div');
+    const stageHeaderTitle = document.createElement('div');
+    const stageHeaderActions = document.createElement('div');
+    const toolRail = document.createElement('aside');
+    const inspectorResizer = document.createElement('div');
+    const inspectorPanel = document.createElement('aside');
+    const inspectorTitle = document.createElement('div');
+    const inspectorContent = document.createElement('div');
 
     root.append(header, body, status);
     host.appendChild(root);
@@ -150,15 +121,14 @@ export function createWorkbenchDOM(host) {
         sidePanelContainer: /** @type {HTMLElement} */ (root.querySelector('[data-role="side-panel-content"]')),
         tabs,
         stageHeader,
-        stageHeaderTitle: /** @type {HTMLElement} */ (stageHeader.querySelector('[data-role="stage-title"]')),
-        stageHeaderActions: /** @type {HTMLElement} */ (stageHeader.querySelector('[data-role="stage-actions"]')),
+        stageHeaderTitle,
+        stageHeaderActions,
         toolRail,
         inspectorResizer,
         inspectorPanel,
-        inspectorTitle: /** @type {HTMLElement} */ (inspectorPanel.querySelector('[data-role="inspector-title"]')),
-        inspectorContent: /** @type {HTMLElement} */ (inspectorPanel.querySelector('[data-role="inspector-content"]')),
+        inspectorTitle,
+        inspectorContent,
         iframeHost,
         auxHost,
     };
 }
-

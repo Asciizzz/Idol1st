@@ -122,7 +122,6 @@ export class IframeRuntime {
         doc.open();
         doc.write(html);
         doc.close();
-        this.bindEditorInteractions(pageId);
     }
 
     /**
@@ -136,7 +135,6 @@ export class IframeRuntime {
         const css = this.buildCss(state, page);
         const body = this.buildBody(page);
         const runtimeScript = this.buildRuntimeScript(state, page);
-        const editorOverlayCss = this.buildEditorOverlayCss();
 
         return `<!DOCTYPE html>
 <html>
@@ -144,8 +142,7 @@ export class IframeRuntime {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <style>${css}
-${editorOverlayCss}</style>
+    <style>${css}</style>
 </head>
 <body>${body}${runtimeScript ? `
     <script>${runtimeScript}</script>` : ''}</body>
@@ -426,12 +423,7 @@ body.vsb-tool-mode-delete * {
     buildBody(page) {
         const nodeById = page?.nodeById && typeof page.nodeById === 'object' ? page.nodeById : {};
         const rootNodeIds = Array.isArray(page.rootNodeIds) ? page.rootNodeIds : [];
-        const selectedNodeIds = Array.isArray(page.activeNodeIds)
-            ? page.activeNodeIds
-            : (typeof page.activeNodeId === 'string' && page.activeNodeId ? [page.activeNodeId] : []);
-        const selected = new Set(selectedNodeIds.map((id) => String(id)));
-
-        return rootNodeIds.map((nodeId) => this.buildNode(nodeId, nodeById, selected)).join('');
+        return rootNodeIds.map((nodeId) => this.buildNode(nodeId, nodeById, new Set())).join('');
     }
 
     /**
@@ -453,20 +445,15 @@ body.vsb-tool-mode-delete * {
         const children = Array.isArray(node.children)
             ? node.children.map((childId) => this.buildNode(String(childId), nodeById, selectedNodeSet)).join('')
             : '';
-        const depth = this.resolveNodeDepth(nodeById, nodeId);
         const classTokens = [];
         if (attrs.className) {
             classTokens.push(attrs.className);
-        }
-        if (selectedNodeSet.has(String(nodeId))) {
-            classTokens.push('vsb-node-selected');
-            classTokens.push(`vsb-node-selected-l${depth % 12}`);
         }
         const classAttr = classTokens.length > 0
             ? ` class="${this.escapeHtml(classTokens.join(' '))}"`
             : '';
 
-        return `<${tag}${attrs.attrText}${classAttr} data-vs-node-id="${this.escapeHtml(nodeId)}">${text}${children}</${tag}>`;
+        return `<${tag}${attrs.attrText}${classAttr}>${text}${children}</${tag}>`;
     }
 
     /**

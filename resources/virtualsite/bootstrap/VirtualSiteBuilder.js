@@ -168,9 +168,6 @@ export class VirtualSiteBuilder {
         this.iframeRuntime = new IframeRuntime({
             host: this.dom.iframeHost,
             getState: () => this.getState(),
-            getToolState: () => this.getPageToolState(),
-            onInteraction: (payload) => this.handleFrameInteraction(payload),
-            canDrop: ({ pageId, targetNodeId, sourceNodeId }) => this.canDropSelectionToNode(pageId, targetNodeId, sourceNodeId),
         });
         this.iframeRuntime.mount();
 
@@ -218,22 +215,9 @@ export class VirtualSiteBuilder {
             getState: () => this.getState(),
         });
 
-        this.nodeInspectorPanel = new NodeInspectorPanel({
-            getState: () => this.getState(),
-            getActivePageId: () => this.getActivePageId(),
-            onUpdateNode: (pageId, nodeId, patch) => this.updatePageNode(pageId, nodeId, patch),
-            onSetSelection: (pageId, nodeIds) => this.setPageSelection(pageId, nodeIds),
-            onCreateNode: (pageId, parentNodeId) => this.createNode(pageId, parentNodeId),
-        });
-        this.nodeInspectorPanel.mount(this.dom.inspectorContent);
-
         this.bindSaveButton();
         this.syncSidePanelWidth();
         this.bindSidePanelResize();
-        this.syncInspectorWidth();
-        this.bindInspectorResize();
-        this.bindToolRail();
-        this.bindKeyboardShortcuts();
         this.ensureInitialTab();
         this.applyTheme();
         this.syncDomainPreview();
@@ -758,9 +742,6 @@ export class VirtualSiteBuilder {
         this.renderTabs();
         this.renderActivePanel();
         this.syncSidePanelWidth();
-        this.syncInspectorWidth();
-        this.syncToolRailButtons();
-        this.renderNodeInspector();
         this.renderStage();
         this.applyTheme();
     }
@@ -1196,29 +1177,6 @@ export class VirtualSiteBuilder {
      */
     renderPageStage(tab) {
         if (!this.dom || !this.iframeRuntime) {
-            return;
-        }
-
-        const page = this.getState()?.resources?.pages?.byId?.[tab.refId];
-        this.dom.stageHeaderTitle.textContent = `Page: ${String(page?.title || tab.refId)}`;
-        this.dom.inspectorTitle.textContent = `Inspector: ${String(page?.title || tab.refId)}`;
-
-        const modeButton = document.createElement('button');
-        modeButton.type = 'button';
-        modeButton.className = 'vsb-btn';
-        modeButton.textContent = tab.mode === 'graph' ? 'Switch To View' : 'Switch To Graph';
-        modeButton.addEventListener('click', () => {
-            this.toggleActivePageMode();
-        });
-        this.dom.stageHeaderActions.appendChild(modeButton);
-
-        if (tab.mode === 'graph') {
-            this.dom.root.classList.add('is-aux-mode');
-            if (this.activeStageMountKey !== `graph:${tab.refId}`) {
-                this.pageGraphPanel?.mount(this.dom.auxHost);
-                this.activeStageMountKey = `graph:${tab.refId}`;
-            }
-            this.pageGraphPanel?.setPageId(tab.refId);
             return;
         }
 
