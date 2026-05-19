@@ -94,7 +94,9 @@ class AuthEditorController extends Controller
             $validated = $request->validate([
                 'project_json' => ['required', 'array'],
                 'project_json.project' => ['nullable', 'array'],
-                'project_json.pages' => ['required', 'array'],
+                'project_json.pages' => ['nullable', 'array'],
+                'project_json.resources' => ['nullable', 'array'],
+                'project_json.editor' => ['nullable', 'array'],
                 'project_json.stylesheets' => ['nullable', 'array'],
                 'project_json.scripts' => ['nullable', 'array'],
             ]);

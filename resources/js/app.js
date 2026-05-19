@@ -1,2 +1,2 @@
 import '../css/global.css';
-import '../editor/main.js';
+import '../virtualsite/main.js';
