@@ -1143,7 +1143,7 @@ export class VirtualSiteBuilder {
             return {
                 icon: 'P',
                 title: String(page.title || tab.refId),
-                context: mode === 'both' ? 'both mode' : `${mode} mode`,
+                context: mode === 'both' ? 'view + graph' : `${mode} mode`,
             };
         }
         if (tab.kind === TAB_KIND.STYLE) {
