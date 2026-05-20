@@ -73,6 +73,7 @@ function normalizeV2Project(source, context) {
     cloned.editor.ui ||= {
         leftPanelWidth: 22,
         rightPanelWidth: 20,
+        bothPanePercent: 50,
         activePanelKey: 'explorer',
         panelOrder: ['explorer', 'siteSetting', 'setting'],
         activeInspectorPanelKey: 'siteSetting',
@@ -81,6 +82,7 @@ function normalizeV2Project(source, context) {
         deleteMode: 'single',
     };
     cloned.editor.ui.rightPanelWidth = normalizePercent(cloned.editor.ui.rightPanelWidth, 20);
+    cloned.editor.ui.bothPanePercent = normalizePercent(cloned.editor.ui.bothPanePercent, 50);
     cloned.editor.ui.pageToolMode = normalizePageToolMode(cloned.editor.ui.pageToolMode);
     cloned.editor.ui.deleteMode = normalizeDeleteMode(cloned.editor.ui.deleteMode);
     cloned.editor.theme ||= {
@@ -268,6 +270,7 @@ function normalizeLegacyProject(legacy, context) {
             ui: {
                 leftPanelWidth: 22,
                 rightPanelWidth: 20,
+                bothPanePercent: 50,
                 activePanelKey: 'explorer',
                 panelOrder: ['explorer', 'siteSetting', 'setting'],
                 activeInspectorPanelKey: 'siteSetting',

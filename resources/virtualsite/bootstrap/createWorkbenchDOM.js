@@ -22,6 +22,7 @@
  *   inspectorTitle: HTMLElement,
  *   inspectorContent: HTMLElement,
  *   iframeHost: HTMLElement,
+ *   bothModeResizer: HTMLElement,
  *   auxHost: HTMLElement
  * }} Element references.
  */
@@ -83,13 +84,19 @@ export function createWorkbenchDOM(host) {
     const iframeHost = document.createElement('div');
     iframeHost.className = 'vsb-iframe-host';
 
+    const bothModeResizer = document.createElement('div');
+    bothModeResizer.className = 'vsb-both-resizer';
+    bothModeResizer.setAttribute('role', 'separator');
+    bothModeResizer.setAttribute('aria-orientation', 'vertical');
+    bothModeResizer.setAttribute('aria-label', 'Resize iframe and graph split');
+
     const auxHost = document.createElement('div');
     auxHost.className = 'vsb-aux-host';
 
     const pageModeControls = document.createElement('div');
     pageModeControls.className = 'vsb-page-mode-controls';
 
-    stageBody.append(iframeHost, auxHost, pageModeControls);
+    stageBody.append(iframeHost, bothModeResizer, auxHost, pageModeControls);
     stage.append(stageBody);
 
     workspace.append(stage);
@@ -136,6 +143,7 @@ export function createWorkbenchDOM(host) {
         inspectorTitle,
         inspectorContent,
         iframeHost,
+        bothModeResizer,
         auxHost,
     };
 }

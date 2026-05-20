@@ -16,6 +16,7 @@
     --vsb-graph-reparent-target: #35d07f;
     --vsb-side-panel-width: 22vw;
     --vsb-inspector-width: 20vw;
+    --vsb-both-left-width: 50%;
 
     position: fixed;
     inset: 0;
@@ -40,6 +41,12 @@
 
 .vsb-root.is-inspector-resizing,
 .vsb-root.is-inspector-resizing * {
+    cursor: ew-resize;
+    user-select: none;
+}
+
+.vsb-root.is-both-resizing,
+.vsb-root.is-both-resizing * {
     cursor: ew-resize;
     user-select: none;
 }
@@ -470,6 +477,34 @@
     display: none;
 }
 
+.vsb-both-resizer {
+    display: none;
+    min-width: 0.45rem;
+    width: 0.45rem;
+    cursor: ew-resize;
+    touch-action: none;
+    position: relative;
+    background: color-mix(in oklab, var(--vsb-panel-background) 88%, #000);
+    border-left: 1px solid var(--vsb-panel-border);
+    border-right: 1px solid var(--vsb-panel-border);
+}
+
+.vsb-both-resizer::before {
+    content: '';
+    position: absolute;
+    inset: 0.35rem 0.12rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--vsb-panel-border) 74%, #fff);
+    opacity: 0.7;
+}
+
+.vsb-both-resizer:hover::before,
+.vsb-root.is-both-resizing .vsb-both-resizer::before {
+    border-color: var(--vsb-accent-primary);
+    background: color-mix(in oklab, var(--vsb-accent-primary) 20%, transparent);
+    opacity: 1;
+}
+
 .vsb-root.is-aux-mode .vsb-aux-host {
     display: block;
 }
@@ -479,8 +514,8 @@
 }
 
 .vsb-root.is-page-both .vsb-stage-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    display: flex;
+    align-items: stretch;
     gap: 0;
 }
 
@@ -495,7 +530,17 @@
     height: 100%;
 }
 
+.vsb-root.is-page-both .vsb-iframe-host {
+    flex: 0 0 var(--vsb-both-left-width);
+}
+
+.vsb-root.is-page-both .vsb-both-resizer {
+    display: block;
+    flex: 0 0 0.45rem;
+}
+
 .vsb-root.is-page-both .vsb-aux-host {
+    flex: 1 1 auto;
     border-left: 0;
 }
 
@@ -568,8 +613,8 @@
 }
 
 .vsb-graph-node.is-delete-hover-branch {
-    border-color: #b61136;
-    box-shadow: 0 0 0 1px #b61136, 0 10px 22px rgba(0, 0, 0, 0.34);
+    border-color: #8f0f2c;
+    box-shadow: 0 0 0 1px #8f0f2c, 0 10px 22px rgba(0, 0, 0, 0.34);
 }
 
 .vsb-graph-node-head {
@@ -706,8 +751,9 @@
 
 .vsb-graph-tool-rail {
     position: absolute;
-    top: 0.7rem;
+    top: 50%;
     right: 0.7rem;
+    transform: translateY(-50%);
     z-index: 3;
     display: flex;
     flex-direction: column;
@@ -715,17 +761,16 @@
 }
 
 .vsb-graph-tool-btn {
-    min-width: 4.6rem;
+    width: 2.35rem;
+    height: 2.35rem;
     border: 1px solid var(--vsb-panel-border);
-    border-radius: 0.45rem;
+    border-radius: 0.32rem;
     background: color-mix(in oklab, var(--vsb-panel-background) 90%, #000);
     color: inherit;
-    display: grid;
-    grid-template-columns: 1rem 1fr;
+    display: inline-flex;
     align-items: center;
-    column-gap: 0.36rem;
-    row-gap: 0.05rem;
-    padding: 0.28rem 0.38rem;
+    justify-content: center;
+    padding: 0;
     cursor: pointer;
 }
 
@@ -740,26 +785,19 @@
 }
 
 .vsb-graph-tool-btn.is-active.is-branch {
-    border-color: #b61136;
-    box-shadow: 0 0 0 1px #b61136;
+    border-color: #8f0f2c;
+    box-shadow: 0 0 0 1px #8f0f2c;
 }
 
 .vsb-graph-tool-icon {
-    font-size: 0.8rem;
+    font-size: 0.92rem;
     opacity: 0.92;
 }
 
-.vsb-graph-tool-label {
-    text-align: left;
-    font-size: 0.68rem;
-    line-height: 1.2;
-}
-
-.vsb-graph-tool-meta {
-    grid-column: 2;
-    font-size: 0.6rem;
-    opacity: 0.64;
-    line-height: 1;
+.vsb-graph-tool-divider {
+    height: 1px;
+    border-top: 1px solid color-mix(in oklab, var(--vsb-panel-border) 74%, transparent);
+    margin: 0.08rem 0;
 }
 
 .vsb-graph-canvas[data-tool-mode="add"] .vsb-graph-viewport {

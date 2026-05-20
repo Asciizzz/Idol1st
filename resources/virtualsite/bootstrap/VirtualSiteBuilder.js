@@ -32,6 +32,9 @@ const SIDE_PANEL_WIDTH_DEFAULT = 22;
 const INSPECTOR_WIDTH_MIN = 1;
 const INSPECTOR_WIDTH_MAX = 35;
 const INSPECTOR_WIDTH_DEFAULT = 20;
+const BOTH_SPLIT_MIN = 10;
+const BOTH_SPLIT_MAX = 90;
+const BOTH_SPLIT_DEFAULT = 50;
 
 const PAGE_TOOL_MODE = {
     SELECT: 'select',
@@ -133,6 +136,8 @@ export class VirtualSiteBuilder {
         /** @type {(() => void) | null} */
         this.keyboardShortcutsCleanup = null;
         /** @type {(() => void) | null} */
+        this.bothModeResizeCleanup = null;
+        /** @type {(() => void) | null} */
         this.addNodePickerCleanup = null;
         /** @type {boolean} */
         this.skipNextFrameRefresh = false;
@@ -218,6 +223,7 @@ export class VirtualSiteBuilder {
             getToolState: () => this.getPageToolState(),
             onSetToolMode: (mode) => this.setPageToolMode(mode),
             onToggleDeleteMode: () => this.toggleDeleteMode(),
+            onPolishGraph: (pageId) => this.polishGraph(pageId),
             onUpdateNodeGraph: (pageId, nodeId, graphPatch) => this.updateNodeGraph(pageId, nodeId, graphPatch),
             onUpdateNodeData: (pageId, nodeId, patch) => this.updatePageNode(pageId, nodeId, patch),
             onReparentNode: (pageId, nodeId, targetParentId) => this.reparentNode(pageId, nodeId, targetParentId),
@@ -228,7 +234,9 @@ export class VirtualSiteBuilder {
 
         this.bindSaveButton();
         this.syncSidePanelWidth();
+        this.syncBothModeSplit();
         this.bindSidePanelResize();
+        this.bindBothModeResize();
         this.ensureInitialTab();
         this.applyTheme();
         this.syncDomainPreview();
@@ -401,6 +409,149 @@ export class VirtualSiteBuilder {
             window.removeEventListener('pointercancel', stopDragging);
             window.removeEventListener('resize', onWindowResize);
             this.dom?.root.classList.remove('is-side-resizing');
+        };
+    }
+
+    /**
+     * Clamp iframe-vs-graph split percentage within hard limits.
+     * @param {unknown} splitPercent - Candidate split percent for left pane.
+     * @returns {number} Clamped percent.
+     */
+    clampBothModeSplit(splitPercent) {
+        const numeric = Number(splitPercent);
+        if (!Number.isFinite(numeric)) {
+            return BOTH_SPLIT_DEFAULT;
+        }
+        return Math.min(BOTH_SPLIT_MAX, Math.max(BOTH_SPLIT_MIN, numeric));
+    }
+
+    /**
+     * Resolve both-mode split percentage from editor state.
+     * @returns {number} Left pane width percentage.
+     */
+    getBothModeSplit() {
+        return this.clampBothModeSplit(this.getState()?.editor?.ui?.bothPanePercent);
+    }
+
+    /**
+     * Apply both-mode split css variable and aria metadata.
+     * @returns {void}
+     */
+    syncBothModeSplit() {
+        if (!this.dom) {
+            return;
+        }
+        const split = this.getBothModeSplit();
+        this.dom.root.style.setProperty('--vsb-both-left-width', `${split}%`);
+        this.dom.bothModeResizer.setAttribute('aria-valuemin', String(BOTH_SPLIT_MIN));
+        this.dom.bothModeResizer.setAttribute('aria-valuemax', String(BOTH_SPLIT_MAX));
+        this.dom.bothModeResizer.setAttribute('aria-valuenow', String(Math.round(split * 100) / 100));
+    }
+
+    /**
+     * Persist both-mode split percentage.
+     * @param {number} splitPercent - Left pane width percentage.
+     * @returns {void}
+     */
+    persistBothModeSplit(splitPercent) {
+        if (!this.store) {
+            return;
+        }
+        const next = this.clampBothModeSplit(splitPercent);
+        const current = this.clampBothModeSplit(this.getState()?.editor?.ui?.bothPanePercent);
+        if (Math.abs(current - next) < 0.01) {
+            return;
+        }
+        this.store.update((draft) => {
+            draft.editor ||= {};
+            draft.editor.ui ||= {};
+            draft.editor.ui.bothPanePercent = next;
+        });
+    }
+
+    /**
+     * Convert pointer x coordinate into both-mode left split percent.
+     * @param {number} clientX - Pointer client x.
+     * @returns {number} Split percentage.
+     */
+    resolveBothModeSplitFromPointer(clientX) {
+        if (!this.dom) {
+            return BOTH_SPLIT_DEFAULT;
+        }
+        const rect = this.dom.stageBody.getBoundingClientRect();
+        const width = Math.max(rect.width, 1);
+        const raw = ((clientX - rect.left) / width) * 100;
+        return this.clampBothModeSplit(raw);
+    }
+
+    /**
+     * Bind drag-to-resize behavior for iframe|graph split in both mode.
+     * @returns {void}
+     */
+    bindBothModeResize() {
+        if (!this.dom) {
+            return;
+        }
+        this.bothModeResizeCleanup?.();
+        const handle = this.dom.bothModeResizer;
+        let isDragging = false;
+        let liveSplit = this.getBothModeSplit();
+
+        const onPointerMove = (event) => {
+            if (!isDragging) {
+                return;
+            }
+            event.preventDefault();
+            liveSplit = this.resolveBothModeSplitFromPointer(event.clientX);
+            this.dom?.root.style.setProperty('--vsb-both-left-width', `${liveSplit}%`);
+            handle.setAttribute('aria-valuenow', String(Math.round(liveSplit * 100) / 100));
+        };
+
+        const stopDragging = () => {
+            if (!isDragging) {
+                return;
+            }
+            isDragging = false;
+            this.dom?.root.classList.remove('is-both-resizing');
+            this.persistBothModeSplit(liveSplit);
+            this.syncBothModeSplit();
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', stopDragging);
+            window.removeEventListener('pointercancel', stopDragging);
+        };
+
+        const onPointerDown = (event) => {
+            if (event.button !== 0 || !this.dom) {
+                return;
+            }
+            if (!this.dom.root.classList.contains('is-page-both')) {
+                return;
+            }
+            event.preventDefault();
+            isDragging = true;
+            liveSplit = this.resolveBothModeSplitFromPointer(event.clientX);
+            this.dom.root.classList.add('is-both-resizing');
+            this.dom.root.style.setProperty('--vsb-both-left-width', `${liveSplit}%`);
+            handle.setAttribute('aria-valuenow', String(Math.round(liveSplit * 100) / 100));
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', stopDragging);
+            window.addEventListener('pointercancel', stopDragging);
+        };
+
+        const onWindowResize = () => {
+            this.syncBothModeSplit();
+        };
+
+        handle.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('resize', onWindowResize);
+
+        this.bothModeResizeCleanup = () => {
+            handle.removeEventListener('pointerdown', onPointerDown);
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', stopDragging);
+            window.removeEventListener('pointercancel', stopDragging);
+            window.removeEventListener('resize', onWindowResize);
+            this.dom?.root.classList.remove('is-both-resizing');
         };
     }
 
@@ -753,6 +904,7 @@ export class VirtualSiteBuilder {
         this.renderTabs();
         this.renderActivePanel();
         this.syncSidePanelWidth();
+        this.syncBothModeSplit();
         const skipFrameRefresh = this.skipNextFrameRefresh;
         this.skipNextFrameRefresh = false;
         this.renderStage({ skipFrameRefresh });
@@ -1272,7 +1424,6 @@ export class VirtualSiteBuilder {
                 <button type="button" class="vsb-page-mode-btn ${mode === 'graph' ? 'is-active' : ''}" data-mode="graph">graph</button>
                 <button type="button" class="vsb-page-mode-btn ${mode === 'both' ? 'is-active' : ''}" data-mode="both">both</button>
             </div>
-            <button type="button" class="vsb-page-polish-btn" data-role="polish-graph">Polish Graph</button>
         `;
 
         this.dom.pageModeControls.querySelectorAll('[data-mode]').forEach((node) => {
@@ -1285,9 +1436,6 @@ export class VirtualSiteBuilder {
             });
         });
 
-        this.dom.pageModeControls.querySelector('[data-role="polish-graph"]')?.addEventListener('click', () => {
-            this.polishGraph(pageId);
-        });
     }
 
     /**
@@ -2867,6 +3015,8 @@ export class VirtualSiteBuilder {
         this.inspectorResizeCleanup = null;
         this.keyboardShortcutsCleanup?.();
         this.keyboardShortcutsCleanup = null;
+        this.bothModeResizeCleanup?.();
+        this.bothModeResizeCleanup = null;
         this.closeAddNodePicker();
         if (this.dom) {
             this.dom.root.remove();

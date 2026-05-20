@@ -1,4 +1,6 @@
 const BODY_NODE_ID = '__body__';
+const GRAPH_ZOOM_MIN = 0.35;
+const GRAPH_ZOOM_MAX = 2.5;
 const ORDER_COLORS = [
     '#ff5c77',
     '#ff8c42',
@@ -29,6 +31,7 @@ export class PageGraphPanel {
      *   getToolState?: () => { mode: 'select' | 'add' | 'delete', deleteMode: 'single' | 'branch' },
      *   onSetToolMode?: (mode: 'select' | 'add' | 'delete') => void,
      *   onToggleDeleteMode?: () => void,
+     *   onPolishGraph?: (pageId: string) => void,
      *   onUpdateNodeGraph?: (pageId: string, nodeId: string, graphPatch: { x?: number, y?: number, collapsed?: boolean }) => void,
      *   onUpdateNodeData?: (pageId: string, nodeId: string, patch: { tag?: string, text?: string, attrs?: Record<string, string> }) => void,
      *   onReparentNode?: (pageId: string, nodeId: string, targetParentId: string | null) => boolean,
@@ -51,6 +54,10 @@ export class PageGraphPanel {
         /** @type {() => void} */
         this.onToggleDeleteMode = typeof options.onToggleDeleteMode === 'function'
             ? options.onToggleDeleteMode
+            : () => {};
+        /** @type {(pageId: string) => void} */
+        this.onPolishGraph = typeof options.onPolishGraph === 'function'
+            ? options.onPolishGraph
             : () => {};
         /** @type {(pageId: string, nodeId: string, graphPatch: { x?: number, y?: number, collapsed?: boolean }) => void} */
         this.onUpdateNodeGraph = typeof options.onUpdateNodeGraph === 'function'
@@ -84,6 +91,8 @@ export class PageGraphPanel {
         this.panX = 24;
         /** @type {number} */
         this.panY = 24;
+        /** @type {number} */
+        this.zoom = 1;
         /** @type {(() => void) | null} */
         this.keyboardCleanup = null;
     }
@@ -138,6 +147,9 @@ export class PageGraphPanel {
         const deleteMode = toolState.deleteMode === 'branch'
             ? 'branch'
             : 'single';
+        const deleteTitle = deleteMode === 'branch'
+            ? 'Delete Branch (E)'
+            : 'Delete Single (E)';
         this.root.dataset.toolMode = mode;
         this.root.dataset.deleteMode = deleteMode;
 
@@ -146,7 +158,7 @@ export class PageGraphPanel {
                 <div
                     class="vsb-graph-world"
                     data-role="graph-world"
-                    style="width:${world.width}px; height:${world.height}px; transform: translate(${this.panX}px, ${this.panY}px);"
+                    style="width:${world.width}px; height:${world.height}px; transform: translate(${this.panX}px, ${this.panY}px) scale(${this.zoom});"
                 >
                     <svg class="vsb-graph-links" data-role="graph-links" width="${world.width}" height="${world.height}">
                         <defs>
@@ -163,24 +175,25 @@ export class PageGraphPanel {
                 </div>
             </div>
             <aside class="vsb-graph-tool-rail" data-role="graph-tool-rail" aria-label="Graph Modes">
-                <button type="button" class="vsb-graph-tool-btn ${mode === 'select' ? 'is-active' : ''}" data-role="tool-mode" data-mode="select" title="Select (W)">
+                <button type="button" class="vsb-graph-tool-btn ${mode === 'select' ? 'is-active' : ''}" data-role="tool-mode" data-mode="select" title="Select (W)" aria-label="Select (W)">
                     <span class="vsb-graph-tool-icon" aria-hidden="true">&#8598;</span>
-                    <span class="vsb-graph-tool-label">Select</span>
                 </button>
                 <button
                     type="button"
                     class="vsb-graph-tool-btn ${mode === 'delete' ? 'is-active' : ''} ${mode === 'delete' && deleteMode === 'branch' ? 'is-branch' : 'is-single'}"
                     data-role="tool-mode"
                     data-mode="delete"
-                    title="Delete (E)"
+                    title="${deleteTitle}"
+                    aria-label="${deleteTitle}"
                 >
-                    <span class="vsb-graph-tool-icon" aria-hidden="true">&#9003;</span>
-                    <span class="vsb-graph-tool-label">Delete</span>
-                    <span class="vsb-graph-tool-meta">${deleteMode}</span>
+                    <span class="vsb-graph-tool-icon" aria-hidden="true">&#8998;</span>
                 </button>
-                <button type="button" class="vsb-graph-tool-btn ${mode === 'add' ? 'is-active' : ''}" data-role="tool-mode" data-mode="add" title="Add (A)">
+                <button type="button" class="vsb-graph-tool-btn ${mode === 'add' ? 'is-active' : ''}" data-role="tool-mode" data-mode="add" title="Add (A)" aria-label="Add (A)">
                     <span class="vsb-graph-tool-icon" aria-hidden="true">+</span>
-                    <span class="vsb-graph-tool-label">Add</span>
+                </button>
+                <div class="vsb-graph-tool-divider" aria-hidden="true"></div>
+                <button type="button" class="vsb-graph-tool-btn" data-role="tool-action" data-action="polish" title="Polish Graph" aria-label="Polish Graph">
+                    <span class="vsb-graph-tool-icon" aria-hidden="true">&#10022;</span>
                 </button>
             </aside>
         `;
@@ -193,6 +206,7 @@ export class PageGraphPanel {
 
         this.bindToolRail();
         this.bindViewportPan(viewport, worldNode);
+        this.bindViewportZoom(viewport, worldNode);
         this.bindNodeEditors(page.id);
         this.bindNodeDragging(page.id, viewport);
         this.bindModeInteractions(page.id, viewport);
@@ -282,6 +296,7 @@ export class PageGraphPanel {
         if (!this.root) {
             return;
         }
+        const pageId = this.pageId ? String(this.pageId) : '';
         this.root.querySelectorAll('[data-role="tool-mode"]').forEach((node) => {
             const button = /** @type {HTMLButtonElement} */ (node);
             button.addEventListener('click', () => {
@@ -299,6 +314,15 @@ export class PageGraphPanel {
                     return;
                 }
                 this.onSetToolMode('select');
+            });
+        });
+        this.root.querySelectorAll('[data-role="tool-action"]').forEach((node) => {
+            const button = /** @type {HTMLButtonElement} */ (node);
+            button.addEventListener('click', () => {
+                const action = String(button.dataset.action || '');
+                if (action === 'polish' && pageId) {
+                    this.onPolishGraph(pageId);
+                }
             });
         });
     }
@@ -363,7 +387,7 @@ export class PageGraphPanel {
             const onMove = (moveEvent) => {
                 this.panX = initialPanX + (moveEvent.clientX - startX);
                 this.panY = initialPanY + (moveEvent.clientY - startY);
-                worldNode.style.transform = `translate(${this.panX}px, ${this.panY}px)`;
+                this.applyWorldTransform(worldNode);
             };
 
             const onUp = () => {
@@ -376,6 +400,53 @@ export class PageGraphPanel {
             window.addEventListener('pointerup', onUp);
             window.addEventListener('pointercancel', onUp);
         });
+    }
+
+    /**
+     * Bind wheel zoom on empty graph space only.
+     * @param {HTMLElement} viewport - Graph viewport.
+     * @param {HTMLElement} worldNode - Graph world node.
+     * @returns {void}
+     */
+    bindViewportZoom(viewport, worldNode) {
+        viewport.addEventListener('wheel', (event) => {
+            const target = event.target;
+            if (target instanceof Element) {
+                if (target.closest('[data-node-id]')) {
+                    return;
+                }
+                if (target.closest('[data-role="graph-tool-rail"]')) {
+                    return;
+                }
+            }
+
+            event.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const pointerX = event.clientX - rect.left;
+            const pointerY = event.clientY - rect.top;
+            const previousZoom = this.zoom;
+            const zoomFactor = Math.exp(-event.deltaY * 0.0016);
+            const nextZoom = this.clampZoom(previousZoom * zoomFactor);
+            if (Math.abs(nextZoom - previousZoom) < 0.0001) {
+                return;
+            }
+
+            const worldX = (pointerX - this.panX) / previousZoom;
+            const worldY = (pointerY - this.panY) / previousZoom;
+            this.zoom = nextZoom;
+            this.panX = pointerX - (worldX * nextZoom);
+            this.panY = pointerY - (worldY * nextZoom);
+            this.applyWorldTransform(worldNode);
+        }, { passive: false });
+    }
+
+    /**
+     * Apply current pan+zoom transform to world node.
+     * @param {HTMLElement} worldNode - Graph world node.
+     * @returns {void}
+     */
+    applyWorldTransform(worldNode) {
+        worldNode.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.zoom})`;
     }
 
     /**
@@ -557,8 +628,8 @@ export class PageGraphPanel {
                 let hoverTargetNodeId = null;
 
                 const onMove = (moveEvent) => {
-                    const nextX = startX + (moveEvent.clientX - originClientX);
-                    const nextY = startY + (moveEvent.clientY - originClientY);
+                    const nextX = startX + ((moveEvent.clientX - originClientX) / this.zoom);
+                    const nextY = startY + ((moveEvent.clientY - originClientY) / this.zoom);
                     card.style.left = `${nextX}px`;
                     card.style.top = `${nextY}px`;
                     this.drawConnections(pageId);
@@ -728,8 +799,8 @@ export class PageGraphPanel {
      */
     resolveWorldPoint(clientX, clientY, viewport) {
         const rect = viewport.getBoundingClientRect();
-        const x = Math.round(clientX - rect.left - this.panX);
-        const y = Math.round(clientY - rect.top - this.panY);
+        const x = Math.round((clientX - rect.left - this.panX) / this.zoom);
+        const y = Math.round((clientY - rect.top - this.panY) / this.zoom);
         return {
             x: Math.max(0, x),
             y: Math.max(0, y),
@@ -826,6 +897,19 @@ export class PageGraphPanel {
             width: Math.max(1800, Math.round(maxX + 520)),
             height: Math.max(1100, Math.round(maxY + 360)),
         };
+    }
+
+    /**
+     * Clamp zoom factor into supported graph range.
+     * @param {number} value - Requested zoom.
+     * @returns {number} Clamped zoom.
+     */
+    clampZoom(value) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+            return 1;
+        }
+        return Math.min(GRAPH_ZOOM_MAX, Math.max(GRAPH_ZOOM_MIN, numeric));
     }
 
     /**
