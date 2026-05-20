@@ -11,6 +11,8 @@
  *   sidePanelTitle: HTMLElement,
  *   sidePanelContainer: HTMLElement,
  *   tabs: HTMLElement,
+ *   stageBody: HTMLElement,
+ *   pageModeControls: HTMLElement,
  *   stageHeader: HTMLElement,
  *   stageHeaderTitle: HTMLElement,
  *   stageHeaderActions: HTMLElement,
@@ -84,7 +86,10 @@ export function createWorkbenchDOM(host) {
     const auxHost = document.createElement('div');
     auxHost.className = 'vsb-aux-host';
 
-    stageBody.append(iframeHost, auxHost);
+    const pageModeControls = document.createElement('div');
+    pageModeControls.className = 'vsb-page-mode-controls';
+
+    stageBody.append(iframeHost, auxHost, pageModeControls);
     stage.append(stageBody);
 
     workspace.append(stage);
@@ -120,6 +125,8 @@ export function createWorkbenchDOM(host) {
         sidePanelTitle: /** @type {HTMLElement} */ (root.querySelector('[data-role="side-panel-title"]')),
         sidePanelContainer: /** @type {HTMLElement} */ (root.querySelector('[data-role="side-panel-content"]')),
         tabs,
+        stageBody,
+        pageModeControls,
         stageHeader,
         stageHeaderTitle,
         stageHeaderActions,

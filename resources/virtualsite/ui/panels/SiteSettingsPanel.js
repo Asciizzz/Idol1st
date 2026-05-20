@@ -269,7 +269,8 @@ export class SiteSettingsPanel {
             const styleName = String(style?.name || styleId);
             return `
                 <label class="vsb-include-row">
-                    <input type="checkbox" data-role="include-style" data-resource-id="${this.escapeHtml(styleId)}" ${styleIds.has(styleId) ? 'checked' : ''} />
+                    <input class="vsb-checkbox" type="checkbox" data-role="include-style" data-resource-id="${this.escapeHtml(styleId)}" ${styleIds.has(styleId) ? 'checked' : ''} />
+                    <span class="vsb-checkbox-ui" aria-hidden="true"></span>
                     <span>${this.escapeHtml(styleName)}</span>
                 </label>
             `;
@@ -283,7 +284,8 @@ export class SiteSettingsPanel {
             const scriptName = String(script?.name || scriptId);
             return `
                 <label class="vsb-include-row">
-                    <input type="checkbox" data-role="include-script" data-resource-id="${this.escapeHtml(scriptId)}" ${scriptIds.has(scriptId) ? 'checked' : ''} />
+                    <input class="vsb-checkbox" type="checkbox" data-role="include-script" data-resource-id="${this.escapeHtml(scriptId)}" ${scriptIds.has(scriptId) ? 'checked' : ''} />
+                    <span class="vsb-checkbox-ui" aria-hidden="true"></span>
                     <span>${this.escapeHtml(scriptName)}</span>
                 </label>
             `;

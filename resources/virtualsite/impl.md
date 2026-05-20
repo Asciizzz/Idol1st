@@ -1282,3 +1282,40 @@ This pass addresses concrete breakpoints reported during live usage and refines 
 - select: default cursor
 - add: copy cursor
 - delete: not-allowed cursor
+
+### 18.13 Graph-first page editor implementation
+
+This phase transitions page editing to graph-first interaction while keeping iframe as a display surface.
+
+Implemented behaviors:
+
+1. Page mode toggle:
+- `view`, `graph`, `both` controls are now fixed in the top-right of page editor.
+- `both` shows iframe and graph side-by-side.
+
+2. Graph canvas interaction model:
+- middle mouse drag pans the graph world on X/Y.
+- left drag on a node header moves that node.
+- `Ctrl + drop on node` reparents dragged node to the drop target.
+
+3. Reparent safety rules:
+- no self-parenting.
+- no reparent into descendant (cycle prevention via ancestor checks).
+- invalid targets are ignored.
+
+4. Node editing in graph cards:
+- change tag.
+- change text.
+- edit attribute/property key-value rows.
+- collapse/expand node cards (collapsed view keeps only tag/title row).
+
+5. Graph relationship rendering:
+- parent-child links are rendered as curved SVG paths.
+- links include clear arrow tips indicating direction.
+
+6. Persistence model:
+- graph metadata (`x`, `y`, `collapsed`) is persisted directly on each node object (`node.graph`).
+- missing graph metadata is auto-generated during project normalization for legacy payloads.
+
+7. Layout utility:
+- `Polish Graph` performs auto tree layout from left (near-root/body) to right (deeper descendants).

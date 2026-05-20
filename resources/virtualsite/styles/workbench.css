@@ -7,6 +7,13 @@
     --vsb-tab-inactive-background: #171b24;
     --vsb-statusbar-background: #0f1115;
     --vsb-accent-primary: #4f7cff;
+    --vsb-graph-background: #0f1117;
+    --vsb-graph-dot: #2c3342;
+    --vsb-graph-node-background: #181a1f;
+    --vsb-graph-node-border: #2a2f3a;
+    --vsb-graph-node-header-background: #141822;
+    --vsb-graph-link: #5f89ff;
+    --vsb-graph-reparent-target: #35d07f;
     --vsb-side-panel-width: 22vw;
     --vsb-inspector-width: 20vw;
 
@@ -383,6 +390,59 @@
     overflow: hidden;
 }
 
+.vsb-page-mode-controls {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.65rem;
+    z-index: 24;
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    pointer-events: auto;
+}
+
+.vsb-root.is-page-tab .vsb-page-mode-controls {
+    display: flex;
+}
+
+.vsb-page-mode-group {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.4rem;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--vsb-panel-background) 92%, #000);
+}
+
+.vsb-page-mode-btn,
+.vsb-page-polish-btn {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-height: 1.85rem;
+    padding: 0 0.62rem;
+    cursor: pointer;
+}
+
+.vsb-page-mode-btn + .vsb-page-mode-btn {
+    border-left: 1px solid var(--vsb-panel-border);
+}
+
+.vsb-page-mode-btn:hover,
+.vsb-page-polish-btn:hover,
+.vsb-page-mode-btn.is-active {
+    background: color-mix(in oklab, var(--vsb-accent-primary) 22%, transparent);
+}
+
+.vsb-page-polish-btn {
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.4rem;
+    background: color-mix(in oklab, var(--vsb-panel-background) 90%, #000);
+}
+
 .vsb-iframe-host {
     position: absolute;
     inset: 0;
@@ -404,7 +464,7 @@
     width: 100%;
     height: 100%;
     border: 1px solid var(--vsb-panel-border);
-    border-radius: 0.65rem;
+    border-radius: 0;
     background: color-mix(in oklab, var(--vsb-editor-background) 70%, #fff);
     overflow: auto;
     display: none;
@@ -416,6 +476,151 @@
 
 .vsb-root.is-aux-mode .vsb-iframe-host {
     display: none;
+}
+
+.vsb-root.is-page-both .vsb-stage-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+}
+
+.vsb-root.is-page-both .vsb-iframe-host,
+.vsb-root.is-page-both .vsb-aux-host {
+    position: relative;
+    inset: auto;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.vsb-root.is-page-both .vsb-aux-host {
+    border-left: 0;
+}
+
+.vsb-root.is-page-both .vsb-page-mode-controls {
+    grid-column: 1 / span 2;
+    justify-self: end;
+}
+
+.vsb-graph-canvas {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.vsb-graph-viewport {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    background:
+        radial-gradient(circle at 1px 1px, var(--vsb-graph-dot) 1px, transparent 0) 0 0 / 22px 22px,
+        var(--vsb-graph-background);
+}
+
+.vsb-graph-world {
+    position: relative;
+    transform-origin: 0 0;
+}
+
+.vsb-graph-links {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.vsb-graph-link {
+    fill: none;
+    stroke: var(--vsb-graph-link);
+    stroke-width: 2;
+}
+
+#vsbGraphArrowTip path {
+    fill: var(--vsb-graph-link);
+}
+
+.vsb-graph-node-layer {
+    position: absolute;
+    inset: 0;
+}
+
+.vsb-graph-node {
+    position: absolute;
+    width: 12.8rem;
+    border: 1px solid var(--vsb-graph-node-border);
+    border-radius: 0.5rem;
+    background: var(--vsb-graph-node-background);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
+.vsb-graph-node.is-reparent-target {
+    border-color: var(--vsb-graph-reparent-target);
+    box-shadow: 0 0 0 1px var(--vsb-graph-reparent-target), 0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
+.vsb-graph-node-head {
+    min-height: 1.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-bottom: 1px solid var(--vsb-graph-node-border);
+    background: var(--vsb-graph-node-header-background);
+    padding: 0 0.45rem;
+    cursor: move;
+    user-select: none;
+}
+
+.vsb-graph-collapse-btn {
+    border: 1px solid var(--vsb-graph-node-border);
+    border-radius: 0.3rem;
+    width: 1.28rem;
+    height: 1.2rem;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.vsb-graph-node-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.vsb-graph-node-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.42rem;
+}
+
+.vsb-graph-node.is-collapsed .vsb-graph-node-body {
+    display: none;
+}
+
+.vsb-graph-node-text {
+    min-height: 4.2rem !important;
+    max-height: 11.4rem;
+    overflow-y: hidden;
+    resize: none;
+}
+
+.vsb-graph-attrs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.vsb-graph-attr-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
 }
 
 .vsb-inspector-resizer {
@@ -653,6 +858,7 @@
     border: 1px solid var(--vsb-panel-border);
     border-radius: 0.4rem;
     padding: 0.4rem 0.45rem;
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.45rem;
@@ -663,8 +869,40 @@
     border-color: var(--vsb-accent-primary);
 }
 
-.vsb-include-row input[type='checkbox'] {
-    accent-color: var(--vsb-accent-primary);
+.vsb-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vsb-checkbox-ui {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.24rem;
+    background: color-mix(in oklab, var(--vsb-editor-background) 75%, #fff);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.vsb-checkbox:checked + .vsb-checkbox-ui {
+    border-color: var(--vsb-accent-primary);
+    background: color-mix(in oklab, var(--vsb-accent-primary) 30%, transparent);
+}
+
+.vsb-checkbox:checked + .vsb-checkbox-ui::before {
+    content: '';
+    width: 0.52rem;
+    height: 0.52rem;
+    border-radius: 0.1rem;
+    background: var(--vsb-accent-primary);
+}
+
+.vsb-checkbox:focus-visible + .vsb-checkbox-ui {
+    outline: 1px solid var(--vsb-accent-primary);
+    outline-offset: 1px;
 }
 
 .vsb-list-btn {

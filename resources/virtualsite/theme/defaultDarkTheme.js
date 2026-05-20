@@ -14,7 +14,13 @@ export const defaultDarkTheme = {
         "tab.activeBackground": "#1f2430",
         "tab.inactiveBackground": "#171b24",
         "statusbar.background": "#0f1115",
-        "accent.primary": "#4f7cff"
+        "accent.primary": "#4f7cff",
+        "graph.background": "#0f1117",
+        "graph.dot": "#2c3342",
+        "graph.nodeBackground": "#181a1f",
+        "graph.nodeBorder": "#2a2f3a",
+        "graph.nodeHeaderBackground": "#141822",
+        "graph.link": "#5f89ff",
+        "graph.reparentTarget": "#35d07f"
     }
 };
-

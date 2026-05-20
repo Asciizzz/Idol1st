@@ -14,7 +14,13 @@ export const defaultLightTheme = {
         "tab.activeBackground": "#ffffff",
         "tab.inactiveBackground": "#e8edf6",
         "statusbar.background": "#dde3ef",
-        "accent.primary": "#3056d8"
+        "accent.primary": "#3056d8",
+        "graph.background": "#edf2fa",
+        "graph.dot": "#c4cede",
+        "graph.nodeBackground": "#ffffff",
+        "graph.nodeBorder": "#c7d2e4",
+        "graph.nodeHeaderBackground": "#eef3fb",
+        "graph.link": "#3e64db",
+        "graph.reparentTarget": "#268f5a"
     }
 };
-

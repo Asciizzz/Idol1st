@@ -67,6 +67,7 @@ function normalizeV2Project(source, context) {
         page.activeNodeIds = page.activeNodeIds.filter((id) => id !== BODY_NODE_ID);
         page.activeNodeId = page.activeNodeIds[0] || null;
         ensureBodyRootNode(page);
+        ensureNodeGraphProps(page);
     });
     cloned.editor ||= {};
     cloned.editor.ui ||= {
@@ -160,6 +161,7 @@ function normalizeLegacyProject(legacy, context) {
             activeNodeIds: page.active_node_id ? [String(page.active_node_id)] : [],
         };
         ensureBodyRootNode(pagesById[pageId]);
+        ensureNodeGraphProps(pagesById[pageId]);
         pageOrder.push(pageId);
     });
 
@@ -217,6 +219,7 @@ function normalizeLegacyProject(legacy, context) {
             activeNodeIds: [],
         };
         ensureBodyRootNode(pagesById[startPageId]);
+        ensureNodeGraphProps(pagesById[startPageId]);
         pageOrder.unshift(startPageId);
     }
 
@@ -387,6 +390,72 @@ function ensureBodyRootNode(page) {
         children: page.rootNodeIds.filter((id) => id !== BODY_NODE_ID),
         _virtualRoot: true,
     };
+}
+
+/**
+ * Ensure each non-body node has graph layout metadata.
+ * @param {any} page - Page object.
+ * @returns {void}
+ */
+function ensureNodeGraphProps(page) {
+    if (!page || typeof page !== 'object') {
+        return;
+    }
+
+    const nodeById = page.nodeById && typeof page.nodeById === 'object' ? page.nodeById : {};
+    const rootIds = Array.isArray(page.rootNodeIds) ? page.rootNodeIds : [];
+    /** @type {Array<{ id: string, depth: number }>} */
+    const order = [];
+    const visited = new Set();
+
+    /**
+     * Depth-first traversal for graph defaults.
+     * @param {string} nodeId - Node id.
+     * @param {number} depth - Tree depth.
+     * @returns {void}
+     */
+    const visit = (nodeId, depth) => {
+        const id = String(nodeId || '').trim();
+        if (!id || id === BODY_NODE_ID || visited.has(id) || !nodeById[id]) {
+            return;
+        }
+        visited.add(id);
+        order.push({ id, depth });
+        const children = Array.isArray(nodeById[id].children) ? nodeById[id].children : [];
+        children.forEach((childId) => {
+            visit(String(childId || ''), depth + 1);
+        });
+    };
+
+    rootIds.forEach((rootId) => {
+        visit(String(rootId || ''), 0);
+    });
+
+    Object.keys(nodeById).forEach((nodeId) => {
+        if (nodeId !== BODY_NODE_ID && !visited.has(nodeId)) {
+            visit(nodeId, 0);
+        }
+    });
+
+    /** @type {Record<string, number>} */
+    const rowByDepth = {};
+    order.forEach((entry) => {
+        const node = nodeById[entry.id];
+        if (!node || typeof node !== 'object') {
+            return;
+        }
+
+        node.graph = node.graph && typeof node.graph === 'object' ? node.graph : {};
+        const row = rowByDepth[String(entry.depth)] || 0;
+        if (!Number.isFinite(Number(node.graph.x))) {
+            node.graph.x = 120 + (entry.depth * 300);
+        }
+        if (!Number.isFinite(Number(node.graph.y))) {
+            node.graph.y = 90 + (row * 170);
+        }
+        node.graph.collapsed = Boolean(node.graph.collapsed);
+        rowByDepth[String(entry.depth)] = row + 1;
+    });
 }
 
 /**

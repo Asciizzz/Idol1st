@@ -27,9 +27,22 @@ export class ThemeApplier {
             rootElement.style.setProperty(tokenToCssVar(tokenKey), value);
         });
 
+        // Apply optional custom tokens (including graph-specific tokens) using fallback->active merge.
+        const mergedTokens = {
+            ...fallbackTokens,
+            ...activeTokens,
+        };
+        Object.entries(mergedTokens).forEach((entry) => {
+            const key = String(entry[0] || '').trim();
+            const value = String(entry[1] || '').trim();
+            if (!key || !value) {
+                return;
+            }
+            rootElement.style.setProperty(tokenToCssVar(key), value);
+        });
+
         if (activeTheme?.id) {
             rootElement.dataset.themeId = activeTheme.id;
         }
     }
 }
-

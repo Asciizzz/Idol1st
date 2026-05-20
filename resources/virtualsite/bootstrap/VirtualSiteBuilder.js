@@ -134,6 +134,8 @@ export class VirtualSiteBuilder {
         this.keyboardShortcutsCleanup = null;
         /** @type {(() => void) | null} */
         this.addNodePickerCleanup = null;
+        /** @type {boolean} */
+        this.skipNextFrameRefresh = false;
     }
 
     /**
@@ -213,6 +215,9 @@ export class VirtualSiteBuilder {
 
         this.pageGraphPanel = new PageGraphPanel({
             getState: () => this.getState(),
+            onUpdateNodeGraph: (pageId, nodeId, graphPatch) => this.updateNodeGraph(pageId, nodeId, graphPatch),
+            onUpdateNodeData: (pageId, nodeId, patch) => this.updatePageNode(pageId, nodeId, patch),
+            onReparentNode: (pageId, nodeId, targetParentId) => this.reparentNode(pageId, nodeId, targetParentId),
         });
 
         this.bindSaveButton();
@@ -742,7 +747,9 @@ export class VirtualSiteBuilder {
         this.renderTabs();
         this.renderActivePanel();
         this.syncSidePanelWidth();
-        this.renderStage();
+        const skipFrameRefresh = this.skipNextFrameRefresh;
+        this.skipNextFrameRefresh = false;
+        this.renderStage({ skipFrameRefresh });
         this.applyTheme();
     }
 
@@ -823,16 +830,17 @@ export class VirtualSiteBuilder {
     /**
      * Open page tab.
      * @param {string} pageId - Page id.
-     * @param {{ activate?: boolean, mode?: "view" | "graph" }} [options] - Open options.
+     * @param {{ activate?: boolean, mode?: "view" | "graph" | "both" }} [options] - Open options.
      * @returns {void}
      */
     openPageTab(pageId, options = {}) {
+        const mode = options.mode === 'graph' || options.mode === 'both' ? options.mode : 'view';
         const id = this.buildTabId(TAB_KIND.PAGE, pageId);
         this.openTab({
             id,
             kind: TAB_KIND.PAGE,
             refId: pageId,
-            mode: options.mode || 'view',
+            mode,
         }, options.activate !== false);
     }
 
@@ -957,6 +965,27 @@ export class VirtualSiteBuilder {
             return;
         }
         const nextMode = active.mode === 'graph' ? 'view' : 'graph';
+        const nextOpenTabs = tabs.openTabs.map((tab) => (
+            tab.id === active.id ? { ...tab, mode: nextMode } : tab
+        ));
+        this.setTabsState({
+            activeTabId: active.id,
+            openTabs: nextOpenTabs,
+        });
+    }
+
+    /**
+     * Set active page tab mode.
+     * @param {'view' | 'graph' | 'both'} mode - Target mode.
+     * @returns {void}
+     */
+    setActivePageMode(mode) {
+        const tabs = this.getTabsState();
+        const active = this.getActiveTab();
+        if (!active || active.kind !== TAB_KIND.PAGE) {
+            return;
+        }
+        const nextMode = mode === 'graph' || mode === 'both' ? mode : 'view';
         const nextOpenTabs = tabs.openTabs.map((tab) => (
             tab.id === active.id ? { ...tab, mode: nextMode } : tab
         ));
@@ -1109,10 +1138,11 @@ export class VirtualSiteBuilder {
         const state = this.getState();
         if (tab.kind === TAB_KIND.PAGE) {
             const page = state?.resources?.pages?.byId?.[tab.refId] || {};
+            const mode = tab.mode === 'graph' || tab.mode === 'both' ? tab.mode : 'view';
             return {
                 icon: 'P',
                 title: String(page.title || tab.refId),
-                context: tab.mode === 'graph' ? 'graph mode' : 'view mode',
+                context: mode === 'both' ? 'both mode' : `${mode} mode`,
             };
         }
         if (tab.kind === TAB_KIND.STYLE) {
@@ -1133,34 +1163,36 @@ export class VirtualSiteBuilder {
 
     /**
      * Render stage content by active tab kind.
+     * @param {{ skipFrameRefresh?: boolean }} [options] - Render options.
      * @returns {void}
      */
-    renderStage() {
+    renderStage(options = {}) {
         if (!this.dom || !this.iframeRuntime) {
             return;
         }
+        const skipFrameRefresh = Boolean(options.skipFrameRefresh);
 
         const activeTab = this.getActiveTab();
         if (!activeTab) {
             this.closeAddNodePicker();
-            this.dom.stageHeaderTitle.textContent = 'No Tab';
-            this.dom.stageHeaderActions.replaceChildren();
             this.dom.auxHost.replaceChildren();
+            this.dom.root.classList.remove('is-page-tab', 'is-page-both');
             this.dom.root.classList.add('is-no-tools');
-            this.dom.inspectorTitle.textContent = 'Inspector';
+            this.dom.pageModeControls.replaceChildren();
             return;
         }
 
-        this.dom.stageHeaderActions.replaceChildren();
+        this.dom.root.classList.toggle('is-page-tab', activeTab.kind === TAB_KIND.PAGE);
         this.dom.root.classList.toggle('is-no-tools', activeTab.kind !== TAB_KIND.PAGE);
 
         if (activeTab.kind === TAB_KIND.PAGE) {
-            this.renderPageStage(activeTab);
+            this.renderPageStage(activeTab, { skipFrameRefresh });
             return;
         }
 
         this.closeAddNodePicker();
-        this.dom.inspectorTitle.textContent = 'Inspector';
+        this.dom.root.classList.remove('is-page-both');
+        this.dom.pageModeControls.replaceChildren();
 
         if (activeTab.kind === TAB_KIND.STYLE) {
             this.renderStyleStage(activeTab);
@@ -1173,16 +1205,83 @@ export class VirtualSiteBuilder {
     /**
      * Render page stage by page tab mode.
      * @param {{ id: string, kind: "page", refId: string, mode?: string }} tab - Page tab.
+     * @param {{ skipFrameRefresh?: boolean }} [options] - Render options.
      * @returns {void}
      */
-    renderPageStage(tab) {
+    renderPageStage(tab, options = {}) {
         if (!this.dom || !this.iframeRuntime) {
+            return;
+        }
+        const skipFrameRefresh = Boolean(options.skipFrameRefresh);
+
+        const mode = tab.mode === 'graph' || tab.mode === 'both' ? tab.mode : 'view';
+        this.renderPageModeControls(mode, tab.refId);
+
+        if (mode === 'view') {
+            this.dom.root.classList.remove('is-aux-mode', 'is-page-both');
+            this.activeStageMountKey = `page:view:${tab.refId}`;
+            if (!skipFrameRefresh) {
+                this.iframeRuntime.setActivePage(tab.refId);
+            }
+            return;
+        }
+
+        if (mode === 'graph') {
+            this.dom.root.classList.remove('is-page-both');
+            this.dom.root.classList.add('is-aux-mode');
+            if (this.activeStageMountKey !== `page:graph:${tab.refId}`) {
+                this.pageGraphPanel?.mount(this.dom.auxHost);
+                this.activeStageMountKey = `page:graph:${tab.refId}`;
+            }
+            this.pageGraphPanel?.setPageId(tab.refId);
             return;
         }
 
         this.dom.root.classList.remove('is-aux-mode');
-        this.activeStageMountKey = `page:${tab.refId}`;
-        this.iframeRuntime.setActivePage(tab.refId);
+        this.dom.root.classList.add('is-page-both');
+        if (this.activeStageMountKey !== `page:both:${tab.refId}`) {
+            this.pageGraphPanel?.mount(this.dom.auxHost);
+            this.activeStageMountKey = `page:both:${tab.refId}`;
+        }
+        this.pageGraphPanel?.setPageId(tab.refId);
+        if (!skipFrameRefresh) {
+            this.iframeRuntime.setActivePage(tab.refId);
+        }
+    }
+
+    /**
+     * Render floating page mode and polish controls.
+     * @param {'view' | 'graph' | 'both'} mode - Active page mode.
+     * @param {string} pageId - Active page id.
+     * @returns {void}
+     */
+    renderPageModeControls(mode, pageId) {
+        if (!this.dom) {
+            return;
+        }
+
+        this.dom.pageModeControls.innerHTML = `
+            <div class="vsb-page-mode-group" role="group" aria-label="Page Mode">
+                <button type="button" class="vsb-page-mode-btn ${mode === 'view' ? 'is-active' : ''}" data-mode="view">view</button>
+                <button type="button" class="vsb-page-mode-btn ${mode === 'graph' ? 'is-active' : ''}" data-mode="graph">graph</button>
+                <button type="button" class="vsb-page-mode-btn ${mode === 'both' ? 'is-active' : ''}" data-mode="both">both</button>
+            </div>
+            <button type="button" class="vsb-page-polish-btn" data-role="polish-graph">Polish Graph</button>
+        `;
+
+        this.dom.pageModeControls.querySelectorAll('[data-mode]').forEach((node) => {
+            const button = /** @type {HTMLButtonElement} */ (node);
+            button.addEventListener('click', () => {
+                const nextMode = String(button.dataset.mode || 'view');
+                if (nextMode === 'view' || nextMode === 'graph' || nextMode === 'both') {
+                    this.setActivePageMode(nextMode);
+                }
+            });
+        });
+
+        this.dom.pageModeControls.querySelector('[data-role="polish-graph"]')?.addEventListener('click', () => {
+            this.polishGraph(pageId);
+        });
     }
 
     /**
@@ -1419,12 +1518,20 @@ export class VirtualSiteBuilder {
 
             const nextNodeId = this.generateNodeId(page.nodeById);
             const safeParentId = parentNodeId && page.nodeById[parentNodeId] ? parentNodeId : null;
+            const parentGraph = safeParentId && page.nodeById[safeParentId]?.graph && typeof page.nodeById[safeParentId].graph === 'object'
+                ? page.nodeById[safeParentId].graph
+                : null;
             page.nodeById[nextNodeId] = {
                 tag: this.normalizeTagName(tagName),
                 text: '',
                 attrs: {},
                 children: [],
                 parent: safeParentId,
+                graph: {
+                    x: Number.isFinite(Number(parentGraph?.x)) ? Number(parentGraph.x) + 280 : 120,
+                    y: Number.isFinite(Number(parentGraph?.y)) ? Number(parentGraph.y) + 70 : (90 + (page.rootNodeIds.length * 160)),
+                    collapsed: false,
+                },
             };
 
             if (safeParentId) {
@@ -1576,6 +1683,174 @@ export class VirtualSiteBuilder {
                         .filter((entry) => entry[0] && !entry[0].startsWith('_')),
                 );
             }
+        });
+    }
+
+    /**
+     * Update node graph metadata.
+     * @param {string} pageId - Page id.
+     * @param {string} nodeId - Node id.
+     * @param {{ x?: number, y?: number, collapsed?: boolean }} graphPatch - Graph patch.
+     * @returns {void}
+     */
+    updateNodeGraph(pageId, nodeId, graphPatch) {
+        if (!this.store || !nodeId || nodeId === BODY_NODE_ID) {
+            return;
+        }
+        this.skipNextFrameRefresh = true;
+        this.store.update((draft) => {
+            const node = draft?.resources?.pages?.byId?.[pageId]?.nodeById?.[nodeId];
+            if (!node || typeof node !== 'object') {
+                return;
+            }
+            node.graph = node.graph && typeof node.graph === 'object' ? node.graph : {};
+            if (Number.isFinite(Number(graphPatch?.x))) {
+                node.graph.x = Number(graphPatch.x);
+            }
+            if (Number.isFinite(Number(graphPatch?.y))) {
+                node.graph.y = Number(graphPatch.y);
+            }
+            if (typeof graphPatch?.collapsed === 'boolean') {
+                node.graph.collapsed = graphPatch.collapsed;
+            }
+        });
+    }
+
+    /**
+     * Reparent a single node to another node or root.
+     * @param {string} pageId - Page id.
+     * @param {string} nodeId - Source node id.
+     * @param {string | null} targetParentId - Target parent node id or null for root/body.
+     * @returns {boolean} True when reparent operation succeeded.
+     */
+    reparentNode(pageId, nodeId, targetParentId) {
+        if (!this.store || !nodeId || nodeId === BODY_NODE_ID) {
+            return false;
+        }
+
+        let changed = false;
+        this.store.update((draft) => {
+            const page = draft?.resources?.pages?.byId?.[pageId];
+            if (!page || !page?.nodeById?.[nodeId]) {
+                return;
+            }
+
+            const targetId = targetParentId && targetParentId !== BODY_NODE_ID
+                ? String(targetParentId)
+                : null;
+            if (targetId && !page.nodeById[targetId]) {
+                return;
+            }
+            if (targetId === nodeId) {
+                return;
+            }
+            if (targetId && this.isAncestorInPage(page, nodeId, targetId)) {
+                return;
+            }
+
+            const currentParent = this.findParentNodeId(page, nodeId);
+            if ((currentParent || null) === (targetId || null)) {
+                changed = true;
+                return;
+            }
+
+            this.detachNodeReferences(page, nodeId);
+            if (targetId) {
+                const parentNode = page.nodeById[targetId];
+                parentNode.children = Array.isArray(parentNode.children) ? parentNode.children : [];
+                if (!parentNode.children.includes(nodeId)) {
+                    parentNode.children.push(nodeId);
+                }
+                page.nodeById[nodeId].parent = targetId;
+            } else {
+                page.rootNodeIds = Array.isArray(page.rootNodeIds) ? page.rootNodeIds : [];
+                if (!page.rootNodeIds.includes(nodeId)) {
+                    page.rootNodeIds.push(nodeId);
+                }
+                page.nodeById[nodeId].parent = null;
+            }
+
+            this.syncBodyRootNode(page);
+            changed = true;
+        });
+
+        return changed;
+    }
+
+    /**
+     * Auto-arrange graph node positions in a left-to-right tree layout.
+     * @param {string} pageId - Page id.
+     * @returns {void}
+     */
+    polishGraph(pageId) {
+        if (!this.store) {
+            return;
+        }
+        this.store.update((draft) => {
+            const page = draft?.resources?.pages?.byId?.[pageId];
+            if (!page) {
+                return;
+            }
+            const nodeById = page.nodeById && typeof page.nodeById === 'object' ? page.nodeById : {};
+            const roots = (Array.isArray(page.rootNodeIds) ? page.rootNodeIds : [])
+                .map((id) => String(id || ''))
+                .filter((id) => id && id !== BODY_NODE_ID && nodeById[id]);
+            let cursorY = 0;
+            const visited = new Set();
+
+            /**
+             * Compute tree row placement for a node branch.
+             * @param {string} currentId - Node id.
+             * @param {number} depth - Depth from root.
+             * @returns {number} Assigned y coordinate.
+             */
+            const place = (currentId, depth) => {
+                const id = String(currentId || '');
+                if (!id || id === BODY_NODE_ID || !nodeById[id]) {
+                    const y = 90 + (cursorY * 170);
+                    cursorY += 1;
+                    return y;
+                }
+                if (visited.has(id)) {
+                    const fallbackY = Number(nodeById[id]?.graph?.y);
+                    return Number.isFinite(fallbackY) ? fallbackY : (90 + (cursorY * 170));
+                }
+                visited.add(id);
+                const node = nodeById[id];
+                const children = Array.isArray(node.children)
+                    ? node.children.map((childId) => String(childId || '')).filter((childId) => childId && childId !== BODY_NODE_ID && nodeById[childId])
+                    : [];
+
+                /** @type {number[]} */
+                const childY = [];
+                children.forEach((childId) => {
+                    childY.push(place(childId, depth + 1));
+                });
+
+                let y = 0;
+                if (childY.length === 0) {
+                    y = 90 + (cursorY * 170);
+                    cursorY += 1;
+                } else {
+                    y = childY.reduce((acc, value) => acc + value, 0) / childY.length;
+                }
+
+                node.graph = node.graph && typeof node.graph === 'object' ? node.graph : {};
+                node.graph.x = 90 + (depth * 300);
+                node.graph.y = y;
+                node.graph.collapsed = Boolean(node.graph.collapsed);
+                return y;
+            };
+
+            roots.forEach((rootId) => {
+                place(rootId, 0);
+            });
+
+            Object.keys(nodeById).forEach((nodeId) => {
+                if (nodeId !== BODY_NODE_ID && !visited.has(nodeId)) {
+                    place(nodeId, 0);
+                }
+            });
         });
     }
 
