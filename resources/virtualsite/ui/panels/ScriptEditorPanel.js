@@ -22,6 +22,10 @@ export class ScriptEditorPanel {
         this.scriptId = null;
         /** @type {boolean} */
         this.rawMode = false;
+        /** @type {number} */
+        this.actionPanePercent = 70;
+        /** @type {(() => void) | null} */
+        this.splitResizeCleanup = null;
     }
 
     /**
@@ -55,6 +59,8 @@ export class ScriptEditorPanel {
         if (!this.root) {
             return;
         }
+        this.splitResizeCleanup?.();
+        this.splitResizeCleanup = null;
 
         const script = this.getActiveScript();
         if (!script) {
@@ -122,9 +128,21 @@ export class ScriptEditorPanel {
                             ${actionOptions}
                         </select>
                         <div class="vsb-theme-actions">
-                            <label><input type="checkbox" data-role="attr-capture" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.capture ? 'checked' : ''}/> capture</label>
-                            <label><input type="checkbox" data-role="attr-once" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.once ? 'checked' : ''}/> once</label>
-                            <label><input type="checkbox" data-role="attr-passive" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.passive ? 'checked' : ''}/> passive</label>
+                            <label class="vsb-script-flag">
+                                <input class="vsb-checkbox" type="checkbox" data-role="attr-capture" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.capture ? 'checked' : ''}/>
+                                <span class="vsb-checkbox-ui" aria-hidden="true"></span>
+                                <span>capture</span>
+                            </label>
+                            <label class="vsb-script-flag">
+                                <input class="vsb-checkbox" type="checkbox" data-role="attr-once" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.once ? 'checked' : ''}/>
+                                <span class="vsb-checkbox-ui" aria-hidden="true"></span>
+                                <span>once</span>
+                            </label>
+                            <label class="vsb-script-flag">
+                                <input class="vsb-checkbox" type="checkbox" data-role="attr-passive" data-event-type="${this.escapeHtml(eventType)}" data-binding-index="${bindingIndex}" ${attrs.passive ? 'checked' : ''}/>
+                                <span class="vsb-checkbox-ui" aria-hidden="true"></span>
+                                <span>passive</span>
+                            </label>
                         </div>
                     </article>
                 `);
@@ -132,12 +150,13 @@ export class ScriptEditorPanel {
         });
 
         return `
-            <div class="vsb-split">
-                <section class="vsb-split-left">
+            <div class="vsb-script-split" data-role="script-split" style="--vsb-script-action-width:${this.clampActionPanePercent(this.actionPanePercent)}%;">
+                <section class="vsb-script-pane vsb-script-pane-actions">
                     <h4>Actions</h4>
                     ${actionCards || '<div class="vsb-small">No actions.</div>'}
                 </section>
-                <section class="vsb-split-right">
+                <div class="vsb-script-split-resizer" data-role="script-split-resizer" role="separator" aria-orientation="vertical" aria-label="Resize actions and events"></div>
+                <section class="vsb-script-pane vsb-script-pane-events">
                     <h4>Events</h4>
                     ${eventRows.join('') || '<div class="vsb-small">No event bindings.</div>'}
                 </section>
@@ -283,6 +302,7 @@ export class ScriptEditorPanel {
         this.bindEventCheckbox(script, 'attr-capture', 'capture');
         this.bindEventCheckbox(script, 'attr-once', 'once');
         this.bindEventCheckbox(script, 'attr-passive', 'passive');
+        this.bindSplitResizer();
     }
 
     /**
@@ -342,6 +362,103 @@ export class ScriptEditorPanel {
     }
 
     /**
+     * Clamp actions pane percentage for structured split.
+     * @param {unknown} value - Candidate percentage.
+     * @returns {number} Clamped percentage.
+     */
+    clampActionPanePercent(value) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+            return 70;
+        }
+        return Math.min(85, Math.max(30, numeric));
+    }
+
+    /**
+     * Bind drag resize between actions and events panes.
+     * @returns {void}
+     */
+    bindSplitResizer() {
+        if (!this.root || this.rawMode) {
+            return;
+        }
+        this.splitResizeCleanup?.();
+
+        const split = /** @type {HTMLElement | null} */ (this.root.querySelector('[data-role="script-split"]'));
+        const handle = /** @type {HTMLElement | null} */ (this.root.querySelector('[data-role="script-split-resizer"]'));
+        if (!split || !handle) {
+            return;
+        }
+
+        let isDragging = false;
+        let activePointerId = null;
+        let livePercent = this.clampActionPanePercent(this.actionPanePercent);
+        handle.setAttribute('aria-valuemin', '30');
+        handle.setAttribute('aria-valuemax', '85');
+        handle.setAttribute('aria-valuenow', String(Math.round(livePercent * 100) / 100));
+
+        const onPointerMove = (event) => {
+            if (!isDragging || (activePointerId !== null && event.pointerId !== activePointerId)) {
+                return;
+            }
+            event.preventDefault();
+            const rect = split.getBoundingClientRect();
+            const width = Math.max(rect.width, 1);
+            const raw = ((event.clientX - rect.left) / width) * 100;
+            livePercent = this.clampActionPanePercent(raw);
+            split.style.setProperty('--vsb-script-action-width', `${livePercent}%`);
+            handle.setAttribute('aria-valuenow', String(Math.round(livePercent * 100) / 100));
+        };
+
+        const stopDragging = () => {
+            if (!isDragging) {
+                return;
+            }
+            isDragging = false;
+            if (activePointerId !== null) {
+                try {
+                    handle.releasePointerCapture(activePointerId);
+                } catch {
+                    // ignore release errors
+                }
+            }
+            activePointerId = null;
+            this.actionPanePercent = livePercent;
+            this.root?.classList.remove('is-script-split-resizing');
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', stopDragging);
+            window.removeEventListener('pointercancel', stopDragging);
+        };
+
+        const onPointerDown = (event) => {
+            if (event.button !== 0) {
+                return;
+            }
+            event.preventDefault();
+            isDragging = true;
+            activePointerId = event.pointerId;
+            try {
+                handle.setPointerCapture(event.pointerId);
+            } catch {
+                // ignore capture errors
+            }
+            this.root?.classList.add('is-script-split-resizing');
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', stopDragging);
+            window.addEventListener('pointercancel', stopDragging);
+        };
+
+        handle.addEventListener('pointerdown', onPointerDown);
+        this.splitResizeCleanup = () => {
+            handle.removeEventListener('pointerdown', onPointerDown);
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', stopDragging);
+            window.removeEventListener('pointercancel', stopDragging);
+            this.root?.classList.remove('is-script-split-resizing');
+        };
+    }
+
+    /**
      * Resolve active script.
      * @returns {any | null} Active script object.
      */
@@ -385,4 +502,3 @@ export class ScriptEditorPanel {
             .replace(/'/g, '&#39;');
     }
 }
-

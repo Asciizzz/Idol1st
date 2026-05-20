@@ -39,6 +39,12 @@
     user-select: none;
 }
 
+.vsb-root.is-side-resizing .vsb-iframe-host,
+.vsb-root.is-side-resizing .vsb-iframe-host iframe,
+.vsb-root.is-side-resizing .vsb-render-frame {
+    pointer-events: none !important;
+}
+
 .vsb-root.is-inspector-resizing,
 .vsb-root.is-inspector-resizing * {
     cursor: ew-resize;
@@ -49,6 +55,12 @@
 .vsb-root.is-both-resizing * {
     cursor: ew-resize;
     user-select: none;
+}
+
+.vsb-root.is-both-resizing .vsb-iframe-host,
+.vsb-root.is-both-resizing .vsb-iframe-host iframe,
+.vsb-root.is-both-resizing .vsb-render-frame {
+    pointer-events: none !important;
 }
 
 .vsb-header {
@@ -1029,8 +1041,7 @@
 }
 
 .vsb-input,
-.vsb-textarea,
-.vsb-list-btn {
+.vsb-textarea {
     width: 100%;
     border: 1px solid var(--vsb-panel-border);
     border-radius: 0.4rem;
@@ -1049,6 +1060,36 @@
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
+}
+
+.vsb-explorer-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.vsb-explorer-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.vsb-mini-btn {
+    min-height: 1.85rem;
+    padding: 0 0.5rem;
+    font-size: 0.68rem;
+}
+
+.vsb-delete-btn {
+    min-width: 6.8rem;
+    white-space: nowrap;
+}
+
+.vsb-delete-btn.is-armed {
+    border-color: #d25757;
+    color: #ffe4e4;
+    background: color-mix(in oklab, #d25757 24%, transparent);
 }
 
 .vsb-include-row {
@@ -1103,12 +1144,23 @@
 }
 
 .vsb-list-btn {
+    width: 100%;
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.4rem;
+    background: color-mix(in oklab, var(--vsb-panel-background) 86%, #fff);
+    color: inherit;
+    padding: 0.45rem;
     text-align: left;
     cursor: pointer;
 }
 
 .vsb-list-btn:hover {
     border-color: var(--vsb-accent-primary);
+    background: color-mix(in oklab, var(--vsb-panel-background) 72%, var(--vsb-accent-primary) 8%);
+}
+
+.vsb-explorer-rename-input {
+    background: color-mix(in oklab, var(--vsb-editor-background) 70%, #fff);
 }
 
 .vsb-list-item {
@@ -1214,6 +1266,86 @@
     border-radius: 0.55rem;
     background: color-mix(in oklab, var(--vsb-panel-background) 90%, #000);
     padding: 0.5rem;
+}
+
+.vsb-editor-canvas.is-script-split-resizing,
+.vsb-editor-canvas.is-script-split-resizing * {
+    cursor: ew-resize;
+    user-select: none;
+}
+
+.vsb-script-split {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    --vsb-script-action-width: 70%;
+}
+
+.vsb-script-pane {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.55rem;
+    background: color-mix(in oklab, var(--vsb-panel-background) 90%, #000);
+    padding: 0.5rem;
+}
+
+.vsb-script-pane > h4 {
+    margin: 0 0 0.45rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
+
+.vsb-script-pane-actions {
+    flex: 0 0 var(--vsb-script-action-width);
+}
+
+.vsb-script-pane-events {
+    flex: 1 1 auto;
+}
+
+.vsb-script-split-resizer {
+    min-width: 0.45rem;
+    width: 0.45rem;
+    cursor: ew-resize;
+    touch-action: none;
+    position: relative;
+    background: color-mix(in oklab, var(--vsb-panel-background) 88%, #000);
+    border-left: 1px solid var(--vsb-panel-border);
+    border-right: 1px solid var(--vsb-panel-border);
+    margin: 0 0.28rem;
+    border-radius: 999px;
+}
+
+.vsb-script-split-resizer::before {
+    content: '';
+    position: absolute;
+    inset: 0.35rem 0.12rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--vsb-panel-border) 74%, #fff);
+    opacity: 0.7;
+}
+
+.vsb-script-split-resizer:hover::before,
+.vsb-editor-canvas.is-script-split-resizing .vsb-script-split-resizer::before {
+    border-color: var(--vsb-accent-primary);
+    background: color-mix(in oklab, var(--vsb-accent-primary) 20%, transparent);
+    opacity: 1;
+}
+
+.vsb-script-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    opacity: 0.92;
+    cursor: pointer;
 }
 
 .vsb-card {

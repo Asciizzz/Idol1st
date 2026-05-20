@@ -183,6 +183,12 @@ export class VirtualSiteBuilder {
             onSelectPage: (pageId) => this.openPageTab(pageId),
             onSelectStyle: (styleId) => this.openStyleTab(styleId),
             onSelectScript: (scriptId) => this.openScriptTab(scriptId),
+            onRenamePage: (pageId, nextTitle) => this.renamePage(pageId, nextTitle),
+            onRenameStyle: (styleId, nextName) => this.renameStyle(styleId, nextName),
+            onRenameScript: (scriptId, nextName) => this.renameScript(scriptId, nextName),
+            onDeletePage: (pageId) => this.deletePage(pageId),
+            onDeleteStyle: (styleId) => this.deleteStyle(styleId),
+            onDeleteScript: (scriptId) => this.deleteScript(scriptId),
             onCreateStyle: () => this.createStyle(),
             onCreateScript: () => this.createScript(),
         });
@@ -353,9 +359,10 @@ export class VirtualSiteBuilder {
         const handle = this.dom.sidePanelResizer;
         let isDragging = false;
         let liveWidth = this.getSidePanelWidth();
+        let activePointerId = null;
 
         const onPointerMove = (event) => {
-            if (!isDragging) {
+            if (!isDragging || (activePointerId !== null && event.pointerId !== activePointerId)) {
                 return;
             }
             event.preventDefault();
@@ -369,6 +376,14 @@ export class VirtualSiteBuilder {
                 return;
             }
             isDragging = false;
+            if (activePointerId !== null) {
+                try {
+                    handle.releasePointerCapture(activePointerId);
+                } catch {
+                    // ignore capture release errors
+                }
+            }
+            activePointerId = null;
             this.dom?.root.classList.remove('is-side-resizing');
             this.persistSidePanelWidth(liveWidth);
             this.syncSidePanelWidth();
@@ -386,6 +401,12 @@ export class VirtualSiteBuilder {
             }
             event.preventDefault();
             isDragging = true;
+            activePointerId = event.pointerId;
+            try {
+                handle.setPointerCapture(event.pointerId);
+            } catch {
+                // ignore capture setup errors
+            }
             liveWidth = this.resolveSidePanelWidthFromPointer(event.clientX);
             this.dom.root.classList.add('is-side-resizing');
             this.dom.root.style.setProperty('--vsb-side-panel-width', `${liveWidth}vw`);
@@ -496,9 +517,10 @@ export class VirtualSiteBuilder {
         const handle = this.dom.bothModeResizer;
         let isDragging = false;
         let liveSplit = this.getBothModeSplit();
+        let activePointerId = null;
 
         const onPointerMove = (event) => {
-            if (!isDragging) {
+            if (!isDragging || (activePointerId !== null && event.pointerId !== activePointerId)) {
                 return;
             }
             event.preventDefault();
@@ -512,6 +534,14 @@ export class VirtualSiteBuilder {
                 return;
             }
             isDragging = false;
+            if (activePointerId !== null) {
+                try {
+                    handle.releasePointerCapture(activePointerId);
+                } catch {
+                    // ignore capture release errors
+                }
+            }
+            activePointerId = null;
             this.dom?.root.classList.remove('is-both-resizing');
             this.persistBothModeSplit(liveSplit);
             this.syncBothModeSplit();
@@ -529,6 +559,12 @@ export class VirtualSiteBuilder {
             }
             event.preventDefault();
             isDragging = true;
+            activePointerId = event.pointerId;
+            try {
+                handle.setPointerCapture(event.pointerId);
+            } catch {
+                // ignore capture setup errors
+            }
             liveSplit = this.resolveBothModeSplitFromPointer(event.clientX);
             this.dom.root.classList.add('is-both-resizing');
             this.dom.root.style.setProperty('--vsb-both-left-width', `${liveSplit}%`);
@@ -2515,6 +2551,20 @@ export class VirtualSiteBuilder {
     }
 
     /**
+     * Rename page title from explorer.
+     * @param {string} pageId - Page id.
+     * @param {string} nextTitle - Next page title.
+     * @returns {void}
+     */
+    renamePage(pageId, nextTitle) {
+        const title = String(nextTitle || '').trim();
+        if (!title) {
+            return;
+        }
+        this.updatePage(pageId, { title });
+    }
+
+    /**
      * Set start page in project state.
      * @param {string} pageId - Page id.
      * @returns {void}
@@ -2670,6 +2720,29 @@ export class VirtualSiteBuilder {
     }
 
     /**
+     * Rename style resource.
+     * @param {string} styleId - Style id.
+     * @param {string} nextName - Next style display name.
+     * @returns {void}
+     */
+    renameStyle(styleId, nextName) {
+        if (!this.store) {
+            return;
+        }
+        const safeName = String(nextName || '').trim();
+        if (!safeName) {
+            return;
+        }
+        this.store.update((draft) => {
+            const style = draft?.resources?.styles?.byId?.[styleId];
+            if (!style) {
+                return;
+            }
+            style.name = safeName;
+        });
+    }
+
+    /**
      * Update script resource object.
      * @param {string} scriptId - Script id.
      * @param {any} nextScript - Next script object.
@@ -2693,6 +2766,29 @@ export class VirtualSiteBuilder {
             safe.actions = safe.actions && typeof safe.actions === 'object' ? safe.actions : {};
             safe.events = safe.events && typeof safe.events === 'object' ? safe.events : {};
             draft.resources.scripts.byId[scriptId] = safe;
+        });
+    }
+
+    /**
+     * Rename script resource.
+     * @param {string} scriptId - Script id.
+     * @param {string} nextName - Next script display name.
+     * @returns {void}
+     */
+    renameScript(scriptId, nextName) {
+        if (!this.store) {
+            return;
+        }
+        const safeName = String(nextName || '').trim();
+        if (!safeName) {
+            return;
+        }
+        this.store.update((draft) => {
+            const script = draft?.resources?.scripts?.byId?.[scriptId];
+            if (!script) {
+                return;
+            }
+            script.name = safeName;
         });
     }
 
@@ -2726,6 +2822,45 @@ export class VirtualSiteBuilder {
     }
 
     /**
+     * Delete a style resource and remove all references.
+     * @param {string} styleId - Style id.
+     * @returns {void}
+     */
+    deleteStyle(styleId) {
+        if (!this.store) {
+            return;
+        }
+
+        this.store.update((draft) => {
+            const styles = draft?.resources?.styles?.byId || {};
+            if (!styles[styleId]) {
+                return;
+            }
+            delete styles[styleId];
+
+            Object.values(draft?.resources?.pages?.byId || {}).forEach((page) => {
+                if (!page || typeof page !== 'object') {
+                    return;
+                }
+                page.includes ||= { styleIds: [], scriptIds: [] };
+                page.includes.styleIds = Array.isArray(page.includes.styleIds)
+                    ? page.includes.styleIds.filter((id) => id !== styleId)
+                    : [];
+            });
+
+            const tabs = draft?.editor?.tabs;
+            if (tabs && Array.isArray(tabs.openTabs)) {
+                tabs.openTabs = tabs.openTabs.filter((tab) => !(tab.kind === TAB_KIND.STYLE && tab.refId === styleId));
+                if (!tabs.openTabs.some((tab) => tab.id === tabs.activeTabId)) {
+                    tabs.activeTabId = tabs.openTabs[0] ? tabs.openTabs[0].id : null;
+                }
+            }
+        });
+
+        this.ensureInitialTab();
+    }
+
+    /**
      * Create a new script resource.
      * @returns {void}
      */
@@ -2754,6 +2889,45 @@ export class VirtualSiteBuilder {
         if (scriptId) {
             this.openScriptTab(scriptId, { activate: true });
         }
+    }
+
+    /**
+     * Delete a script resource and remove all references.
+     * @param {string} scriptId - Script id.
+     * @returns {void}
+     */
+    deleteScript(scriptId) {
+        if (!this.store) {
+            return;
+        }
+
+        this.store.update((draft) => {
+            const scripts = draft?.resources?.scripts?.byId || {};
+            if (!scripts[scriptId]) {
+                return;
+            }
+            delete scripts[scriptId];
+
+            Object.values(draft?.resources?.pages?.byId || {}).forEach((page) => {
+                if (!page || typeof page !== 'object') {
+                    return;
+                }
+                page.includes ||= { styleIds: [], scriptIds: [] };
+                page.includes.scriptIds = Array.isArray(page.includes.scriptIds)
+                    ? page.includes.scriptIds.filter((id) => id !== scriptId)
+                    : [];
+            });
+
+            const tabs = draft?.editor?.tabs;
+            if (tabs && Array.isArray(tabs.openTabs)) {
+                tabs.openTabs = tabs.openTabs.filter((tab) => !(tab.kind === TAB_KIND.SCRIPT && tab.refId === scriptId));
+                if (!tabs.openTabs.some((tab) => tab.id === tabs.activeTabId)) {
+                    tabs.activeTabId = tabs.openTabs[0] ? tabs.openTabs[0].id : null;
+                }
+            }
+        });
+
+        this.ensureInitialTab();
     }
 
     /**
