@@ -26,15 +26,32 @@ export class PageGraphPanel {
      * Create graph panel.
      * @param {{
      *   getState: () => object,
+     *   getToolState?: () => { mode: 'select' | 'add' | 'delete', deleteMode: 'single' | 'branch' },
+     *   onSetToolMode?: (mode: 'select' | 'add' | 'delete') => void,
+     *   onToggleDeleteMode?: () => void,
      *   onUpdateNodeGraph?: (pageId: string, nodeId: string, graphPatch: { x?: number, y?: number, collapsed?: boolean }) => void,
      *   onUpdateNodeData?: (pageId: string, nodeId: string, patch: { tag?: string, text?: string, attrs?: Record<string, string> }) => void,
      *   onReparentNode?: (pageId: string, nodeId: string, targetParentId: string | null) => boolean,
-     *   onReorderChild?: (pageId: string, parentNodeId: string, childNodeId: string, direction: 'up' | 'down') => void
+     *   onReorderChild?: (pageId: string, parentNodeId: string, childNodeId: string, direction: 'up' | 'down') => void,
+     *   onCreateNode?: (pageId: string, parentNodeId: string | null, pointer: { x: number, y: number }) => void,
+     *   onDeleteNode?: (pageId: string, nodeId: string) => void
      * }} options - Panel options.
      */
     constructor(options) {
         /** @type {() => object} */
         this.getState = options.getState;
+        /** @type {() => { mode: 'select' | 'add' | 'delete', deleteMode: 'single' | 'branch' }} */
+        this.getToolState = typeof options.getToolState === 'function'
+            ? options.getToolState
+            : () => ({ mode: 'select', deleteMode: 'single' });
+        /** @type {(mode: 'select' | 'add' | 'delete') => void} */
+        this.onSetToolMode = typeof options.onSetToolMode === 'function'
+            ? options.onSetToolMode
+            : () => {};
+        /** @type {() => void} */
+        this.onToggleDeleteMode = typeof options.onToggleDeleteMode === 'function'
+            ? options.onToggleDeleteMode
+            : () => {};
         /** @type {(pageId: string, nodeId: string, graphPatch: { x?: number, y?: number, collapsed?: boolean }) => void} */
         this.onUpdateNodeGraph = typeof options.onUpdateNodeGraph === 'function'
             ? options.onUpdateNodeGraph
@@ -51,6 +68,14 @@ export class PageGraphPanel {
         this.onReorderChild = typeof options.onReorderChild === 'function'
             ? options.onReorderChild
             : () => {};
+        /** @type {(pageId: string, parentNodeId: string | null, pointer: { x: number, y: number }) => void} */
+        this.onCreateNode = typeof options.onCreateNode === 'function'
+            ? options.onCreateNode
+            : () => {};
+        /** @type {(pageId: string, nodeId: string) => void} */
+        this.onDeleteNode = typeof options.onDeleteNode === 'function'
+            ? options.onDeleteNode
+            : () => {};
         /** @type {HTMLElement | null} */
         this.root = null;
         /** @type {string | null} */
@@ -59,6 +84,8 @@ export class PageGraphPanel {
         this.panX = 24;
         /** @type {number} */
         this.panY = 24;
+        /** @type {(() => void) | null} */
+        this.keyboardCleanup = null;
     }
 
     /**
@@ -67,10 +94,14 @@ export class PageGraphPanel {
      * @returns {void}
      */
     mount(host) {
+        this.keyboardCleanup?.();
+        this.keyboardCleanup = null;
+
         const root = document.createElement('div');
         root.className = 'vsb-graph-canvas';
         host.replaceChildren(root);
         this.root = root;
+        this.bindKeyboardShortcuts();
         this.render();
     }
 
@@ -100,6 +131,16 @@ export class PageGraphPanel {
 
         const graphNodes = this.collectGraphNodes(page);
         const world = this.computeWorldBounds(graphNodes);
+        const toolState = this.getToolState();
+        const mode = toolState.mode === 'add' || toolState.mode === 'delete'
+            ? toolState.mode
+            : 'select';
+        const deleteMode = toolState.deleteMode === 'branch'
+            ? 'branch'
+            : 'single';
+        this.root.dataset.toolMode = mode;
+        this.root.dataset.deleteMode = deleteMode;
+
         this.root.innerHTML = `
             <div class="vsb-graph-viewport" data-role="graph-viewport">
                 <div
@@ -121,6 +162,27 @@ export class PageGraphPanel {
                     </div>
                 </div>
             </div>
+            <aside class="vsb-graph-tool-rail" data-role="graph-tool-rail" aria-label="Graph Modes">
+                <button type="button" class="vsb-graph-tool-btn ${mode === 'select' ? 'is-active' : ''}" data-role="tool-mode" data-mode="select" title="Select (W)">
+                    <span class="vsb-graph-tool-icon" aria-hidden="true">&#8598;</span>
+                    <span class="vsb-graph-tool-label">Select</span>
+                </button>
+                <button
+                    type="button"
+                    class="vsb-graph-tool-btn ${mode === 'delete' ? 'is-active' : ''} ${mode === 'delete' && deleteMode === 'branch' ? 'is-branch' : 'is-single'}"
+                    data-role="tool-mode"
+                    data-mode="delete"
+                    title="Delete (E)"
+                >
+                    <span class="vsb-graph-tool-icon" aria-hidden="true">&#9003;</span>
+                    <span class="vsb-graph-tool-label">Delete</span>
+                    <span class="vsb-graph-tool-meta">${deleteMode}</span>
+                </button>
+                <button type="button" class="vsb-graph-tool-btn ${mode === 'add' ? 'is-active' : ''}" data-role="tool-mode" data-mode="add" title="Add (A)">
+                    <span class="vsb-graph-tool-icon" aria-hidden="true">+</span>
+                    <span class="vsb-graph-tool-label">Add</span>
+                </button>
+            </aside>
         `;
 
         const viewport = /** @type {HTMLElement | null} */ (this.root.querySelector('[data-role="graph-viewport"]'));
@@ -128,9 +190,12 @@ export class PageGraphPanel {
         if (!viewport || !worldNode) {
             return;
         }
+
+        this.bindToolRail();
         this.bindViewportPan(viewport, worldNode);
         this.bindNodeEditors(page.id);
         this.bindNodeDragging(page.id, viewport);
+        this.bindModeInteractions(page.id, viewport);
         this.drawConnections(page.id);
     }
 
@@ -149,14 +214,29 @@ export class PageGraphPanel {
         const children = Array.isArray(node.children) ? node.children : [];
         const hasChildren = children.length > 0;
         const attrs = node.attrs && typeof node.attrs === 'object' ? node.attrs : {};
-        const nodeHint = this.resolveNodeHint(entry.id, node);
         const nodeTag = this.normalizeTag(node.tag);
+        const nodeHint = this.formatNodeDisplayId(entry.id);
         const attrRows = Object.entries(attrs).map((entryRow) => `
             <div class="vsb-graph-attr-row" data-role="attr-row">
                 <input class="vsb-input vsb-graph-input" data-role="attr-key" placeholder="attribute" value="${this.escapeHtml(String(entryRow[0]))}" />
                 <input class="vsb-input vsb-graph-input" data-role="attr-val" placeholder="value" value="${this.escapeHtml(String(entryRow[1]))}" />
             </div>
         `).join('');
+        const childRows = children.map((childId, index) => {
+            const childNode = page?.nodeById?.[childId];
+            return `
+                <div class="vsb-graph-child-row" style="--vsb-graph-order-color:${this.escapeHtml(this.getOrderColor(index))};">
+                    <span class="vsb-graph-child-label">
+                        <span class="vsb-graph-child-main">${this.escapeHtml(this.normalizeTag(childNode?.tag))}</span>
+                        <span class="vsb-graph-child-meta">&middot; ${this.escapeHtml(this.formatNodeDisplayId(String(childId || '')))}</span>
+                    </span>
+                    <div class="vsb-graph-child-actions">
+                        <button type="button" class="vsb-graph-child-btn" data-role="child-up" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Up" ${index === 0 ? 'disabled' : ''}>&#9652;</button>
+                        <button type="button" class="vsb-graph-child-btn" data-role="child-down" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Down" ${index === children.length - 1 ? 'disabled' : ''}>&#9662;</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
 
         return `
             <article
@@ -170,7 +250,7 @@ export class PageGraphPanel {
                     </button>
                     <span class="vsb-graph-node-title-wrap">
                         <span class="vsb-graph-node-title">${this.escapeHtml(nodeTag)}</span>
-                        <span class="vsb-graph-node-meta">${this.escapeHtml(nodeHint)}</span>
+                        <span class="vsb-graph-node-meta">&middot; ${this.escapeHtml(nodeHint)}</span>
                     </span>
                 </header>
                 <section class="vsb-graph-node-body">
@@ -178,20 +258,7 @@ export class PageGraphPanel {
                     <input class="vsb-input vsb-graph-input" data-role="node-tag" value="${this.escapeHtml(nodeTag)}" />
                     ${hasChildren
         ? `<label class="vsb-field-label">Children</label>
-                    <div class="vsb-graph-children-list">
-                        ${children.map((childId, index) => `
-                            <div
-                                class="vsb-graph-child-row"
-                                style="--vsb-graph-order-color:${this.escapeHtml(this.getOrderColor(index))};"
-                            >
-                                <span class="vsb-graph-child-label">${this.escapeHtml(this.resolveNodeListLabel(String(childId || ''), page?.nodeById?.[childId]))}</span>
-                                <div class="vsb-graph-child-actions">
-                                    <button type="button" class="vsb-graph-child-btn" data-role="child-up" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Up" ${index === 0 ? 'disabled' : ''}>▴</button>
-                                    <button type="button" class="vsb-graph-child-btn" data-role="child-down" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Down" ${index === children.length - 1 ? 'disabled' : ''}>▾</button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`
+                    <div class="vsb-graph-children-list">${childRows}</div>`
         : `<label class="vsb-field-label">Text</label>
                     <textarea class="vsb-textarea vsb-graph-node-text" data-role="node-text">${this.escapeHtml(String(node.text || ''))}</textarea>`}
                     <label class="vsb-field-label">Attributes</label>
@@ -205,6 +272,75 @@ export class PageGraphPanel {
                 </section>
             </article>
         `;
+    }
+
+    /**
+     * Bind mode rail buttons.
+     * @returns {void}
+     */
+    bindToolRail() {
+        if (!this.root) {
+            return;
+        }
+        this.root.querySelectorAll('[data-role="tool-mode"]').forEach((node) => {
+            const button = /** @type {HTMLButtonElement} */ (node);
+            button.addEventListener('click', () => {
+                const mode = String(button.dataset.mode || 'select');
+                if (mode === 'delete') {
+                    if (this.getToolState().mode === 'delete') {
+                        this.onToggleDeleteMode();
+                    } else {
+                        this.onSetToolMode('delete');
+                    }
+                    return;
+                }
+                if (mode === 'add') {
+                    this.onSetToolMode('add');
+                    return;
+                }
+                this.onSetToolMode('select');
+            });
+        });
+    }
+
+    /**
+     * Bind keyboard shortcuts for graph tool switching.
+     * @returns {void}
+     */
+    bindKeyboardShortcuts() {
+        this.keyboardCleanup?.();
+        const onKeyDown = (event) => {
+            if (!this.root || !this.root.isConnected) {
+                return;
+            }
+            const target = event.target;
+            if (target instanceof Element && target.closest('input, textarea, select, [contenteditable="true"]')) {
+                return;
+            }
+            const key = String(event.key || '').toLowerCase();
+            if (key === 'w') {
+                event.preventDefault();
+                this.onSetToolMode('select');
+                return;
+            }
+            if (key === 'a') {
+                event.preventDefault();
+                this.onSetToolMode('add');
+                return;
+            }
+            if (key === 'e') {
+                event.preventDefault();
+                if (this.getToolState().mode === 'delete') {
+                    this.onToggleDeleteMode();
+                } else {
+                    this.onSetToolMode('delete');
+                }
+            }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        this.keyboardCleanup = () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
     }
 
     /**
@@ -261,6 +397,7 @@ export class PageGraphPanel {
 
             card.querySelector('[data-role="toggle-collapse"]')?.addEventListener('click', (event) => {
                 event.preventDefault();
+                event.stopPropagation();
                 const isCollapsed = card.classList.contains('is-collapsed');
                 this.onUpdateNodeGraph(pageId, nodeId, { collapsed: !isCollapsed });
             });
@@ -268,7 +405,6 @@ export class PageGraphPanel {
             this.bindTextInput(card, '[data-role="node-tag"]', (value) => {
                 this.onUpdateNodeData(pageId, nodeId, { tag: value || 'div' });
             });
-
             this.bindTextInput(card, '[data-role="node-text"]', (value) => {
                 this.onUpdateNodeData(pageId, nodeId, { text: value });
             });
@@ -284,6 +420,7 @@ export class PageGraphPanel {
                 const button = /** @type {HTMLButtonElement} */ (buttonNode);
                 button.addEventListener('click', (event) => {
                     event.preventDefault();
+                    event.stopPropagation();
                     const childId = String(button.dataset.childId || '').trim();
                     if (!childId) {
                         return;
@@ -301,6 +438,76 @@ export class PageGraphPanel {
                 input.addEventListener('change', syncAttrs);
                 input.addEventListener('blur', syncAttrs);
             });
+        });
+    }
+
+    /**
+     * Bind mode-specific interactions (add/delete click and delete hover).
+     * @param {string} pageId - Active page id.
+     * @param {HTMLElement} viewport - Graph viewport element.
+     * @returns {void}
+     */
+    bindModeInteractions(pageId, viewport) {
+        if (!this.root) {
+            return;
+        }
+
+        const clearDeleteHover = () => {
+            this.root?.querySelectorAll('.vsb-graph-node.is-delete-hover-single, .vsb-graph-node.is-delete-hover-branch').forEach((node) => {
+                node.classList.remove('is-delete-hover-single');
+                node.classList.remove('is-delete-hover-branch');
+            });
+        };
+
+        const applyDeleteHover = (card) => {
+            clearDeleteHover();
+            if (!(card instanceof HTMLElement)) {
+                return;
+            }
+            const deleteMode = this.getToolState().deleteMode === 'branch' ? 'branch' : 'single';
+            card.classList.add(deleteMode === 'branch' ? 'is-delete-hover-branch' : 'is-delete-hover-single');
+        };
+
+        viewport.addEventListener('pointermove', (event) => {
+            const state = this.getToolState();
+            if (state.mode !== 'delete') {
+                clearDeleteHover();
+                return;
+            }
+            const card = this.resolveNodeCardFromPoint(event.clientX, event.clientY);
+            applyDeleteHover(card);
+        });
+
+        viewport.addEventListener('pointerleave', () => {
+            clearDeleteHover();
+        });
+
+        viewport.addEventListener('click', (event) => {
+            const state = this.getToolState();
+            if (state.mode === 'select') {
+                return;
+            }
+            if (event.target instanceof Element && event.target.closest('[data-role="graph-tool-rail"]')) {
+                return;
+            }
+
+            const pointer = this.resolveWorldPoint(event.clientX, event.clientY, viewport);
+            const card = this.resolveNodeCardFromPoint(event.clientX, event.clientY);
+            const nodeId = String(card?.getAttribute('data-node-id') || '');
+
+            if (state.mode === 'delete') {
+                event.preventDefault();
+                if (nodeId && nodeId !== BODY_NODE_ID) {
+                    this.onDeleteNode(pageId, nodeId);
+                }
+                return;
+            }
+
+            if (state.mode === 'add') {
+                event.preventDefault();
+                const parentNodeId = nodeId && nodeId !== BODY_NODE_ID ? nodeId : null;
+                this.onCreateNode(pageId, parentNodeId, pointer);
+            }
         });
     }
 
@@ -330,6 +537,9 @@ export class PageGraphPanel {
             }
 
             handle.addEventListener('pointerdown', (event) => {
+                if (this.getToolState().mode !== 'select') {
+                    return;
+                }
                 if (event.button !== 0) {
                     return;
                 }
@@ -510,6 +720,23 @@ export class PageGraphPanel {
     }
 
     /**
+     * Convert viewport pointer coordinates to graph-world coordinates.
+     * @param {number} clientX - Pointer x.
+     * @param {number} clientY - Pointer y.
+     * @param {HTMLElement} viewport - Graph viewport.
+     * @returns {{ x: number, y: number }} World coordinates.
+     */
+    resolveWorldPoint(clientX, clientY, viewport) {
+        const rect = viewport.getBoundingClientRect();
+        const x = Math.round(clientX - rect.left - this.panX);
+        const y = Math.round(clientY - rect.top - this.panY);
+        return {
+            x: Math.max(0, x),
+            y: Math.max(0, y),
+        };
+    }
+
+    /**
      * Read attribute rows from a node card.
      * @param {HTMLElement} card - Node card.
      * @returns {Record<string, string>} Attr map.
@@ -635,38 +862,16 @@ export class PageGraphPanel {
     }
 
     /**
-     * Resolve human hint for node identity.
-     * @param {string} nodeId - Node id.
-     * @param {any} node - Node object.
-     * @returns {string} Node hint text.
+     * Normalize node id for compact display.
+     * @param {unknown} nodeId - Raw node id.
+     * @returns {string} Compact node id.
      */
-    resolveNodeHint(nodeId, node) {
-        const attrs = node?.attrs && typeof node.attrs === 'object' ? node.attrs : {};
-        const fallback = String(nodeId || '');
-        const idAttr = String(attrs.id || '').trim();
-        if (idAttr) {
-            return fallback ? `#${idAttr} · ${fallback}` : `#${idAttr}`;
+    formatNodeDisplayId(nodeId) {
+        const raw = String(nodeId || '').trim();
+        if (!raw) {
+            return '';
         }
-        const classAttr = String(attrs.class || '').trim();
-        if (classAttr) {
-            const firstClass = classAttr.split(/\s+/).filter(Boolean)[0] || '';
-            if (firstClass) {
-                return fallback ? `.${firstClass} · ${fallback}` : `.${firstClass}`;
-            }
-        }
-        return fallback;
-    }
-
-    /**
-     * Resolve node label for children list rows.
-     * @param {string} nodeId - Node id.
-     * @param {any} node - Node object.
-     * @returns {string} Display label.
-     */
-    resolveNodeListLabel(nodeId, node) {
-        const tag = this.normalizeTag(node?.tag);
-        const hint = this.resolveNodeHint(nodeId, node);
-        return `${tag} ${hint}`;
+        return raw.replace(/^n_/, 'n');
     }
 
     /**

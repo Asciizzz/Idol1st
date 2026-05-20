@@ -509,6 +509,7 @@
     height: 100%;
     min-width: 0;
     min-height: 0;
+    position: relative;
 }
 
 .vsb-graph-viewport {
@@ -561,6 +562,16 @@
     box-shadow: 0 0 0 1px var(--vsb-graph-reparent-target), 0 10px 22px rgba(0, 0, 0, 0.34);
 }
 
+.vsb-graph-node.is-delete-hover-single {
+    border-color: #e74f4f;
+    box-shadow: 0 0 0 1px #e74f4f, 0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
+.vsb-graph-node.is-delete-hover-branch {
+    border-color: #b61136;
+    box-shadow: 0 0 0 1px #b61136, 0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
 .vsb-graph-node-head {
     min-height: 1.95rem;
     display: flex;
@@ -569,8 +580,12 @@
     border-bottom: 1px solid var(--vsb-graph-node-border);
     background: var(--vsb-graph-node-header-background);
     padding: 0 0.45rem;
-    cursor: move;
+    cursor: default;
     user-select: none;
+}
+
+.vsb-graph-canvas[data-tool-mode="select"] .vsb-graph-node-head {
+    cursor: move;
 }
 
 .vsb-graph-collapse-btn {
@@ -641,11 +656,22 @@
 }
 
 .vsb-graph-child-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.28rem;
     font-size: 0.68rem;
-    opacity: 0.9;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.vsb-graph-child-main {
+    opacity: 0.93;
+}
+
+.vsb-graph-child-meta {
+    font-size: 0.62rem;
+    opacity: 0.65;
 }
 
 .vsb-graph-child-actions {
@@ -676,6 +702,72 @@
 .vsb-graph-node .vsb-textarea {
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
+}
+
+.vsb-graph-tool-rail {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.vsb-graph-tool-btn {
+    min-width: 4.6rem;
+    border: 1px solid var(--vsb-panel-border);
+    border-radius: 0.45rem;
+    background: color-mix(in oklab, var(--vsb-panel-background) 90%, #000);
+    color: inherit;
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    align-items: center;
+    column-gap: 0.36rem;
+    row-gap: 0.05rem;
+    padding: 0.28rem 0.38rem;
+    cursor: pointer;
+}
+
+.vsb-graph-tool-btn.is-active {
+    border-color: var(--vsb-accent-primary);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--vsb-accent-primary) 68%, transparent);
+}
+
+.vsb-graph-tool-btn.is-active.is-single {
+    border-color: #e74f4f;
+    box-shadow: 0 0 0 1px #e74f4f;
+}
+
+.vsb-graph-tool-btn.is-active.is-branch {
+    border-color: #b61136;
+    box-shadow: 0 0 0 1px #b61136;
+}
+
+.vsb-graph-tool-icon {
+    font-size: 0.8rem;
+    opacity: 0.92;
+}
+
+.vsb-graph-tool-label {
+    text-align: left;
+    font-size: 0.68rem;
+    line-height: 1.2;
+}
+
+.vsb-graph-tool-meta {
+    grid-column: 2;
+    font-size: 0.6rem;
+    opacity: 0.64;
+    line-height: 1;
+}
+
+.vsb-graph-canvas[data-tool-mode="add"] .vsb-graph-viewport {
+    cursor: copy;
+}
+
+.vsb-graph-canvas[data-tool-mode="delete"] .vsb-graph-viewport {
+    cursor: not-allowed;
 }
 
 .vsb-graph-attrs {

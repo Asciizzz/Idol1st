@@ -215,10 +215,15 @@ export class VirtualSiteBuilder {
 
         this.pageGraphPanel = new PageGraphPanel({
             getState: () => this.getState(),
+            getToolState: () => this.getPageToolState(),
+            onSetToolMode: (mode) => this.setPageToolMode(mode),
+            onToggleDeleteMode: () => this.toggleDeleteMode(),
             onUpdateNodeGraph: (pageId, nodeId, graphPatch) => this.updateNodeGraph(pageId, nodeId, graphPatch),
             onUpdateNodeData: (pageId, nodeId, patch) => this.updatePageNode(pageId, nodeId, patch),
             onReparentNode: (pageId, nodeId, targetParentId) => this.reparentNode(pageId, nodeId, targetParentId),
             onReorderChild: (pageId, parentNodeId, childNodeId, direction) => this.reorderNodeChild(pageId, parentNodeId, childNodeId, direction),
+            onCreateNode: (pageId, parentNodeId, pointer) => this.createNode(pageId, parentNodeId, 'div', pointer),
+            onDeleteNode: (pageId, nodeId) => this.deleteNode(pageId, nodeId),
         });
 
         this.bindSaveButton();
@@ -1503,12 +1508,14 @@ export class VirtualSiteBuilder {
      * @param {string} pageId - Page id.
      * @param {string | null} parentNodeId - Parent node id or null for root.
      * @param {string} [tagName='div'] - Tag name for new node.
-     * @returns {void}
+     * @param {{ x?: number, y?: number } | null} [graphPosition] - Optional graph position override.
+     * @returns {string | null} Created node id.
      */
-    createNode(pageId, parentNodeId, tagName = 'div') {
+    createNode(pageId, parentNodeId, tagName = 'div', graphPosition = null) {
         if (!this.store) {
-            return;
+            return null;
         }
+        let createdNodeId = null;
         this.store.update((draft) => {
             const page = draft?.resources?.pages?.byId?.[pageId];
             if (!page) {
@@ -1522,6 +1529,8 @@ export class VirtualSiteBuilder {
             const parentGraph = safeParentId && page.nodeById[safeParentId]?.graph && typeof page.nodeById[safeParentId].graph === 'object'
                 ? page.nodeById[safeParentId].graph
                 : null;
+            const hasCustomX = Number.isFinite(Number(graphPosition?.x));
+            const hasCustomY = Number.isFinite(Number(graphPosition?.y));
             page.nodeById[nextNodeId] = {
                 tag: this.normalizeTagName(tagName),
                 text: '',
@@ -1529,8 +1538,12 @@ export class VirtualSiteBuilder {
                 children: [],
                 parent: safeParentId,
                 graph: {
-                    x: Number.isFinite(Number(parentGraph?.x)) ? Number(parentGraph.x) + 280 : 120,
-                    y: Number.isFinite(Number(parentGraph?.y)) ? Number(parentGraph.y) + 70 : (90 + (page.rootNodeIds.length * 160)),
+                    x: hasCustomX
+                        ? Number(graphPosition?.x)
+                        : (Number.isFinite(Number(parentGraph?.x)) ? Number(parentGraph.x) + 280 : 120),
+                    y: hasCustomY
+                        ? Number(graphPosition?.y)
+                        : (Number.isFinite(Number(parentGraph?.y)) ? Number(parentGraph.y) + 70 : (90 + (page.rootNodeIds.length * 160))),
                     collapsed: false,
                 },
             };
@@ -1546,7 +1559,9 @@ export class VirtualSiteBuilder {
             this.syncBodyRootNode(page);
             page.activeNodeIds = [nextNodeId];
             page.activeNodeId = nextNodeId;
+            createdNodeId = nextNodeId;
         });
+        return createdNodeId;
     }
 
     /**
