@@ -538,12 +538,8 @@
 
 .vsb-graph-link {
     fill: none;
-    stroke: var(--vsb-graph-link);
+    stroke: var(--vsb-graph-link-color, var(--vsb-graph-link));
     stroke-width: 2;
-}
-
-#vsbGraphArrowTip path {
-    fill: var(--vsb-graph-link);
 }
 
 .vsb-graph-node-layer {
@@ -593,6 +589,22 @@
     font-weight: 700;
 }
 
+.vsb-graph-node-title-wrap {
+    min-width: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.vsb-graph-node-meta {
+    font-size: 0.62rem;
+    opacity: 0.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 6.8rem;
+}
+
 .vsb-graph-node-body {
     display: flex;
     flex-direction: column;
@@ -609,6 +621,61 @@
     max-height: 11.4rem;
     overflow-y: hidden;
     resize: none;
+}
+
+.vsb-graph-children-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.vsb-graph-child-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.28rem;
+    border: 1px solid color-mix(in oklab, var(--vsb-graph-order-color, var(--vsb-graph-node-border)) 68%, var(--vsb-graph-node-border));
+    border-radius: 0.35rem;
+    padding: 0.2rem 0.28rem;
+    background: color-mix(in oklab, var(--vsb-graph-order-color, var(--vsb-editor-background)) 14%, var(--vsb-editor-background));
+}
+
+.vsb-graph-child-label {
+    font-size: 0.68rem;
+    opacity: 0.9;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vsb-graph-child-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.vsb-graph-child-btn {
+    border: 1px solid color-mix(in oklab, var(--vsb-graph-order-color, var(--vsb-graph-node-border)) 74%, var(--vsb-graph-node-border));
+    border-radius: 0.28rem;
+    background: transparent;
+    color: inherit;
+    font-size: 0.72rem;
+    line-height: 1;
+    min-height: 1.15rem;
+    min-width: 1.15rem;
+    padding: 0;
+    cursor: pointer;
+}
+
+.vsb-graph-child-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.vsb-graph-node .vsb-input,
+.vsb-graph-node .vsb-textarea {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
 }
 
 .vsb-graph-attrs {

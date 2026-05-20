@@ -218,6 +218,7 @@ export class VirtualSiteBuilder {
             onUpdateNodeGraph: (pageId, nodeId, graphPatch) => this.updateNodeGraph(pageId, nodeId, graphPatch),
             onUpdateNodeData: (pageId, nodeId, patch) => this.updatePageNode(pageId, nodeId, patch),
             onReparentNode: (pageId, nodeId, targetParentId) => this.reparentNode(pageId, nodeId, targetParentId),
+            onReorderChild: (pageId, parentNodeId, childNodeId, direction) => this.reorderNodeChild(pageId, parentNodeId, childNodeId, direction),
         });
 
         this.bindSaveButton();
@@ -1750,7 +1751,6 @@ export class VirtualSiteBuilder {
 
             const currentParent = this.findParentNodeId(page, nodeId);
             if ((currentParent || null) === (targetId || null)) {
-                changed = true;
                 return;
             }
 
@@ -1775,6 +1775,41 @@ export class VirtualSiteBuilder {
         });
 
         return changed;
+    }
+
+    /**
+     * Reorder a direct child inside a parent node children list.
+     * @param {string} pageId - Page id.
+     * @param {string} parentNodeId - Parent node id.
+     * @param {string} childNodeId - Child node id.
+     * @param {'up' | 'down'} direction - Reorder direction.
+     * @returns {void}
+     */
+    reorderNodeChild(pageId, parentNodeId, childNodeId, direction) {
+        if (!this.store || !parentNodeId || !childNodeId) {
+            return;
+        }
+        this.store.update((draft) => {
+            const page = draft?.resources?.pages?.byId?.[pageId];
+            const parentNode = page?.nodeById?.[parentNodeId];
+            if (!page || !parentNode) {
+                return;
+            }
+            const children = Array.isArray(parentNode.children) ? parentNode.children : [];
+            const index = children.indexOf(childNodeId);
+            if (index < 0) {
+                return;
+            }
+            const nextIndex = direction === 'up' ? index - 1 : index + 1;
+            if (nextIndex < 0 || nextIndex >= children.length) {
+                return;
+            }
+            const temp = children[index];
+            children[index] = children[nextIndex];
+            children[nextIndex] = temp;
+            parentNode.children = children;
+            this.syncBodyRootNode(page);
+        });
     }
 
     /**

@@ -1,4 +1,22 @@
 const BODY_NODE_ID = '__body__';
+const ORDER_COLORS = [
+    '#ff5c77',
+    '#ff8c42',
+    '#ffd166',
+    '#9be564',
+    '#4cc9a6',
+    '#00c2ff',
+    '#4d96ff',
+    '#7a6cff',
+    '#b86bff',
+    '#ff70c6',
+    '#ff6b6b',
+    '#f4a261',
+    '#e9ff70',
+    '#54d4a0',
+    '#34b3ff',
+    '#a0a8ff',
+];
 
 /**
  * Interactive page graph editor panel.
@@ -10,7 +28,8 @@ export class PageGraphPanel {
      *   getState: () => object,
      *   onUpdateNodeGraph?: (pageId: string, nodeId: string, graphPatch: { x?: number, y?: number, collapsed?: boolean }) => void,
      *   onUpdateNodeData?: (pageId: string, nodeId: string, patch: { tag?: string, text?: string, attrs?: Record<string, string> }) => void,
-     *   onReparentNode?: (pageId: string, nodeId: string, targetParentId: string | null) => boolean
+     *   onReparentNode?: (pageId: string, nodeId: string, targetParentId: string | null) => boolean,
+     *   onReorderChild?: (pageId: string, parentNodeId: string, childNodeId: string, direction: 'up' | 'down') => void
      * }} options - Panel options.
      */
     constructor(options) {
@@ -28,6 +47,10 @@ export class PageGraphPanel {
         this.onReparentNode = typeof options.onReparentNode === 'function'
             ? options.onReparentNode
             : () => false;
+        /** @type {(pageId: string, parentNodeId: string, childNodeId: string, direction: 'up' | 'down') => void} */
+        this.onReorderChild = typeof options.onReorderChild === 'function'
+            ? options.onReorderChild
+            : () => {};
         /** @type {HTMLElement | null} */
         this.root = null;
         /** @type {string | null} */
@@ -86,13 +109,15 @@ export class PageGraphPanel {
                 >
                     <svg class="vsb-graph-links" data-role="graph-links" width="${world.width}" height="${world.height}">
                         <defs>
-                            <marker id="vsbGraphArrowTip" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
-                                <path d="M0,0 L10,4 L0,8 Z" />
-                            </marker>
+                            ${ORDER_COLORS.map((color, index) => `
+                                <marker id="vsbGraphArrowTip-${index}" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+                                    <path d="M0,0 L10,4 L0,8 Z" fill="${this.escapeHtml(color)}" />
+                                </marker>
+                            `).join('')}
                         </defs>
                     </svg>
                     <div class="vsb-graph-node-layer">
-                        ${graphNodes.map((entry) => this.renderNode(entry)).join('')}
+                        ${graphNodes.map((entry) => this.renderNode(entry, page)).join('')}
                     </div>
                 </div>
             </div>
@@ -112,9 +137,10 @@ export class PageGraphPanel {
     /**
      * Render node card.
      * @param {{ id: string, node: any }} entry - Node entry.
+     * @param {any} page - Active page object.
      * @returns {string} Node card markup.
      */
-    renderNode(entry) {
+    renderNode(entry, page) {
         const node = entry.node || {};
         const graph = node.graph && typeof node.graph === 'object' ? node.graph : {};
         const x = Number.isFinite(Number(graph.x)) ? Number(graph.x) : 120;
@@ -123,10 +149,12 @@ export class PageGraphPanel {
         const children = Array.isArray(node.children) ? node.children : [];
         const hasChildren = children.length > 0;
         const attrs = node.attrs && typeof node.attrs === 'object' ? node.attrs : {};
+        const nodeHint = this.resolveNodeHint(entry.id, node);
+        const nodeTag = this.normalizeTag(node.tag);
         const attrRows = Object.entries(attrs).map((entryRow) => `
             <div class="vsb-graph-attr-row" data-role="attr-row">
-                <input class="vsb-input" data-role="attr-key" placeholder="attribute" value="${this.escapeHtml(String(entryRow[0]))}" />
-                <input class="vsb-input" data-role="attr-val" placeholder="value" value="${this.escapeHtml(String(entryRow[1]))}" />
+                <input class="vsb-input vsb-graph-input" data-role="attr-key" placeholder="attribute" value="${this.escapeHtml(String(entryRow[0]))}" />
+                <input class="vsb-input vsb-graph-input" data-role="attr-val" placeholder="value" value="${this.escapeHtml(String(entryRow[1]))}" />
             </div>
         `).join('');
 
@@ -140,21 +168,38 @@ export class PageGraphPanel {
                     <button type="button" class="vsb-graph-collapse-btn" data-role="toggle-collapse" title="Collapse Node">
                         ${collapsed ? '+' : '-'}
                     </button>
-                    <span class="vsb-graph-node-title">&lt;${this.escapeHtml(String(node.tag || 'div'))}&gt;</span>
+                    <span class="vsb-graph-node-title-wrap">
+                        <span class="vsb-graph-node-title">${this.escapeHtml(nodeTag)}</span>
+                        <span class="vsb-graph-node-meta">${this.escapeHtml(nodeHint)}</span>
+                    </span>
                 </header>
                 <section class="vsb-graph-node-body">
                     <label class="vsb-field-label">Tag</label>
-                    <input class="vsb-input" data-role="node-tag" value="${this.escapeHtml(String(node.tag || 'div'))}" />
+                    <input class="vsb-input vsb-graph-input" data-role="node-tag" value="${this.escapeHtml(nodeTag)}" />
                     ${hasChildren
-        ? '<div class="vsb-small">Text field hidden because this node has children.</div>'
+        ? `<label class="vsb-field-label">Children</label>
+                    <div class="vsb-graph-children-list">
+                        ${children.map((childId, index) => `
+                            <div
+                                class="vsb-graph-child-row"
+                                style="--vsb-graph-order-color:${this.escapeHtml(this.getOrderColor(index))};"
+                            >
+                                <span class="vsb-graph-child-label">${this.escapeHtml(this.resolveNodeListLabel(String(childId || ''), page?.nodeById?.[childId]))}</span>
+                                <div class="vsb-graph-child-actions">
+                                    <button type="button" class="vsb-graph-child-btn" data-role="child-up" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Up" ${index === 0 ? 'disabled' : ''}>▴</button>
+                                    <button type="button" class="vsb-graph-child-btn" data-role="child-down" data-child-id="${this.escapeHtml(String(childId || ''))}" title="Move Down" ${index === children.length - 1 ? 'disabled' : ''}>▾</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`
         : `<label class="vsb-field-label">Text</label>
                     <textarea class="vsb-textarea vsb-graph-node-text" data-role="node-text">${this.escapeHtml(String(node.text || ''))}</textarea>`}
                     <label class="vsb-field-label">Attributes</label>
                     <div class="vsb-graph-attrs" data-role="attr-list">
                         ${attrRows}
                         <div class="vsb-graph-attr-row" data-role="attr-row">
-                            <input class="vsb-input" data-role="attr-key" placeholder="attribute" value="" />
-                            <input class="vsb-input" data-role="attr-val" placeholder="value" value="" />
+                            <input class="vsb-input vsb-graph-input" data-role="attr-key" placeholder="attribute" value="" />
+                            <input class="vsb-input vsb-graph-input" data-role="attr-val" placeholder="value" value="" />
                         </div>
                     </div>
                 </section>
@@ -235,6 +280,19 @@ export class PageGraphPanel {
                 });
             });
 
+            card.querySelectorAll('[data-role="child-up"], [data-role="child-down"]').forEach((buttonNode) => {
+                const button = /** @type {HTMLButtonElement} */ (buttonNode);
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const childId = String(button.dataset.childId || '').trim();
+                    if (!childId) {
+                        return;
+                    }
+                    const direction = button.dataset.role === 'child-up' ? 'up' : 'down';
+                    this.onReorderChild(pageId, nodeId, childId, direction);
+                });
+            });
+
             card.querySelectorAll('[data-role="attr-key"], [data-role="attr-val"]').forEach((inputNode) => {
                 const input = /** @type {HTMLInputElement} */ (inputNode);
                 const syncAttrs = () => {
@@ -285,6 +343,8 @@ export class PageGraphPanel {
                 const startY = Number.parseFloat(card.style.top || '0') || 0;
                 const originClientX = event.clientX;
                 const originClientY = event.clientY;
+                /** @type {string | null} */
+                let hoverTargetNodeId = null;
 
                 const onMove = (moveEvent) => {
                     const nextX = startX + (moveEvent.clientX - originClientX);
@@ -294,10 +354,12 @@ export class PageGraphPanel {
                     this.drawConnections(pageId);
 
                     clearReparentTargetClass();
+                    hoverTargetNodeId = null;
                     if (moveEvent.ctrlKey) {
-                        const hoverNode = this.resolveNodeCardFromPoint(moveEvent.clientX, moveEvent.clientY);
+                        const hoverNode = this.resolveDropTargetForDrag(moveEvent.clientX, moveEvent.clientY, card);
                         const hoverId = String(hoverNode?.getAttribute('data-node-id') || '');
                         if (hoverNode && hoverId && hoverId !== nodeId) {
+                            hoverTargetNodeId = hoverId;
                             hoverNode.classList.add('is-reparent-target');
                         }
                     }
@@ -313,10 +375,15 @@ export class PageGraphPanel {
                     this.onUpdateNodeGraph(pageId, nodeId, { x: finalX, y: finalY });
 
                     if (upEvent.ctrlKey) {
-                        const targetCard = this.resolveNodeCardFromPoint(upEvent.clientX, upEvent.clientY);
-                        const targetId = String(targetCard?.getAttribute('data-node-id') || '');
+                        let targetId = hoverTargetNodeId || '';
+                        if (!targetId) {
+                            const targetCard = this.resolveDropTargetForDrag(upEvent.clientX, upEvent.clientY, card);
+                            targetId = String(targetCard?.getAttribute('data-node-id') || '');
+                        }
                         if (targetId && targetId !== nodeId) {
                             this.onReparentNode(pageId, nodeId, targetId);
+                        } else {
+                            this.onReparentNode(pageId, nodeId, null);
                         }
                     }
 
@@ -385,6 +452,12 @@ export class PageGraphPanel {
             if (!sourceCard || !targetCard) {
                 return;
             }
+            const parentChildren = Array.isArray(nodeById[parentId]?.children)
+                ? nodeById[parentId].children.map((childId) => String(childId || ''))
+                : [];
+            const orderIndex = parentChildren.indexOf(nodeId);
+            const markerIndex = this.getOrderColorIndex(orderIndex);
+            const linkColor = this.getOrderColor(markerIndex);
 
             const x1 = sourceCard.offsetLeft + sourceCard.offsetWidth - 8;
             const y1 = sourceCard.offsetTop + (sourceCard.offsetHeight / 2);
@@ -397,7 +470,8 @@ export class PageGraphPanel {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('class', 'vsb-graph-link');
             path.setAttribute('d', `M ${x1} ${y1} C ${c1x} ${y1}, ${c2x} ${y2}, ${x2} ${y2}`);
-            path.setAttribute('marker-end', 'url(#vsbGraphArrowTip)');
+            path.style.setProperty('--vsb-graph-link-color', linkColor);
+            path.setAttribute('marker-end', `url(#vsbGraphArrowTip-${markerIndex})`);
             svg.appendChild(path);
         });
     }
@@ -415,6 +489,24 @@ export class PageGraphPanel {
         }
         const node = target.closest('[data-node-id]');
         return node instanceof HTMLElement ? node : null;
+    }
+
+    /**
+     * Resolve reparent drop target while temporarily ignoring the dragged card.
+     * @param {number} clientX - Pointer x.
+     * @param {number} clientY - Pointer y.
+     * @param {HTMLElement} draggedCard - Dragged node card.
+     * @returns {HTMLElement | null} Drop target card or null.
+     */
+    resolveDropTargetForDrag(clientX, clientY, draggedCard) {
+        if (!(draggedCard instanceof HTMLElement)) {
+            return this.resolveNodeCardFromPoint(clientX, clientY);
+        }
+        const previousPointerEvents = draggedCard.style.pointerEvents;
+        draggedCard.style.pointerEvents = 'none';
+        const targetCard = this.resolveNodeCardFromPoint(clientX, clientY);
+        draggedCard.style.pointerEvents = previousPointerEvents;
+        return targetCard;
     }
 
     /**
@@ -507,6 +599,74 @@ export class PageGraphPanel {
             width: Math.max(1800, Math.round(maxX + 520)),
             height: Math.max(1100, Math.round(maxY + 360)),
         };
+    }
+
+    /**
+     * Resolve categorical color index for order visualization.
+     * @param {number} orderIndex - Raw order index.
+     * @returns {number} Palette index.
+     */
+    getOrderColorIndex(orderIndex) {
+        const value = Number(orderIndex);
+        if (!Number.isFinite(value)) {
+            return 0;
+        }
+        const size = ORDER_COLORS.length;
+        return ((Math.trunc(value) % size) + size) % size;
+    }
+
+    /**
+     * Resolve categorical color for order visualization.
+     * @param {number} orderIndex - Raw order index.
+     * @returns {string} Hex color.
+     */
+    getOrderColor(orderIndex) {
+        return ORDER_COLORS[this.getOrderColorIndex(orderIndex)];
+    }
+
+    /**
+     * Normalize tag display text.
+     * @param {unknown} rawTag - Raw tag value.
+     * @returns {string} Normalized tag.
+     */
+    normalizeTag(rawTag) {
+        const value = String(rawTag || '').trim().toLowerCase();
+        return value || 'div';
+    }
+
+    /**
+     * Resolve human hint for node identity.
+     * @param {string} nodeId - Node id.
+     * @param {any} node - Node object.
+     * @returns {string} Node hint text.
+     */
+    resolveNodeHint(nodeId, node) {
+        const attrs = node?.attrs && typeof node.attrs === 'object' ? node.attrs : {};
+        const fallback = String(nodeId || '');
+        const idAttr = String(attrs.id || '').trim();
+        if (idAttr) {
+            return fallback ? `#${idAttr} · ${fallback}` : `#${idAttr}`;
+        }
+        const classAttr = String(attrs.class || '').trim();
+        if (classAttr) {
+            const firstClass = classAttr.split(/\s+/).filter(Boolean)[0] || '';
+            if (firstClass) {
+                return fallback ? `.${firstClass} · ${fallback}` : `.${firstClass}`;
+            }
+        }
+        return fallback;
+    }
+
+    /**
+     * Resolve node label for children list rows.
+     * @param {string} nodeId - Node id.
+     * @param {any} node - Node object.
+     * @returns {string} Display label.
+     */
+    resolveNodeListLabel(nodeId, node) {
+        const tag = this.normalizeTag(node?.tag);
+        const hint = this.resolveNodeHint(nodeId, node);
+        return `${tag} ${hint}`;
     }
 
     /**
