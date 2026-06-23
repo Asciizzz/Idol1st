@@ -109,7 +109,7 @@ export class VsbNodeData extends VsData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
+    static renderFn({ node, element, graph, vsgraph, cache }) {
         const vsg = node.data.vsgdata;
         const x = vsg?.x ?? 0;
         const y = vsg?.y ?? 0;

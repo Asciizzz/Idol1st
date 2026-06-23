@@ -61,7 +61,7 @@ export class ExampleEdgeData extends VsData {
         return { element: svg, cache: { line, arrow } };
     }
 
-    static renderFn({ edge, graph, element, cache, ctx }) {
+    static renderFn({ edge, graph, element, cache }) {
         const src = graph.getNode(edge.srcId);
         const dst = graph.getNode(edge.dstId);
         if (!src || !dst) return;

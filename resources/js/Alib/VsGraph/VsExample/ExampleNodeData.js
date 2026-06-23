@@ -75,9 +75,9 @@ export class ExampleNodeData extends VsData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
+    static renderFn({ node, element, graph, vsgraph, cache }) {
         // Store vsgraph ref from ctx so drag handlers can trigger render & read zoom
-        cache.vsgraph = ctx?.vsgraph ?? null;
+        cache.vsgraph = vsgraph ?? null;
 
         const { x, y } = node.data.vsgraph;
         element.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;

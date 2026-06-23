@@ -66,8 +66,8 @@ export class VsbHtmlElementData extends VsbElementData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        VsbElementData.renderFn({ node, element, graph, vsgraph, cache, ctx });
+    static renderFn({ node, element, graph, vsgraph, cache }) {
+        VsbElementData.renderFn({ node, element, graph, vsgraph, cache });
 
         const data = node.data;
         const collapsed = data.vsgdata?.collapsed ?? false;

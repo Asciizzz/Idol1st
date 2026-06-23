@@ -131,8 +131,8 @@ export class VsbElementData extends VsbNodeData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        VsbNodeData.renderFn({ node, element, graph, vsgraph, cache, ctx });
+    static renderFn({ node, element, graph, vsgraph, cache }) {
+        VsbNodeData.renderFn({ node, element, graph, vsgraph, cache });
 
         const defaultWidth = node.data.constructor._defaultWidth();
         element.style.width = (node.data.vsgdata?.width ?? defaultWidth) + "px";

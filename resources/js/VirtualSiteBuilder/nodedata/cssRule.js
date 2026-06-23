@@ -53,8 +53,8 @@ export class VsbCssRuleData extends VsbElementData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        VsbElementData.renderFn({ node, element, graph, vsgraph, cache, ctx });
+    static renderFn({ node, element, graph, vsgraph, cache }) {
+        VsbElementData.renderFn({ node, element, graph, vsgraph, cache });
 
         element.style.outlineColor = VsbCssRuleData._fileTypeColor();
 

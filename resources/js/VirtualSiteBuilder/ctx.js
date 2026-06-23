@@ -1,5 +1,5 @@
 // Editor state - highlighted nodes/edges, selection, panel state, etc.
-// Passed into every VsData.renderFn as <ctx>.
+// Accessed from vsgraph.ctx in VsData methods.
 
 export class VsbCtx {
     constructor() {

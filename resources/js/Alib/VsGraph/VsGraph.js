@@ -68,7 +68,7 @@ export class VsGraph extends Acanvas {
             }
 
             const inst = _instances.get(key);
-            inst.DataClass.renderFn({ node, graph, element: inst.element, cache: inst.cache, ctx, vsgraph: this });
+            inst.DataClass.renderFn({ node, graph, element: inst.element, cache: inst.cache, vsgraph: this });
         }
 
         // Edges
@@ -87,7 +87,7 @@ export class VsGraph extends Acanvas {
             }
 
             const inst = _instances.get(key);
-            inst.DataClass.renderFn({ edge, graph, element: inst.element, cache: inst.cache, ctx, vsgraph: this });
+            inst.DataClass.renderFn({ edge, graph, element: inst.element, cache: inst.cache, vsgraph: this });
         }
 
         // Remove elements for nodes/edges that no longer exist or lost their VsData

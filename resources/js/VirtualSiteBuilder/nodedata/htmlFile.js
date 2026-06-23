@@ -68,8 +68,8 @@ export class VsbHtmlFileData extends VsbFileData {
         return { element, cache };
     }
 
-    static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        super.renderFn({ node, element, graph, vsgraph, cache, ctx });
+    static renderFn({ node, element, graph, vsgraph, cache }) {
+        super.renderFn({ node, element, graph, vsgraph, cache });
 
         if (document.activeElement !== cache.slugInput) {
             cache.slugInput.value = node.data.slug ?? "/";

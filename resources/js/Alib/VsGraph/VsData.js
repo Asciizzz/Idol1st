@@ -31,5 +31,5 @@ export class VsData {
      * ctx: object
      * }} params
      */
-    static renderFn({ node, edge, element, graph, vsgraph , cache, ctx } = {}) {}
+    static renderFn({ node, edge, element, graph, vsgraph, cache } = {}) {}
 }

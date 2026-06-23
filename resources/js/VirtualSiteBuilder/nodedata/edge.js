@@ -151,7 +151,8 @@ export class VsbEdgeData extends VsData {
         return { element, cache };
     }
 
-    static renderFn({ edge, element, graph, vsgraph, cache, ctx }) {
+    static renderFn({ edge, element, graph, vsgraph, cache }) {
+        const ctx = vsgraph?.ctx;
         const srcNode = graph.getNode(edge.srcId);
         const dstNode = graph.getNode(edge.dstId);
         if (!srcNode || !dstNode) return;
