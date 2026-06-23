@@ -1,4 +1,5 @@
 import { VsData } from "../../Alib/VsGraph/VsData.js";
+import { VsbNodeType } from "./node.js";
 
 // ---- Edge geometry helpers ----
 
@@ -38,14 +39,8 @@ function _cubicControls(src, dst) {
     const handle = Math.min(220, Math.max(72, distance * 0.42));
 
     return {
-        c1: {
-            x: src.x + src.normal.x * handle,
-            y: src.y + src.normal.y * handle,
-        },
-        c2: {
-            x: dst.x + dst.normal.x * handle,
-            y: dst.y + dst.normal.y * handle,
-        },
+        c1: { x: src.x + src.normal.x * handle, y: src.y + src.normal.y * handle },
+        c2: { x: dst.x + dst.normal.x * handle, y: dst.y + dst.normal.y * handle },
     };
 }
 
@@ -66,6 +61,8 @@ function _arrowPoints(tip, control) {
         `${baseX - px * ARROW_WIDTH / 2},${baseY - py * ARROW_WIDTH / 2}`,
     ].join(" ");
 }
+
+const isFileNode = (type) => type === VsbNodeType.HTML || type === VsbNodeType.CSS || type === VsbNodeType.JS;
 
 export class VsbEdgeData extends VsData {
     constructor({ rootId = null, order = 0, enabled = true } = {}) {
@@ -118,7 +115,7 @@ export class VsbEdgeData extends VsData {
             cache.hover = true;
             visiblePath.style.opacity = "1";
             socket.style.opacity      = "1";
-            arrow.style.opacity        = "1";
+            arrow.style.opacity       = "1";
             visiblePath.setAttribute("stroke-width", "3");
         });
         hitPath.addEventListener("pointerleave", () => {
@@ -134,8 +131,8 @@ export class VsbEdgeData extends VsData {
         const dstNode = graph.getNode(edge.dstId);
         if (!srcNode || !dstNode) return;
 
-        const srcVsg = srcNode.data?.vsgraph;
-        const dstVsg = dstNode.data?.vsgraph;
+        const srcVsg = srcNode.data?.vsgdata;
+        const dstVsg = dstNode.data?.vsgdata;
         if (!srcVsg || !dstVsg) return;
 
         const srcEl = vsgraph?._instances?.get(`n:${srcNode.id}`)?.element;
@@ -156,15 +153,36 @@ export class VsbEdgeData extends VsData {
 
         const src = _portForRect(srcRect, dstRect);
         const dst = _portForRect(dstRect, srcRect);
-        const controls = _cubicControls(src, dst);
-        const pathD = `M ${src.x} ${src.y} C ${controls.c1.x} ${controls.c1.y} ${controls.c2.x} ${controls.c2.y} ${dst.x} ${dst.y}`;
+
+        const bothFiles = isFileNode(srcNode.data?.type) && isFileNode(dstNode.data?.type);
+
+        let pathD;
+        if (bothFiles) {
+            pathD = `M ${src.x} ${src.y} L ${dst.x} ${dst.y}`;
+            cache.arrow.setAttribute("points", _arrowPoints(dst, src));
+        } else {
+            const controls = _cubicControls(src, dst);
+            pathD = `M ${src.x} ${src.y} C ${controls.c1.x} ${controls.c1.y} ${controls.c2.x} ${controls.c2.y} ${dst.x} ${dst.y}`;
+            cache.arrow.setAttribute("points", _arrowPoints(dst, controls.c2));
+        }
 
         // Determine color
+        let color = "rgba(235, 238, 246, 0.46)"; // Default gray
+        
+        if (bothFiles) {
+            color = "rgba(255, 255, 255, 0.7)"; // Included files
+        } else {
+            const rootId = edge.data?.rootId;
+            const rootNode = rootId ? graph.getNode(rootId) : null;
+            if (rootNode && isFileNode(rootNode.data?.type)) {
+                // Paint edge matching the root file's explicit fileColor, fallback to its type color
+                color = rootNode.data.vsgdata?.fileColor 
+                     ?? rootNode.data.constructor._fileTypeColor?.() 
+                     ?? "rgba(235, 238, 246, 0.46)";
+            }
+        }
+
         const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
-        const rootId = edge.data?.rootId;
-        const rootNode = rootId ? graph.getNode(rootId) : null;
-        const fileColor = rootNode?.data?.fileColor ?? null;
-        const color = fileColor ?? "rgba(235, 238, 246, 0.46)";
         const opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
         cache.visiblePath.setAttribute("d", pathD);
@@ -176,7 +194,6 @@ export class VsbEdgeData extends VsData {
         cache.socket.setAttribute("fill", color);
         cache.socket.style.opacity = opacity;
 
-        cache.arrow.setAttribute("points", _arrowPoints(dst, controls.c2));
         cache.arrow.setAttribute("fill", color);
         cache.arrow.style.opacity = opacity;
 

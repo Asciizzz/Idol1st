@@ -11,11 +11,11 @@ export const VsbNodeType = Object.freeze({
 });
 
 export class VsbNodeData extends VsData {
-    constructor({ type = VsbNodeType.UNDEFINED, name = "Node", vsgraph = {} } = {}) {
+    constructor({ type = VsbNodeType.UNDEFINED, name = "Node", vsgdata = {} } = {}) {
         super();
         this.type    = type;
         this.name    = name;
-        this.vsgraph = { x: 0, y: 0, z: 0, collapsed: false, ...vsgraph };
+        this.vsgdata = { x: 0, y: 0, z: 0, collapsed: false, ...vsgdata };
     }
 
     static createFn({ node, graph, vsgraph } = {}) {
@@ -55,8 +55,8 @@ export class VsbNodeData extends VsData {
         element.addEventListener("pointermove", e => {
             if (!drag) return;
             const zoom = vsgraph?.camera?.zoom ?? 1;
-            node.data.vsgraph.x += (e.clientX - drag.x) / zoom;
-            node.data.vsgraph.y += (e.clientY - drag.y) / zoom;
+            node.data.vsgdata.x += (e.clientX - drag.x) / zoom;
+            node.data.vsgdata.y += (e.clientY - drag.y) / zoom;
             drag.x = e.clientX;
             drag.y = e.clientY;
             vsgraph?.render();
@@ -70,7 +70,7 @@ export class VsbNodeData extends VsData {
     }
 
     static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        const vsg = node.data.vsgraph;
+        const vsg = node.data.vsgdata;
         const x = vsg?.x ?? 0;
         const y = vsg?.y ?? 0;
         const z = vsg?.z ?? 0;

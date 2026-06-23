@@ -6,7 +6,7 @@
 		{
 			"id": "vsb_demo_n0",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": 280,
 					"y": -140,
 					"z": 2,
@@ -20,7 +20,7 @@
 		{
 			"id": "vsb_demo_n1",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": 280,
 					"y": 130,
 					"z": 2,
@@ -34,7 +34,7 @@
 		{
 			"id": "vsb_demo_n2",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -260,
 					"y": -190,
 					"fileColor": "#ffeb8f"
@@ -46,7 +46,7 @@
 		{
 			"id": "vsb_demo_n3",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -260,
 					"y": 20,
 					"fileColor": "#ffff00"
@@ -58,7 +58,7 @@
 		{
 			"id": "vsb_demo_n4",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -260,
 					"y": 230,
 					"fileColor": "#75bdff"
@@ -70,7 +70,7 @@
 		{
 			"id": "vsb_demo_n5",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": 560,
 					"y": -20
 				},
@@ -87,7 +87,7 @@
 		{
 			"id": "vsb_demo_n6",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": 830,
 					"y": -140
 				},
@@ -102,7 +102,7 @@
 		{
 			"id": "vsb_demo_n7",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": 830,
 					"y": 130
 				},
@@ -117,7 +117,7 @@
 		{
 			"id": "vsb_demo_n8",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -520,
 					"y": 120
 				},
@@ -135,7 +135,7 @@
 		{
 			"id": "vsb_demo_n9",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -780,
 					"y": 20
 				},
@@ -150,7 +150,7 @@
 		{
 			"id": "vsb_demo_n10",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -780,
 					"y": 230
 				},
@@ -166,7 +166,7 @@
 		{
 			"id": "vsb_demo_n11",
 			"data": {
-				"vsgraph": {
+				"vsgdata": {
 					"x": -520,
 					"y": -190
 				},

@@ -15,7 +15,6 @@ const _NODE_CLASS = {
 };
 
 export class VsbJSON {
-
     static read(json) {
         const raw = typeof json === "string" ? JSON.parse(json) : json;
         const graph = Agraph.deserialize(JSON.stringify(raw));
@@ -24,10 +23,14 @@ export class VsbJSON {
             const data = node.data;
             if (!data || typeof data !== "object") return;
 
-            // Migrate legacy canvas -> vsgraph
+            // Legacy migrations: canvas -> vsgraph -> vsgdata
             if (data.canvas && !data.vsgraph) {
                 data.vsgraph = data.canvas;
                 delete data.canvas;
+            }
+            if (data.vsgraph && !data.vsgdata) {
+                data.vsgdata = data.vsgraph;
+                delete data.vsgraph;
             }
 
             const Cls = _NODE_CLASS[data.type];

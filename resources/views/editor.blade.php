@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>VSB &mdash; {{ $draft['project_name'] ?? 'Editor' }}</title>
+    <title>VSB - {{ $draft['project_name'] ?? 'Editor' }}</title>
     <style>
         body {
             margin: 0;
