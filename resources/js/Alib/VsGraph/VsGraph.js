@@ -36,7 +36,7 @@ export class VsGraph extends Acanvas {
 
         // nodeId/edgeId -> { element, cache, DataClass }
         this._instances = new Map();
-        // callbacks fired after every render() — use for layers that track camera
+        // callbacks fired after every render() - use for layers that track camera
         this._afterRender = [];
 
         this.world = null;

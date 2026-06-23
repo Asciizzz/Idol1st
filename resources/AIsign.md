@@ -52,7 +52,7 @@ Sounds meaningful without saying anything concrete.
 
 **Short example**
 
-> “This isn’t just software — it’s a revolution in human collaboration.”
+> “This isn’t just software - it’s a revolution in human collaboration.”
 
 Human version:
 
@@ -392,7 +392,7 @@ Human: "This Canvas is a fcking beast lmao, bro thought he was doing quantum phy
 ## B3. Foreign Symbols
 
 - AI in general is notorious for the usage of documentation style, which often includes the usage of foreign symbols such as "→", "✓", "✗", "✔", "✘", "⚠️", "❌", "✅" etc. Emojis in general are offlimits.
-- But the most dangerous one are emdash "—" and en dash "–", which are often used in documentation to separate clauses. They are NOT used in programming at all, since we tend to work with ASCII characters only. The presence of emdash and endash is a dead giveaway.
+- But the most dangerous one are emdash "-" and en dash "–", which are often used in documentation to separate clauses. They are NOT used in programming at all, since we tend to work with ASCII characters only. The presence of emdash and endash is a dead giveaway.
 - You may be tempted to make a counterpoint: "Many comments act like documentation, so it's natural to use documentation style punctuation in them", however, these comments are still supposed to be written using code text (ASCII).
 
 

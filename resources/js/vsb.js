@@ -3,6 +3,7 @@ import { VsGraph, VsCamera, VsDotGrid } from "./Alib/VsGraph/index.js";
 
 import { VsbJSON } from "./VirtualSiteBuilder/JSON.js";
 import { VsbCtx }  from "./VirtualSiteBuilder/ctx.js";
+import { VsbUI }   from "./VirtualSiteBuilder/ui.js";
 
 const raw   = window.__VSB_GRAPH__ ?? null;
 const graph = raw ? VsbJSON.read(raw) : new Agraph();
@@ -22,3 +23,4 @@ vsgraph.render();
 window.graph   = graph;
 window.vsgraph = vsgraph;
 window.ctx     = ctx;
+window.ui      = new VsbUI(vsgraph);

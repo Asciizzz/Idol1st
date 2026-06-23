@@ -203,6 +203,9 @@ export class VsbEdgeData extends VsData {
             cache.input.value = edge.data?.order ?? 0;
         }
 
+        const showInput = ctx?.showEdgeInputs ?? false;
+        cache.foreignObject.style.display = showInput ? "block" : "none";
+
         // Determine color
         let color = "rgba(235, 238, 246, 0.46)"; // Default gray
         
