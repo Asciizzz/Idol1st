@@ -84,7 +84,7 @@ export class VsbEdgeData extends VsData {
             height:        "1px",
             overflow:      "visible",
             pointerEvents: "none",
-            zIndex:        "0",
+            zIndex:        "-1",
         });
 
         const visiblePath = document.createElementNS(SVG_NS, "path");
@@ -138,14 +138,13 @@ export class VsbEdgeData extends VsData {
 
         hitPath.addEventListener("pointerenter", () => {
             cache.hover = true;
-            visiblePath.style.opacity = "1";
-            socket.style.opacity      = "1";
-            arrow.style.opacity       = "1";
             visiblePath.setAttribute("stroke-width", "3");
+            if (vsgraph) vsgraph.render();
         });
         hitPath.addEventListener("pointerleave", () => {
             cache.hover = false;
             visiblePath.setAttribute("stroke-width", "2");
+            if (vsgraph) vsgraph.render();
         });
 
         return { element, cache };

@@ -752,9 +752,7 @@
 				"type": "CSS_RULE",
 				"name": "@keyframes ripple",
 				"selector": "@keyframes ripple",
-				"declarations": {
-					"to": "transform: scale(4); opacity: 0"
-				}
+				"code": "to { transform: scale(4); opacity: 0; }"
 			}
 		},
 		{

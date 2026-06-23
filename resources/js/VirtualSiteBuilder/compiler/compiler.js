@@ -170,12 +170,13 @@ export class VsbCompiler {
                     }
                 }
 
+                if (elNode.data.text) {
+                    html += `${indent}  ${elNode.data.text}\n`;
+                }
                 if (children.length > 0) {
                     for (const child of children) {
                         html += renderElement(child, indent + "  ");
                     }
-                } else if (elNode.data.text) {
-                    html += `${indent}  ${elNode.data.text}\n`;
                 }
 
                 html += `${indent}</${elNode.data.tag || "div"}>\n`;
