@@ -227,6 +227,16 @@ export class VsbEdgeData extends VsData {
         const opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
         cache.visiblePath.setAttribute("d", pathD);
+
+        const isEventEdge = srcNode.data?.type === "ELEMENT" && dstNode.data?.type === "JS_EVENT";
+        if (isEventEdge) {
+            color = "#f7df1e";
+            cache.visiblePath.setAttribute("stroke-dasharray", "4 4");
+            if (ctx && !ctx.showEventEdges) opacity = "0";
+        } else {
+            cache.visiblePath.removeAttribute("stroke-dasharray");
+        }
+
         cache.visiblePath.setAttribute("stroke", color);
         cache.visiblePath.style.opacity = opacity;
 
@@ -239,6 +249,11 @@ export class VsbEdgeData extends VsData {
         cache.arrow.style.opacity = opacity;
 
         cache.hitPath.setAttribute("d", pathD);
-        element.style.pointerEvents = "auto";
+        if (isEventEdge && ctx && !ctx.showEventEdges) {
+            element.style.pointerEvents = "none";
+            cache.foreignObject.style.display = "none";
+        } else {
+            element.style.pointerEvents = "auto";
+        }
     }
 }

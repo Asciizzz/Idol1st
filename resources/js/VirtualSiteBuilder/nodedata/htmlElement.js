@@ -1,5 +1,6 @@
 import { VsbNodeType, autoExpand, inputStyle, textAreaStyle, createLabel } from "./node.js";
 import { VsbElementData } from "./elementNode.js";
+import { VsbEdgeData } from "./edge.js";
 
 export class VsbHtmlElementData extends VsbElementData {
     constructor({ tag = "div", attrs = {}, attrsText = "", text = "", jsEventIds = [], name = "New Element", vsgdata = {} } = {}) {
@@ -57,11 +58,20 @@ export class VsbHtmlElementData extends VsbElementData {
             if (vsgraph) vsgraph.render();
         });
 
-        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput);
+        const eventsLabel = createLabel("Events");
+        
+        const boundEventsList = document.createElement("div");
+        Object.assign(boundEventsList.style, {
+            marginTop: "6px", fontSize: "11px", color: "#b9c0ce",
+            display: "flex", flexDirection: "column", gap: "2px"
+        });
+
+        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput, eventsLabel, boundEventsList);
 
         cache.tagInput   = tagInput;
         cache.attrsInput = attrsInput;
         cache.textInput  = textInput;
+        cache.boundEventsList = boundEventsList;
 
         return { element, cache };
     }
@@ -85,6 +95,29 @@ export class VsbHtmlElementData extends VsbElementData {
             if (document.activeElement !== cache.textInput) {
                 cache.textInput.value = data.text ?? "";
                 autoExpand(cache.textInput);
+            }
+
+            const boundEvents = [];
+            const outEdges = graph.outEdges(node.id) || [];
+            for (const e of outEdges) {
+                const dst = graph.getNode(e.dstId);
+                if (dst && dst.data.type === "JS_EVENT") {
+                    boundEvents.push({ 
+                        eventName: dst.data.name ?? dst.id,
+                        eventType: dst.data.event ?? "click"
+                    });
+                }
+            }
+            
+            cache.boundEventsList.innerHTML = "";
+            for (const be of boundEvents) {
+                const row = document.createElement("div");
+                Object.assign(row.style, {
+                    padding: "4px 8px", background: "#18191c", color: "#d8dde8",
+                    borderLeft: "3px solid #f7df1e", fontWeight: "bold"
+                });
+                row.textContent = `[${be.eventType}] ${be.eventName}`;
+                cache.boundEventsList.append(row);
             }
         }
     }

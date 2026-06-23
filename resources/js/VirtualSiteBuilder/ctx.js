@@ -9,5 +9,6 @@ export class VsbCtx {
         this.mode = "CURSOR";
         this.showEdgeInputs = true;
         this.showNodeInputs = false;
+        this.showEventEdges = true;
     }
 }

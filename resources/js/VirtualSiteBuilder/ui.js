@@ -290,10 +290,14 @@ export class VsbUI {
             this.ctx.showNodeInputs = !this.ctx.showNodeInputs;
             this.vsgraph.render();
             this.render();
-        } else if (key === "6" || key === "e") {
+        } else if (key === "6") {
             this.ctx.showEdgeInputs = !this.ctx.showEdgeInputs;
-            this.vsgraph.render();
             this.render();
+            this.vsgraph.render();
+        } else if (key === "7") {
+            this.ctx.showEventEdges = !this.ctx.showEventEdges;
+            this.render();
+            this.vsgraph.render();
         }
         
         this.render();
@@ -540,6 +544,11 @@ export class VsbUI {
             }),
             createIconBtn(edgeInputSvg, "6", this.ctx.showEdgeInputs, () => {
                 this.ctx.showEdgeInputs = !this.ctx.showEdgeInputs;
+                this.render();
+                this.vsgraph.render();
+            }),
+            createIconBtn(`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`, "7", this.ctx.showEventEdges, () => {
+                this.ctx.showEventEdges = !this.ctx.showEventEdges;
                 this.render();
                 this.vsgraph.render();
             })
