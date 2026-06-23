@@ -155,9 +155,7 @@ export class VsbUI {
                     this.vsgraph.render();
                     e.preventDefault();
                     e.stopPropagation();
-                }
-            } else if (this.ctx.mode === "EDGE_DELETE") {
-                if (clickedEdgeId) {
+                } else if (clickedEdgeId) {
                     this.vsgraph.graph.removeEdge(clickedEdgeId);
                     this.vsgraph.render();
                     e.preventDefault();
@@ -263,8 +261,7 @@ export class VsbUI {
             return;
         } else if (this.activeSubMenu === "EDGE") {
             if (key === "1") { this.edgeDefault = "EDGE_ADD"; this.setMode(this.edgeDefault); }
-            else if (key === "2") { this.edgeDefault = "EDGE_DELETE"; this.setMode(this.edgeDefault); }
-            else if (key === "3") { this.edgeDefault = "EDGE_PAINT"; this.setMode(this.edgeDefault); }
+            else if (key === "2") { this.edgeDefault = "EDGE_PAINT"; this.setMode(this.edgeDefault); }
             
             this.activeSubMenu = null;
             this.render();
@@ -281,17 +278,22 @@ export class VsbUI {
                 this.setMode(this.addDefault);
             }
         } else if (key === "3") {
-            this.setMode("DELETE");
-            this.activeSubMenu = null;
-        } else if (key === "4") {
             if (this.ctx.mode.startsWith("EDGE_")) {
                 this.activeSubMenu = this.activeSubMenu === "EDGE" ? null : "EDGE";
             } else {
                 this.setMode(this.edgeDefault);
             }
-        } else if (key === "5" || key === "e") {
+        } else if (key === "4") {
+            this.setMode("DELETE");
+            this.activeSubMenu = null;
+        } else if (key === "5" || key === "n") {
+            this.ctx.showNodeInputs = !this.ctx.showNodeInputs;
+            this.vsgraph.render();
+            this.render();
+        } else if (key === "6" || key === "e") {
             this.ctx.showEdgeInputs = !this.ctx.showEdgeInputs;
             this.vsgraph.render();
+            this.render();
         }
         
         this.render();
@@ -469,16 +471,17 @@ export class VsbUI {
         const addSvg = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>`;
         const delSvg = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg>`;
         const edgeSvg = `<svg viewBox="0 0 24 24"><path d="M16 11V5h-6v2h4.59L6.5 15.09V13H5v6h6v-2H6.41L14.5 8.91V11h1.5z" fill="currentColor"/></svg>`;
-        const inputSvg = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>`;
+        const nodeInputSvg = `<svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z" fill="currentColor"/></svg>`;
+        const edgeInputSvg = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>`;
 
         const getAddLabel = (mode) => {
             switch(mode) {
                 case "ADD_HTML": return "HTML";
                 case "ADD_CSS": return "CSS";
                 case "ADD_JS": return "JS";
-                case "ADD_ELEMENT": return "Element";
-                case "ADD_CSS_RULE": return "Rule";
-                case "ADD_JS_EVENT": return "Event";
+                case "ADD_ELEMENT": return "HTML Element";
+                case "ADD_CSS_RULE": return "CSS Rule";
+                case "ADD_JS_EVENT": return "JS Event";
                 default: return "";
             }
         };
@@ -486,11 +489,19 @@ export class VsbUI {
         const getEdgeLabel = (mode) => {
             switch(mode) {
                 case "EDGE_ADD": return "Add";
-                case "EDGE_DELETE": return "Delete";
                 case "EDGE_PAINT": return "Paint";
                 default: return "";
             }
         };
+
+        const separator = document.createElement("div");
+        Object.assign(separator.style, {
+            width: "30px",
+            height: "2px",
+            background: "#333",
+            margin: "4px auto",
+            borderRadius: "1px"
+        });
 
         mainCol.append(
             createIconBtn(cursorSvg, "1", this.ctx.mode === "CURSOR", () => {
@@ -507,12 +518,7 @@ export class VsbUI {
                 }
                 this.render();
             }, this.activeSubMenu === "ADD" ? null : getAddLabel(this.addDefault)),
-            createIconBtn(delSvg, "3", this.ctx.mode === "DELETE", () => {
-                this.setMode("DELETE");
-                this.activeSubMenu = null;
-                this.render();
-            }),
-            createIconBtn(edgeSvg, "4", this.ctx.mode.startsWith("EDGE_"), () => {
+            createIconBtn(edgeSvg, "3", this.ctx.mode.startsWith("EDGE_"), () => {
                 if (this.ctx.mode.startsWith("EDGE_")) {
                     this.activeSubMenu = this.activeSubMenu === "EDGE" ? null : "EDGE";
                 } else {
@@ -521,7 +527,18 @@ export class VsbUI {
                 }
                 this.render();
             }, this.activeSubMenu === "EDGE" ? null : getEdgeLabel(this.edgeDefault)),
-            createIconBtn(inputSvg, "5", this.ctx.showEdgeInputs, () => {
+            createIconBtn(delSvg, "4", this.ctx.mode === "DELETE", () => {
+                this.setMode("DELETE");
+                this.activeSubMenu = null;
+                this.render();
+            }),
+            separator,
+            createIconBtn(nodeInputSvg, "5", this.ctx.showNodeInputs, () => {
+                this.ctx.showNodeInputs = !this.ctx.showNodeInputs;
+                this.render();
+                this.vsgraph.render();
+            }),
+            createIconBtn(edgeInputSvg, "6", this.ctx.showEdgeInputs, () => {
                 this.ctx.showEdgeInputs = !this.ctx.showEdgeInputs;
                 this.render();
                 this.vsgraph.render();
@@ -540,7 +557,7 @@ export class VsbUI {
                 pointerEvents: "auto",
                 boxShadow: "0 8px 16px rgba(0,0,0,0.4)",
                 backdropFilter: "blur(8px)",
-                marginTop: this.activeSubMenu === "ADD" ? "50px" : "150px"
+                marginTop: this.activeSubMenu === "ADD" ? "50px" : "100px"
             });
             
             const createSubBtn = (label, hotkey, active, onClick) => {
@@ -590,15 +607,14 @@ export class VsbUI {
                     createSubBtn("HTML", "1", this.ctx.mode === "ADD_HTML", () => { this.addDefault = "ADD_HTML"; this.setMode("ADD_HTML"); this.activeSubMenu = null; }),
                     createSubBtn("CSS", "2", this.ctx.mode === "ADD_CSS", () => { this.addDefault = "ADD_CSS"; this.setMode("ADD_CSS"); this.activeSubMenu = null; }),
                     createSubBtn("JS", "3", this.ctx.mode === "ADD_JS", () => { this.addDefault = "ADD_JS"; this.setMode("ADD_JS"); this.activeSubMenu = null; }),
-                    createSubBtn("Element", "4", this.ctx.mode === "ADD_ELEMENT", () => { this.addDefault = "ADD_ELEMENT"; this.setMode("ADD_ELEMENT"); this.activeSubMenu = null; }),
-                    createSubBtn("Rule", "5", this.ctx.mode === "ADD_CSS_RULE", () => { this.addDefault = "ADD_CSS_RULE"; this.setMode("ADD_CSS_RULE"); this.activeSubMenu = null; }),
-                    createSubBtn("Event", "6", this.ctx.mode === "ADD_JS_EVENT", () => { this.addDefault = "ADD_JS_EVENT"; this.setMode("ADD_JS_EVENT"); this.activeSubMenu = null; })
+                    createSubBtn("HTML Element", "4", this.ctx.mode === "ADD_ELEMENT", () => { this.addDefault = "ADD_ELEMENT"; this.setMode("ADD_ELEMENT"); this.activeSubMenu = null; }),
+                    createSubBtn("CSS Rule", "5", this.ctx.mode === "ADD_CSS_RULE", () => { this.addDefault = "ADD_CSS_RULE"; this.setMode("ADD_CSS_RULE"); this.activeSubMenu = null; }),
+                    createSubBtn("JS Event", "6", this.ctx.mode === "ADD_JS_EVENT", () => { this.addDefault = "ADD_JS_EVENT"; this.setMode("ADD_JS_EVENT"); this.activeSubMenu = null; })
                 );
             } else if (this.activeSubMenu === "EDGE") {
                 subRow.append(
                     createSubBtn("Add", "1", this.ctx.mode === "EDGE_ADD", () => { this.edgeDefault = "EDGE_ADD"; this.setMode("EDGE_ADD"); this.activeSubMenu = null; }),
-                    createSubBtn("Delete", "2", this.ctx.mode === "EDGE_DELETE", () => { this.edgeDefault = "EDGE_DELETE"; this.setMode("EDGE_DELETE"); this.activeSubMenu = null; }),
-                    createSubBtn("Paint", "3", this.ctx.mode === "EDGE_PAINT", () => { this.edgeDefault = "EDGE_PAINT"; this.setMode("EDGE_PAINT"); this.activeSubMenu = null; })
+                    createSubBtn("Paint", "2", this.ctx.mode === "EDGE_PAINT", () => { this.edgeDefault = "EDGE_PAINT"; this.setMode("EDGE_PAINT"); this.activeSubMenu = null; })
                 );
             }
             toolbarRow.append(subRow);

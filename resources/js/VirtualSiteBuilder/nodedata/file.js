@@ -15,6 +15,8 @@ export class VsbFileData extends VsbNodeData {
         const header = document.createElement("header");
         const title  = document.createElement("input");
         title.type = "text";
+        const colorInput = document.createElement("input");
+        colorInput.type = "color";
         const meta   = document.createElement("div");
         const body   = document.createElement("div");
 
@@ -61,6 +63,56 @@ export class VsbFileData extends VsbNodeData {
             e.stopPropagation();
             if (e.key === "Enter") title.blur();
         });
+
+        if (!document.getElementById("vsb-color-input-style")) {
+            const style = document.createElement("style");
+            style.id = "vsb-color-input-style";
+            style.textContent = `
+                .vsb-color-picker {
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    border: none;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    padding: 0;
+                    background: transparent;
+                }
+                .vsb-color-picker::-webkit-color-swatch-wrapper {
+                    padding: 0;
+                }
+                .vsb-color-picker::-webkit-color-swatch {
+                    border: 1.5px solid rgba(0, 0, 0, 0.3);
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
+                }
+                .vsb-color-picker::-moz-color-swatch {
+                    border: 1.5px solid rgba(0, 0, 0, 0.3);
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
+                }
+            `;
+            document.head.append(style);
+        }
+
+        colorInput.className = "vsb-color-picker";
+        Object.assign(colorInput.style, {
+            flex: "0 0 auto",
+            outline: "none",
+            marginRight: "4px",
+            marginTop: "2px"
+        });
+        colorInput.addEventListener("input", e => {
+            node.data.vsgdata = node.data.vsgdata || {};
+            node.data.vsgdata.fileColor = e.target.value;
+            if (vsgraph) vsgraph.render();
+        });
+        colorInput.addEventListener("pointerdown", e => {
+            e.stopPropagation();
+        });
+
         Object.assign(meta.style, {
             flex:          "0 0 auto",
             fontSize:      "11px",
@@ -78,11 +130,12 @@ export class VsbFileData extends VsbNodeData {
             overflowWrap: "anywhere",
         });
 
-        header.append(title, meta);
+        header.append(title, colorInput, meta);
         element.append(header, body);
 
         cache.header = header;
         cache.title  = title;
+        cache.colorInput = colorInput;
         cache.meta   = meta;
         cache.body   = body;
 
@@ -112,6 +165,8 @@ export class VsbFileData extends VsbNodeData {
         if (document.activeElement !== cache.title) {
             cache.title.value = node.data.name ?? node.id;
         }
+        cache.colorInput.value = fileColor;
+        
         cache.meta.textContent  = this._fileTypeName();
 
         const bodyText = this._bodyText?.(node, graph);

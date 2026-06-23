@@ -117,5 +117,15 @@ export class VsbNodeData extends VsData {
 
         element.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
         element.style.zIndex    = String(z);
+
+        const allowInput = vsgraph?.ctx?.showNodeInputs ?? false;
+        if (cache.lastAllowInput !== allowInput) {
+            cache.lastAllowInput = allowInput;
+            const inputs = element.querySelectorAll("input, textarea");
+            inputs.forEach(input => {
+                input.style.pointerEvents = allowInput ? "auto" : "none";
+                input.readOnly = !allowInput;
+            });
+        }
     }
 }

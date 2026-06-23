@@ -6,6 +6,8 @@ export class VsbCtx {
         this.highlightedEdgeIds = new Set();
         this.selectedNodeId     = null;
         this.selectedFileNodeId = null;
-        this.showEdgeInputs     = false;
+        this.mode = "CURSOR";
+        this.showEdgeInputs = true;
+        this.showNodeInputs = false;
     }
 }
