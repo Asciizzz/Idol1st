@@ -22,6 +22,21 @@ export class VsbUI {
 
         document.body.appendChild(this.container);
 
+        // Temp edge SVG for drag-and-drop
+        this.tempEdgeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        Object.assign(this.tempEdgeSvg.style, {
+            position: "fixed",
+            top: "0", left: "0", width: "100vw", height: "100vh",
+            pointerEvents: "none", zIndex: "9999", display: "none"
+        });
+        this.tempEdgePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.tempEdgePath.setAttribute("stroke", "#e34c26");
+        this.tempEdgePath.setAttribute("stroke-width", "3");
+        this.tempEdgePath.setAttribute("fill", "none");
+        this.tempEdgePath.setAttribute("stroke-dasharray", "6 6");
+        this.tempEdgeSvg.append(this.tempEdgePath);
+        document.body.appendChild(this.tempEdgeSvg);
+
         this.ctx.mode = "CURSOR";
         this.ctx.edgeSrcId = null;
         
@@ -38,6 +53,51 @@ export class VsbUI {
         document.addEventListener("pointermove", () => { dragStarted = true; }, true);
 
         document.addEventListener("pointerup", e => {
+            if (this.ctx.dragEdgeSrcId) {
+                let hoverNodeId = null;
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                if (el) {
+                    for (const [key, inst] of this.vsgraph._instances) {
+                        if (key.startsWith("n:") && inst.element.contains(el)) {
+                            hoverNodeId = key.substring(2);
+                            break;
+                        }
+                    }
+                }
+
+                if (hoverNodeId && hoverNodeId !== this.ctx.dragEdgeSrcId) {
+                    const srcType = this.vsgraph.graph.getNode(this.ctx.dragEdgeSrcId).data.type;
+                    const dstType = this.vsgraph.graph.getNode(hoverNodeId).data.type;
+
+                    const validPairs = [
+                        ["HTML", "CSS"],
+                        ["HTML", "JS"],
+                        ["HTML", "ELEMENT"],
+                        ["ELEMENT", "ELEMENT"],
+                        ["CSS", "CSS_RULE"],
+                        ["JS", "JS_EVENT"],
+                        ["ELEMENT", "CSS_RULE"],
+                        ["ELEMENT", "JS_EVENT"]
+                    ];
+
+                    let resolvedSrc = null;
+                    let resolvedDst = null;
+
+                    for (const [a, b] of validPairs) {
+                        if (srcType === a && dstType === b) { resolvedSrc = this.ctx.dragEdgeSrcId; resolvedDst = hoverNodeId; break; }
+                        if (srcType === b && dstType === a) { resolvedSrc = hoverNodeId; resolvedDst = this.ctx.dragEdgeSrcId; break; }
+                    }
+
+                    if (resolvedSrc && resolvedDst) {
+                        this.vsgraph.graph.addEdge(resolvedSrc, resolvedDst, { data: new nodetypes.VsbEdgeData() });
+                        this.vsgraph.render();
+                    }
+                }
+                
+                this.ctx.dragEdgeSrcId = null;
+                this.tempEdgeSvg.style.display = "none";
+            }
+
             if (this.container.contains(e.target) && e.target !== this.container) return;
 
             let clickedNodeId = null;
@@ -105,20 +165,9 @@ export class VsbUI {
                 }
             } else if (this.ctx.mode === "EDGE_ADD") {
                 if (clickedNodeId) {
-                    if (!this.ctx.edgeSrcId) {
-                        this.ctx.edgeSrcId = clickedNodeId;
-                        this.render();
-                    } else if (clickedNodeId !== this.ctx.edgeSrcId) {
-                        this.vsgraph.graph.addEdge(this.ctx.edgeSrcId, clickedNodeId, { data: new nodetypes.VsbEdgeData() });
-                        this.ctx.edgeSrcId = null; 
-                        this.render();
-                        this.vsgraph.render();
-                    }
+                    this.ctx.dragEdgeSrcId = clickedNodeId;
                     e.preventDefault();
                     e.stopPropagation();
-                } else {
-                    this.ctx.edgeSrcId = null;
-                    this.render();
                 }
             } else if (this.ctx.mode === "EDGE_PAINT") {
                 if (clickedEdgeId && this.ctx.selectedFileNodeId) {
@@ -145,6 +194,19 @@ export class VsbUI {
         }, true); 
 
         document.addEventListener("pointermove", e => {
+            if (this.ctx.mode === "EDGE_ADD" && this.ctx.dragEdgeSrcId && e.buttons === 1) {
+                const srcNodeEl = this.vsgraph._instances.get(`n:${this.ctx.dragEdgeSrcId}`)?.element;
+                if (srcNodeEl) {
+                    const rect = srcNodeEl.getBoundingClientRect();
+                    const srcX = rect.left + rect.width / 2;
+                    const srcY = rect.top + rect.height / 2;
+                    this.tempEdgePath.setAttribute("d", `M ${srcX} ${srcY} L ${e.clientX} ${e.clientY}`);
+                    this.tempEdgeSvg.style.display = "block";
+                }
+            } else {
+                this.tempEdgeSvg.style.display = "none";
+            }
+
             if (this.ctx.mode === "EDGE_PAINT" && e.buttons === 1 && this.ctx.selectedFileNodeId) {
                 const el = document.elementFromPoint(e.clientX, e.clientY);
                 if (!el) return;
@@ -170,7 +232,8 @@ export class VsbUI {
     setMode(mode) {
         if (this.ctx.mode === mode) return;
         this.ctx.mode = mode;
-        this.ctx.edgeSrcId = null;
+        this.ctx.dragEdgeSrcId = null;
+        this.tempEdgeSvg.style.display = "none";
         this.render();
         this.vsgraph.render();
     }
@@ -242,14 +305,14 @@ export class VsbUI {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            background: "rgba(24, 25, 28, 0.95)",
+            background: "rgba(0, 0, 0, 0.95)",
             padding: "6px 12px",
             borderRadius: "6px",
-            border: "1px solid #3a3b40",
-            color: "#d8dde8",
+            border: "2px solid #333",
+            color: "#fff",
             fontSize: "12px",
             pointerEvents: "auto",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.6)",
             backdropFilter: "blur(8px)"
         });
         
@@ -269,10 +332,10 @@ export class VsbUI {
         if (this.ctx.mode !== "CURSOR" || this.activeSubMenu) {
             const separator = document.createElement("div");
             separator.textContent = "|";
-            separator.style.color = "#72798a";
+            separator.style.color = "#666";
             
             const modeText = document.createElement("div");
-            modeText.style.color = "#e34c26";
+            modeText.style.color = "#fff";
             modeText.style.fontWeight = "bold";
             
             if (this.activeSubMenu === "ADD") modeText.textContent = `Mode: Add > ...`;
@@ -305,19 +368,27 @@ export class VsbUI {
         toolbarRow.append(mainCol);
 
         const createIconBtn = (iconSvg, hotkey, active, onClick, defaultLabel = null) => {
+            const wrapper = document.createElement("div");
+            Object.assign(wrapper.style, {
+                position: "relative",
+                width: "42px",
+                height: "42px"
+            });
+
             const btn = document.createElement("div");
             Object.assign(btn.style, {
-                width: "42px",
-                height: "42px",
+                boxSizing: "border-box",
+                width: "100%",
+                height: "100%",
                 borderRadius: "6px",
                 cursor: "pointer",
-                background: active ? "#8b93a7" : "rgba(24, 25, 28, 0.95)",
-                color: active ? "#18191c" : "#b9c0ce",
+                background: active ? "#ffffff" : "#0a0a0a",
+                color: active ? "#000000" : "#ffffff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: "background 0.1s",
-                border: "1px solid #3a3b40",
+                transition: "background 0.1s, color 0.1s",
+                border: active ? "2px solid #ffffff" : "2px solid #333",
                 position: "relative",
                 pointerEvents: "auto",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
@@ -325,10 +396,10 @@ export class VsbUI {
             });
             
             btn.addEventListener("pointerenter", () => {
-                if (!active) btn.style.background = "rgba(48, 49, 55, 0.95)";
+                if (!active) btn.style.background = "#1a1a1a";
             });
             btn.addEventListener("pointerleave", () => {
-                if (!active) btn.style.background = "rgba(24, 25, 28, 0.95)";
+                if (!active) btn.style.background = "#0a0a0a";
             });
 
             const svgWrap = document.createElement("div");
@@ -351,8 +422,8 @@ export class VsbUI {
                     position: "absolute",
                     top: "3px",
                     left: "3px",
-                    background: active ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.15)",
-                    color: active ? "#18191c" : "#72798a",
+                    background: active ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)",
+                    color: active ? "#000" : "#fff",
                     width: "12px",
                     height: "12px",
                     display: "flex",
@@ -370,21 +441,28 @@ export class VsbUI {
                 labelTag.textContent = defaultLabel;
                 Object.assign(labelTag.style, {
                     position: "absolute",
-                    bottom: "-4px",
-                    right: "-8px",
+                    top: "50%",
+                    left: "calc(100% - 4px)",
+                    transform: "translateY(-50%)",
                     background: "#e34c26",
                     color: "#fff",
-                    padding: "2px 4px",
-                    borderRadius: "3px",
-                    fontSize: "8px",
+                    padding: "2px 10px 2px 12px",
+                    height: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10px",
                     fontWeight: "bold",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.5)"
+                    whiteSpace: "nowrap",
+                    clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%)",
+                    zIndex: "-1"
                 });
-                btn.append(labelTag);
+                wrapper.append(labelTag);
             }
             
+            wrapper.append(btn);
             btn.addEventListener("click", onClick);
-            return btn;
+            return wrapper;
         };
 
         const cursorSvg = `<svg viewBox="0 0 24 24"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.25 1-3.2-7.4-4.4 4.7z" fill="currentColor"/></svg>`;
@@ -392,6 +470,27 @@ export class VsbUI {
         const delSvg = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg>`;
         const edgeSvg = `<svg viewBox="0 0 24 24"><path d="M16 11V5h-6v2h4.59L6.5 15.09V13H5v6h6v-2H6.41L14.5 8.91V11h1.5z" fill="currentColor"/></svg>`;
         const inputSvg = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>`;
+
+        const getAddLabel = (mode) => {
+            switch(mode) {
+                case "ADD_HTML": return "HTML";
+                case "ADD_CSS": return "CSS";
+                case "ADD_JS": return "JS";
+                case "ADD_ELEMENT": return "Element";
+                case "ADD_CSS_RULE": return "Rule";
+                case "ADD_JS_EVENT": return "Event";
+                default: return "";
+            }
+        };
+
+        const getEdgeLabel = (mode) => {
+            switch(mode) {
+                case "EDGE_ADD": return "Add";
+                case "EDGE_DELETE": return "Delete";
+                case "EDGE_PAINT": return "Paint";
+                default: return "";
+            }
+        };
 
         mainCol.append(
             createIconBtn(cursorSvg, "1", this.ctx.mode === "CURSOR", () => {
@@ -407,7 +506,7 @@ export class VsbUI {
                     this.activeSubMenu = null;
                 }
                 this.render();
-            }, this.addDefault.replace("ADD_", "").substring(0, 3)),
+            }, this.activeSubMenu === "ADD" ? null : getAddLabel(this.addDefault)),
             createIconBtn(delSvg, "3", this.ctx.mode === "DELETE", () => {
                 this.setMode("DELETE");
                 this.activeSubMenu = null;
@@ -421,7 +520,7 @@ export class VsbUI {
                     this.activeSubMenu = null;
                 }
                 this.render();
-            }, this.edgeDefault.replace("EDGE_", "").substring(0, 3)),
+            }, this.activeSubMenu === "EDGE" ? null : getEdgeLabel(this.edgeDefault)),
             createIconBtn(inputSvg, "5", this.ctx.showEdgeInputs, () => {
                 this.ctx.showEdgeInputs = !this.ctx.showEdgeInputs;
                 this.render();
@@ -434,10 +533,10 @@ export class VsbUI {
             Object.assign(subRow.style, {
                 display: "flex",
                 gap: "8px",
-                background: "rgba(24, 25, 28, 0.95)",
+                background: "rgba(0, 0, 0, 0.95)",
                 padding: "8px",
                 borderRadius: "6px",
-                border: "1px solid #3a3b40",
+                border: "2px solid #333",
                 pointerEvents: "auto",
                 boxShadow: "0 8px 16px rgba(0,0,0,0.4)",
                 backdropFilter: "blur(8px)",
@@ -447,32 +546,33 @@ export class VsbUI {
             const createSubBtn = (label, hotkey, active, onClick) => {
                 const btn = document.createElement("div");
                 Object.assign(btn.style, {
+                    boxSizing: "border-box",
                     padding: "6px 10px",
                     borderRadius: "4px",
                     cursor: "pointer",
-                    background: active ? "#8b93a7" : "rgba(255,255,255,0.04)",
-                    color: active ? "#18191c" : "#b9c0ce",
+                    background: active ? "#ffffff" : "#0a0a0a",
+                    color: active ? "#000000" : "#ffffff",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
                     fontWeight: "bold",
-                    transition: "background 0.1s",
-                    border: "1px solid rgba(255,255,255,0.1)"
+                    transition: "background 0.1s, color 0.1s",
+                    border: active ? "2px solid #ffffff" : "2px solid #333"
                 });
                 
                 btn.addEventListener("pointerenter", () => {
-                    if (!active) btn.style.background = "rgba(255,255,255,0.1)";
+                    if (!active) btn.style.background = "#1a1a1a";
                 });
                 btn.addEventListener("pointerleave", () => {
-                    if (!active) btn.style.background = "rgba(255,255,255,0.04)";
+                    if (!active) btn.style.background = "#0a0a0a";
                 });
 
                 if (hotkey) {
                     const keyTag = document.createElement("span");
                     keyTag.textContent = hotkey;
                     Object.assign(keyTag.style, {
-                        background: active ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.15)",
-                        color: active ? "#18191c" : "#72798a",
+                        background: active ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)",
+                        color: active ? "#000" : "#fff",
                         padding: "2px 6px",
                         borderRadius: "3px",
                         fontSize: "11px",
