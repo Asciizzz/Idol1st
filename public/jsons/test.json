@@ -1,7 +1,7 @@
 {
-	"label": "Idol1st Showcase",
-	"_nextNodeId": 48,
-	"_nextEdgeId": 61,
+	"label": "V-Builder Pro",
+	"_nextNodeId": 79,
+	"_nextEdgeId": 89,
 	"nodes": [
 		{
 			"id": "n_html_index",
@@ -13,18 +13,6 @@
 				},
 				"type": "HTML",
 				"name": "index.html"
-			}
-		},
-		{
-			"id": "n_html_feat",
-			"data": {
-				"vsgdata": {
-					"x": 0,
-					"y": 800,
-					"z": 0
-				},
-				"type": "HTML",
-				"name": "features.html"
 			}
 		},
 		{
@@ -52,7 +40,7 @@
 			}
 		},
 		{
-			"id": "n_css_body",
+			"id": "c_body",
 			"data": {
 				"vsgdata": {
 					"x": -700,
@@ -65,19 +53,72 @@
 				"declarations": {
 					"margin": "0",
 					"font-family": "\"Outfit\", \"Inter\", sans-serif",
-					"background": "#0a0a0f",
-					"color": "#e2e8f0",
+					"background": "#060608",
+					"color": "#f8fafc",
 					"overflow-x": "hidden",
-					"transition": "opacity 0.4s ease-in-out"
+					"transition": "background 0.5s ease, color 0.5s ease"
 				}
 			}
 		},
 		{
-			"id": "n_css_nav",
+			"id": "c_light",
 			"data": {
 				"vsgdata": {
-					"x": -1000,
-					"y": 0,
+					"x": -950,
+					"y": 150,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "body.light-theme",
+				"selector": "body.light-theme",
+				"declarations": {
+					"background": "#f1f5f9",
+					"color": "#0f172a"
+				}
+			}
+		},
+		{
+			"id": "c_container",
+			"data": {
+				"vsgdata": {
+					"x": -1200,
+					"y": 300,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".container",
+				"selector": ".container",
+				"declarations": {
+					"max-width": "1200px",
+					"margin": "0 auto",
+					"padding": "0 20px"
+				}
+			}
+		},
+		{
+			"id": "c_flex_center",
+			"data": {
+				"vsgdata": {
+					"x": -1450,
+					"y": 450,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".flex-center",
+				"selector": ".flex-center",
+				"declarations": {
+					"display": "flex",
+					"justify-content": "center",
+					"align-items": "center"
+				}
+			}
+		},
+		{
+			"id": "c_nav",
+			"data": {
+				"vsgdata": {
+					"x": -1700,
+					"y": 600,
 					"z": 0
 				},
 				"type": "CSS_RULE",
@@ -87,9 +128,9 @@
 					"display": "flex",
 					"justify-content": "space-between",
 					"align-items": "center",
-					"padding": "20px 60px",
-					"background": "rgba(10, 10, 15, 0.8)",
-					"backdrop-filter": "blur(12px)",
+					"padding": "20px 40px",
+					"background": "rgba(6, 6, 8, 0.7)",
+					"backdrop-filter": "blur(16px)",
 					"border-bottom": "1px solid rgba(255, 255, 255, 0.05)",
 					"position": "sticky",
 					"top": "0",
@@ -98,131 +139,184 @@
 			}
 		},
 		{
-			"id": "n_css_nava",
+			"id": "c_nav_light",
 			"data": {
 				"vsgdata": {
-					"x": -1300,
-					"y": 0,
+					"x": -1950,
+					"y": 750,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": "nav .nav-link, nav .logo",
-				"selector": "nav .nav-link, nav .logo",
+				"name": "body.light-theme nav",
+				"selector": "body.light-theme nav",
 				"declarations": {
-					"color": "#f8fafc",
-					"text-decoration": "none",
-					"font-weight": "600",
-					"cursor": "pointer",
-					"transition": "color 0.2s ease"
+					"background": "rgba(255, 255, 255, 0.7)",
+					"border-bottom": "1px solid rgba(0, 0, 0, 0.05)"
 				}
 			}
 		},
 		{
-			"id": "n_css_navhover",
+			"id": "c_logo",
 			"data": {
 				"vsgdata": {
-					"x": -1600,
-					"y": 0,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "nav .nav-link:hover",
-				"selector": "nav .nav-link:hover",
-				"declarations": {
-					"color": "#60a5fa",
-					"text-shadow": "0 0 10px rgba(96, 165, 250, 0.5)"
-				}
-			}
-		},
-		{
-			"id": "n_css_logo",
-			"data": {
-				"vsgdata": {
-					"x": -1900,
-					"y": 0,
+					"x": -2200,
+					"y": 900,
 					"z": 0
 				},
 				"type": "CSS_RULE",
 				"name": ".logo",
 				"selector": ".logo",
 				"declarations": {
-					"font-size": "1.5rem",
-					"font-weight": "800",
-					"background": "linear-gradient(to right, #60a5fa, #c084fc)",
+					"font-size": "1.75rem",
+					"font-weight": "900",
+					"background": "linear-gradient(to right, #38bdf8, #818cf8, #c084fc)",
 					"-webkit-background-clip": "text",
 					"-webkit-text-fill-color": "transparent"
 				}
 			}
 		},
 		{
-			"id": "n_css_navlinks",
+			"id": "c_navlinks",
 			"data": {
 				"vsgdata": {
-					"x": -2200,
-					"y": 0,
+					"x": -2450,
+					"y": 1050,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": "nav .links",
-				"selector": "nav .links",
+				"name": ".nav-links",
+				"selector": ".nav-links",
 				"declarations": {
 					"display": "flex",
-					"gap": "32px"
+					"gap": "30px"
 				}
 			}
 		},
 		{
-			"id": "n_css_hero",
+			"id": "c_nava",
 			"data": {
 				"vsgdata": {
-					"x": -2500,
-					"y": 0,
+					"x": -2700,
+					"y": 1200,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".nav-item",
+				"selector": ".nav-item",
+				"declarations": {
+					"cursor": "pointer",
+					"font-weight": "600",
+					"transition": "color 0.2s",
+					"color": "#94a3b8"
+				}
+			}
+		},
+		{
+			"id": "c_navahov",
+			"data": {
+				"vsgdata": {
+					"x": -2950,
+					"y": 1350,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".nav-item:hover",
+				"selector": ".nav-item:hover",
+				"declarations": {
+					"color": "#38bdf8"
+				}
+			}
+		},
+		{
+			"id": "c_hero",
+			"data": {
+				"vsgdata": {
+					"x": -3200,
+					"y": 1500,
 					"z": 0
 				},
 				"type": "CSS_RULE",
 				"name": ".hero",
 				"selector": ".hero",
 				"declarations": {
-					"min-height": "80vh",
+					"min-height": "90vh",
 					"display": "flex",
 					"flex-direction": "column",
 					"justify-content": "center",
 					"align-items": "center",
 					"text-align": "center",
-					"padding": "0 20px",
-					"background": "radial-gradient(circle at 50% -20%, rgba(56, 189, 248, 0.15) 0%, rgba(10, 10, 15, 0) 60%)"
+					"position": "relative",
+					"overflow": "hidden"
 				}
 			}
 		},
 		{
-			"id": "n_css_heroh1",
+			"id": "c_hero_bg",
 			"data": {
 				"vsgdata": {
-					"x": -2800,
-					"y": 0,
+					"x": -3450,
+					"y": 1650,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".hero h1",
-				"selector": ".hero h1",
+				"name": ".hero::before",
+				"selector": ".hero::before",
 				"declarations": {
-					"font-size": "4.5rem",
-					"line-height": "1.1",
+					"content": "\"\"",
+					"position": "absolute",
+					"top": "-50%",
+					"left": "-50%",
+					"width": "200%",
+					"height": "200%",
+					"background": "radial-gradient(circle at center, rgba(129, 140, 248, 0.15) 0%, transparent 50%)",
+					"z-index": "-1"
+				}
+			}
+		},
+		{
+			"id": "c_h1",
+			"data": {
+				"vsgdata": {
+					"x": -3700,
+					"y": 1800,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "h1",
+				"selector": "h1",
+				"declarations": {
+					"font-size": "5rem",
 					"font-weight": "800",
-					"margin-bottom": "24px",
-					"letter-spacing": "-0.02em",
-					"background": "linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)",
+					"line-height": "1.1",
+					"letter-spacing": "-0.03em",
+					"margin-bottom": "24px"
+				}
+			}
+		},
+		{
+			"id": "c_h1_span",
+			"data": {
+				"vsgdata": {
+					"x": -3950,
+					"y": 1950,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "h1 span",
+				"selector": "h1 span",
+				"declarations": {
+					"background": "linear-gradient(135deg, #38bdf8, #c084fc)",
 					"-webkit-background-clip": "text",
 					"-webkit-text-fill-color": "transparent"
 				}
 			}
 		},
 		{
-			"id": "n_css_herop",
+			"id": "c_hero_p",
 			"data": {
 				"vsgdata": {
-					"x": -3100,
-					"y": 0,
+					"x": -4200,
+					"y": 2100,
 					"z": 0
 				},
 				"type": "CSS_RULE",
@@ -238,156 +332,400 @@
 			}
 		},
 		{
-			"id": "n_css_btn",
+			"id": "c_btngroup",
 			"data": {
 				"vsgdata": {
-					"x": -3400,
-					"y": 0,
+					"x": -4450,
+					"y": 2250,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".btn-group",
+				"selector": ".btn-group",
+				"declarations": {
+					"display": "flex",
+					"gap": "20px"
+				}
+			}
+		},
+		{
+			"id": "c_btn",
+			"data": {
+				"vsgdata": {
+					"x": -4700,
+					"y": 2400,
 					"z": 0
 				},
 				"type": "CSS_RULE",
 				"name": ".btn",
 				"selector": ".btn",
 				"declarations": {
-					"padding": "16px 36px",
-					"border-radius": "999px",
-					"background": "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-					"color": "#fff",
-					"font-weight": "600",
+					"padding": "16px 32px",
+					"border-radius": "99px",
+					"font-weight": "700",
 					"font-size": "1.1rem",
 					"cursor": "pointer",
-					"box-shadow": "0 4px 20px rgba(139, 92, 246, 0.4)",
-					"transition": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+					"border": "none",
+					"transition": "all 0.3s ease",
 					"position": "relative",
 					"overflow": "hidden"
 				}
 			}
 		},
 		{
-			"id": "n_css_btnhov",
+			"id": "c_btn_pri",
 			"data": {
 				"vsgdata": {
-					"x": -3700,
-					"y": 0,
+					"x": -4950,
+					"y": 2550,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".btn:hover",
-				"selector": ".btn:hover",
+				"name": ".btn.primary",
+				"selector": ".btn.primary",
 				"declarations": {
-					"transform": "translateY(-2px)",
-					"box-shadow": "0 8px 30px rgba(139, 92, 246, 0.6)"
+					"background": "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+					"color": "#fff",
+					"box-shadow": "0 10px 25px rgba(99, 102, 241, 0.4)"
 				}
 			}
 		},
 		{
-			"id": "n_css_grid",
+			"id": "c_btn_pri_hov",
 			"data": {
 				"vsgdata": {
-					"x": -4000,
-					"y": 0,
+					"x": -5200,
+					"y": 2700,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".features-grid",
-				"selector": ".features-grid",
+				"name": ".btn.primary:hover",
+				"selector": ".btn.primary:hover",
+				"declarations": {
+					"transform": "translateY(-3px)",
+					"box-shadow": "0 15px 35px rgba(99, 102, 241, 0.6)"
+				}
+			}
+		},
+		{
+			"id": "c_btn_sec",
+			"data": {
+				"vsgdata": {
+					"x": -5450,
+					"y": 2850,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".btn.secondary",
+				"selector": ".btn.secondary",
+				"declarations": {
+					"background": "rgba(255,255,255,0.1)",
+					"color": "#fff",
+					"backdrop-filter": "blur(10px)"
+				}
+			}
+		},
+		{
+			"id": "c_btn_sec_light",
+			"data": {
+				"vsgdata": {
+					"x": -5700,
+					"y": 3000,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "body.light-theme .btn.secondary",
+				"selector": "body.light-theme .btn.secondary",
+				"declarations": {
+					"background": "rgba(0,0,0,0.1)",
+					"color": "#000"
+				}
+			}
+		},
+		{
+			"id": "c_btn_sec_hov",
+			"data": {
+				"vsgdata": {
+					"x": -5950,
+					"y": 3150,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".btn.secondary:hover",
+				"selector": ".btn.secondary:hover",
+				"declarations": {
+					"background": "rgba(255,255,255,0.2)"
+				}
+			}
+		},
+		{
+			"id": "c_section",
+			"data": {
+				"vsgdata": {
+					"x": -6200,
+					"y": 3300,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "section",
+				"selector": "section",
+				"declarations": {
+					"padding": "100px 20px",
+					"border-top": "1px solid rgba(255,255,255,0.05)"
+				}
+			}
+		},
+		{
+			"id": "c_sec_light",
+			"data": {
+				"vsgdata": {
+					"x": -6450,
+					"y": 3450,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "body.light-theme section",
+				"selector": "body.light-theme section",
+				"declarations": {
+					"border-top": "1px solid rgba(0,0,0,0.05)"
+				}
+			}
+		},
+		{
+			"id": "c_h2",
+			"data": {
+				"vsgdata": {
+					"x": -6700,
+					"y": 3600,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "h2",
+				"selector": "h2",
+				"declarations": {
+					"font-size": "3rem",
+					"text-align": "center",
+					"margin-bottom": "60px",
+					"font-weight": "800"
+				}
+			}
+		},
+		{
+			"id": "c_grid",
+			"data": {
+				"vsgdata": {
+					"x": -6950,
+					"y": 3750,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".grid",
+				"selector": ".grid",
 				"declarations": {
 					"display": "grid",
 					"grid-template-columns": "repeat(auto-fit, minmax(300px, 1fr))",
-					"gap": "32px",
-					"padding": "80px 60px",
-					"max-width": "1200px",
+					"gap": "40px",
+					"max-width": "1000px",
 					"margin": "0 auto"
 				}
 			}
 		},
 		{
-			"id": "n_css_card",
+			"id": "c_card",
 			"data": {
 				"vsgdata": {
-					"x": -4300,
-					"y": 0,
+					"x": -7200,
+					"y": 3900,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".feature-card",
-				"selector": ".feature-card",
+				"name": ".card",
+				"selector": ".card",
 				"declarations": {
-					"background": "rgba(255, 255, 255, 0.03)",
-					"border": "1px solid rgba(255, 255, 255, 0.05)",
+					"background": "rgba(255,255,255,0.02)",
+					"border": "1px solid rgba(255,255,255,0.05)",
+					"border-radius": "20px",
 					"padding": "40px",
-					"border-radius": "24px",
-					"backdrop-filter": "blur(10px)",
-					"transition": "transform 0.4s ease, border-color 0.4s ease",
 					"cursor": "pointer",
-					"perspective": "1000px"
+					"transition": "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s",
+					"transform-style": "preserve-3d",
+					"position": "relative"
 				}
 			}
 		},
 		{
-			"id": "n_css_cardhov",
+			"id": "c_card_light",
 			"data": {
 				"vsgdata": {
-					"x": -4600,
-					"y": 0,
+					"x": -7450,
+					"y": 4050,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".feature-card:hover",
-				"selector": ".feature-card:hover",
+				"name": "body.light-theme .card",
+				"selector": "body.light-theme .card",
 				"declarations": {
-					"transform": "translateY(-10px)",
-					"border-color": "rgba(96, 165, 250, 0.3)",
-					"background": "rgba(255, 255, 255, 0.05)"
+					"background": "#fff",
+					"border": "1px solid rgba(0,0,0,0.1)",
+					"box-shadow": "0 10px 30px rgba(0,0,0,0.05)"
 				}
 			}
 		},
 		{
-			"id": "n_css_cardh3",
+			"id": "c_card_hov",
 			"data": {
 				"vsgdata": {
-					"x": -4900,
-					"y": 0,
+					"x": -7700,
+					"y": 4200,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".feature-card h3",
-				"selector": ".feature-card h3",
+				"name": ".card:hover",
+				"selector": ".card:hover",
 				"declarations": {
-					"color": "#f8fafc",
-					"font-size": "1.5rem",
-					"margin-top": "0",
-					"margin-bottom": "16px",
-					"background": "linear-gradient(90deg, #60a5fa, #c084fc)",
-					"-webkit-background-clip": "text",
-					"-webkit-text-fill-color": "transparent"
+					"box-shadow": "0 20px 40px rgba(0,0,0,0.3)",
+					"border-color": "rgba(129, 140, 248, 0.5)"
 				}
 			}
 		},
 		{
-			"id": "n_css_cardp",
+			"id": "c_para",
 			"data": {
 				"vsgdata": {
-					"x": -5200,
-					"y": 0,
+					"x": -7950,
+					"y": 4350,
 					"z": 0
 				},
 				"type": "CSS_RULE",
-				"name": ".feature-card p",
-				"selector": ".feature-card p",
+				"name": ".parallax-box",
+				"selector": ".parallax-box",
 				"declarations": {
-					"color": "#94a3b8",
-					"line-height": "1.6",
-					"margin": "0"
+					"width": "100%",
+					"max-width": "800px",
+					"height": "400px",
+					"margin": "60px auto",
+					"border-radius": "30px",
+					"background": "linear-gradient(135deg, #1e293b, #0f172a)",
+					"display": "flex",
+					"justify-content": "center",
+					"align-items": "center",
+					"overflow": "hidden",
+					"position": "relative"
 				}
 			}
 		},
 		{
-			"id": "n_css_ripple",
+			"id": "c_para_in",
 			"data": {
 				"vsgdata": {
-					"x": -5500,
-					"y": 0,
+					"x": -8200,
+					"y": 4500,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".parallax-inner",
+				"selector": ".parallax-inner",
+				"declarations": {
+					"width": "80%",
+					"height": "80%",
+					"background": "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2))",
+					"border-radius": "20px",
+					"backdrop-filter": "blur(10px)",
+					"border": "1px solid rgba(255,255,255,0.1)",
+					"transition": "transform 0.1s ease-out",
+					"display": "flex",
+					"justify-content": "center",
+					"align-items": "center",
+					"font-size": "2rem",
+					"font-weight": "bold"
+				}
+			}
+		},
+		{
+			"id": "c_news",
+			"data": {
+				"vsgdata": {
+					"x": -8450,
+					"y": 4650,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".newsletter",
+				"selector": ".newsletter",
+				"declarations": {
+					"background": "linear-gradient(to right, rgba(56, 189, 248, 0.1), rgba(192, 132, 252, 0.1))",
+					"padding": "80px 20px",
+					"text-align": "center",
+					"border-radius": "40px",
+					"margin": "0 auto",
+					"max-width": "1000px"
+				}
+			}
+		},
+		{
+			"id": "c_input",
+			"data": {
+				"vsgdata": {
+					"x": -8700,
+					"y": 4800,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "input",
+				"selector": "input",
+				"declarations": {
+					"padding": "16px 24px",
+					"border-radius": "99px",
+					"border": "1px solid rgba(255,255,255,0.2)",
+					"background": "rgba(0,0,0,0.2)",
+					"color": "#fff",
+					"font-size": "1.1rem",
+					"width": "300px",
+					"margin-right": "10px",
+					"outline": "none"
+				}
+			}
+		},
+		{
+			"id": "c_input_light",
+			"data": {
+				"vsgdata": {
+					"x": -8950,
+					"y": 4950,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "body.light-theme input",
+				"selector": "body.light-theme input",
+				"declarations": {
+					"background": "#fff",
+					"border": "1px solid #ccc",
+					"color": "#000"
+				}
+			}
+		},
+		{
+			"id": "c_input_foc",
+			"data": {
+				"vsgdata": {
+					"x": -9200,
+					"y": 5100,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "input:focus",
+				"selector": "input:focus",
+				"declarations": {
+					"border-color": "#38bdf8"
+				}
+			}
+		},
+		{
+			"id": "c_ripple",
+			"data": {
+				"vsgdata": {
+					"x": -9450,
+					"y": 5250,
 					"z": 0
 				},
 				"type": "CSS_RULE",
@@ -396,7 +734,7 @@
 				"declarations": {
 					"position": "absolute",
 					"border-radius": "50%",
-					"background": "rgba(255, 255, 255, 0.5)",
+					"background": "rgba(255, 255, 255, 0.4)",
 					"transform": "scale(0)",
 					"animation": "ripple 0.6s linear",
 					"pointer-events": "none"
@@ -404,11 +742,11 @@
 			}
 		},
 		{
-			"id": "n_css_keyf",
+			"id": "c_keyf",
 			"data": {
 				"vsgdata": {
-					"x": -5800,
-					"y": 0,
+					"x": -9700,
+					"y": 5400,
 					"z": 0
 				},
 				"type": "CSS_RULE",
@@ -420,142 +758,219 @@
 			}
 		},
 		{
-			"id": "n_js_click",
+			"id": "c_footer",
+			"data": {
+				"vsgdata": {
+					"x": -9950,
+					"y": 5550,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "footer",
+				"selector": "footer",
+				"declarations": {
+					"text-align": "center",
+					"padding": "40px",
+					"color": "#64748b",
+					"border-top": "1px solid rgba(255,255,255,0.05)",
+					"margin-top": "60px"
+				}
+			}
+		},
+		{
+			"id": "j_nav",
 			"data": {
 				"vsgdata": {
 					"x": 400,
-					"y": -400,
+					"y": -600,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Alert Route",
+				"event": "click",
+				"code": "alert(\"Simulated routing to: \" + event.currentTarget.innerText);"
+			}
+		},
+		{
+			"id": "j_rip",
+			"data": {
+				"vsgdata": {
+					"x": 800,
+					"y": -600,
 					"z": 0
 				},
 				"type": "JS_EVENT",
 				"name": "Ripple Effect",
 				"event": "click",
-				"code": "\nconst rect = event.currentTarget.getBoundingClientRect();\nconst circle = document.createElement(\"span\");\nconst diameter = Math.max(rect.width, rect.height);\nconst radius = diameter / 2;\ncircle.style.width = circle.style.height = `${diameter}px`;\ncircle.style.left = `${event.clientX - rect.left - radius}px`;\ncircle.style.top = `${event.clientY - rect.top - radius}px`;\ncircle.classList.add(\"ripple\");\nconst existing = event.currentTarget.querySelector('.ripple');\nif (existing) existing.remove();\nevent.currentTarget.appendChild(circle);\nsetTimeout(() => alert(\"Stunning visual logic compilation initialized!\"), 400);\n"
+				"code": "\nconst rect = event.currentTarget.getBoundingClientRect();\nconst circle = document.createElement(\"span\");\nconst diameter = Math.max(rect.width, rect.height);\ncircle.style.width = circle.style.height = `${diameter}px`;\ncircle.style.left = `${event.clientX - rect.left - diameter/2}px`;\ncircle.style.top = `${event.clientY - rect.top - diameter/2}px`;\ncircle.classList.add(\"ripple\");\nconst existing = event.currentTarget.querySelector('.ripple');\nif (existing) existing.remove();\nevent.currentTarget.appendChild(circle);\n"
 			}
 		},
 		{
-			"id": "n_js_card",
+			"id": "j_flip",
 			"data": {
 				"vsgdata": {
-					"x": 800,
-					"y": -400,
+					"x": 1200,
+					"y": -600,
 					"z": 0
 				},
 				"type": "JS_EVENT",
 				"name": "Card Flip",
 				"event": "click",
-				"code": "\nconst target = event.currentTarget;\ntarget.style.transform = 'rotateY(180deg)';\nsetTimeout(() => {\n  target.style.transform = 'rotateY(0deg) translateY(-10px)';\n}, 600);\n"
+				"code": "\nconst target = event.currentTarget;\ntarget.style.transform = 'rotateY(180deg) scale(1.05)';\nsetTimeout(() => {\n  target.style.transform = 'rotateY(0deg) scale(1)';\n}, 800);\n"
 			}
 		},
 		{
-			"id": "n_js_nav_home",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": -400,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Route Home",
-				"event": "click",
-				"code": "document.body.style.opacity = \"0\";\nsetTimeout(() => window.location.href = \"index.html\", 400);"
-			}
-		},
-		{
-			"id": "n_js_nav_feat",
+			"id": "j_theme",
 			"data": {
 				"vsgdata": {
 					"x": 1600,
-					"y": -400,
+					"y": -600,
 					"z": 0
 				},
 				"type": "JS_EVENT",
-				"name": "Route Feat",
+				"name": "Theme Toggle",
 				"event": "click",
-				"code": "document.body.style.opacity = \"0\";\nsetTimeout(() => window.location.href = \"features.html\", 400);"
+				"code": "\ndocument.body.classList.toggle('light-theme');\nevent.currentTarget.innerText = document.body.classList.contains('light-theme') ? 'Dark Mode' : 'Light Mode';\n"
 			}
 		},
 		{
-			"id": "n_el_nav",
+			"id": "j_pmv",
+			"data": {
+				"vsgdata": {
+					"x": 2000,
+					"y": -600,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Parallax Move",
+				"event": "mousemove",
+				"code": "\nconst inner = event.currentTarget.querySelector('.parallax-inner');\nif(!inner) return;\nconst rect = event.currentTarget.getBoundingClientRect();\nconst x = event.clientX - rect.left;\nconst y = event.clientY - rect.top;\nconst moveX = (x - rect.width/2) / 10;\nconst moveY = (y - rect.height/2) / 10;\ninner.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.05)`;\n"
+			}
+		},
+		{
+			"id": "j_plv",
+			"data": {
+				"vsgdata": {
+					"x": 2400,
+					"y": -600,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Parallax Leave",
+				"event": "mouseleave",
+				"code": "\nconst inner = event.currentTarget.querySelector('.parallax-inner');\nif(inner) inner.style.transform = 'translate(0, 0) scale(1)';\n"
+			}
+		},
+		{
+			"id": "j_sub",
+			"data": {
+				"vsgdata": {
+					"x": 2800,
+					"y": -600,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Form Submit",
+				"event": "click",
+				"code": "\nevent.preventDefault();\nconst btn = event.currentTarget;\nif(btn.disabled) return;\nconst prev = btn.innerText;\nbtn.innerText = \"Processing...\";\nbtn.style.opacity = \"0.7\";\nbtn.disabled = true;\nsetTimeout(() => {\n  btn.innerText = \"Subscribed!\";\n  btn.style.background = \"#10b981\";\n  btn.style.opacity = \"1\";\n  setTimeout(() => {\n     btn.innerText = prev;\n     btn.style.background = \"\";\n     btn.disabled = false;\n  }, 2500);\n}, 1000);\n"
+			}
+		},
+		{
+			"id": "e_nav",
 			"data": {
 				"vsgdata": {
 					"x": 300,
-					"y": 300,
+					"y": -200,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Shared Nav",
+				"name": "Navbar",
 				"tag": "nav",
 				"attrsText": "",
 				"text": ""
 			}
 		},
 		{
-			"id": "n_el_logo",
+			"id": "e_logo",
 			"data": {
 				"vsgdata": {
 					"x": 600,
-					"y": 150,
+					"y": -300,
 					"z": 0
 				},
 				"type": "ELEMENT",
 				"name": "Logo",
 				"tag": "div",
 				"attrsText": "class=\"logo\"",
-				"text": "Idol1st"
+				"text": "V-BUILDER"
 			}
 		},
 		{
-			"id": "n_el_links",
+			"id": "e_links",
 			"data": {
 				"vsgdata": {
 					"x": 600,
-					"y": 450,
+					"y": -100,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Links Container",
+				"name": "Nav Links",
 				"tag": "div",
-				"attrsText": "class=\"links\"",
+				"attrsText": "class=\"nav-links\"",
 				"text": ""
 			}
 		},
 		{
-			"id": "n_el_link1",
+			"id": "e_l1",
 			"data": {
 				"vsgdata": {
 					"x": 900,
-					"y": 350,
+					"y": -200,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Nav Home",
+				"name": "Link Solutions",
 				"tag": "div",
-				"attrsText": "class=\"nav-link\"",
-				"text": "Home"
+				"attrsText": "class=\"nav-item\"",
+				"text": "Solutions"
 			}
 		},
 		{
-			"id": "n_el_link2",
+			"id": "e_l2",
 			"data": {
 				"vsgdata": {
 					"x": 900,
-					"y": 550,
+					"y": -100,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Nav Features",
+				"name": "Link Demos",
 				"tag": "div",
-				"attrsText": "class=\"nav-link\"",
-				"text": "Features"
+				"attrsText": "class=\"nav-item\"",
+				"text": "Interactive Demos"
 			}
 		},
 		{
-			"id": "n_el_hero",
+			"id": "e_l3",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 0,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Link Pricing",
+				"tag": "div",
+				"attrsText": "class=\"nav-item\"",
+				"text": "Pricing"
+			}
+		},
+		{
+			"id": "e_hero",
 			"data": {
 				"vsgdata": {
 					"x": 300,
-					"y": -100,
+					"y": 400,
 					"z": 0
 				},
 				"type": "ELEMENT",
@@ -566,67 +981,52 @@
 			}
 		},
 		{
-			"id": "n_el_heroh1",
+			"id": "e_h1",
 			"data": {
 				"vsgdata": {
 					"x": 600,
-					"y": -200,
+					"y": 200,
 					"z": 0
 				},
 				"type": "ELEMENT",
 				"name": "Hero Title",
 				"tag": "h1",
 				"attrsText": "",
-				"text": "Engineering Perfection."
+				"text": "The Future is "
 			}
 		},
 		{
-			"id": "n_el_herop",
+			"id": "e_h1_span",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Hero Highlight",
+				"tag": "span",
+				"attrsText": "",
+				"text": "Visual."
+			}
+		},
+		{
+			"id": "e_hp",
 			"data": {
 				"vsgdata": {
 					"x": 600,
-					"y": -100,
+					"y": 400,
 					"z": 0
 				},
 				"type": "ELEMENT",
 				"name": "Hero Desc",
 				"tag": "p",
 				"attrsText": "",
-				"text": "Architect highly scalable web graphs with pure visual intuition. Write logic seamlessly. Compile instantly."
+				"text": "Build fully functional, script-injected, and beautifully styled web graphs. Welcome to the ultimate spatial engineering playground."
 			}
 		},
 		{
-			"id": "n_el_btn",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 0,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "CTA Button",
-				"tag": "div",
-				"attrsText": "class=\"btn\"",
-				"text": "Initialize System"
-			}
-		},
-		{
-			"id": "n_el_fhero",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 700,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Feat Hero",
-				"tag": "section",
-				"attrsText": "class=\"hero\" style=\"min-height:40vh\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "n_el_fheroh1",
+			"id": "e_hbg",
 			"data": {
 				"vsgdata": {
 					"x": 600,
@@ -634,44 +1034,59 @@
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Feat Title",
-				"tag": "h1",
-				"attrsText": "",
-				"text": "Next-Gen Architecture."
-			}
-		},
-		{
-			"id": "n_el_fherop",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 800,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Feat Desc",
-				"tag": "p",
-				"attrsText": "",
-				"text": "Unleash extreme developer velocity with spatial logic mapping."
-			}
-		},
-		{
-			"id": "n_el_fgrid",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 1200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Grid Wrap",
-				"tag": "section",
-				"attrsText": "class=\"features-grid\"",
+				"name": "Hero Btn Group",
+				"tag": "div",
+				"attrsText": "class=\"btn-group\"",
 				"text": ""
 			}
 		},
 		{
-			"id": "n_el_f1",
+			"id": "e_btn1",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 500,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Btn Primary",
+				"tag": "button",
+				"attrsText": "class=\"btn primary\"",
+				"text": "Launch App"
+			}
+		},
+		{
+			"id": "e_btn2",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 700,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Btn Secondary",
+				"tag": "button",
+				"attrsText": "class=\"btn secondary\"",
+				"text": "Light Mode"
+			}
+		},
+		{
+			"id": "e_sec",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 1400,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Demo Section",
+				"tag": "section",
+				"attrsText": "",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_sh2",
 			"data": {
 				"vsgdata": {
 					"x": 600,
@@ -679,44 +1094,14 @@
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Card Spatial",
-				"tag": "div",
-				"attrsText": "class=\"feature-card\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "n_el_f1h3",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 950,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Title 1",
-				"tag": "h3",
+				"name": "Section Title",
+				"tag": "h2",
 				"attrsText": "",
-				"text": "Spatial Logic"
+				"text": "Interactive Elements"
 			}
 		},
 		{
-			"id": "n_el_f1p",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 1050,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Desc 1",
-				"tag": "p",
-				"attrsText": "",
-				"text": "Arrange structural components, visual styling vines, and Javascript logic blocks in a completely unified canvas."
-			}
-		},
-		{
-			"id": "n_el_f2",
+			"id": "e_grid",
 			"data": {
 				"vsgdata": {
 					"x": 600,
@@ -724,113 +1109,263 @@
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Card Compiler",
+				"name": "Card Grid",
 				"tag": "div",
-				"attrsText": "class=\"feature-card\"",
+				"attrsText": "class=\"grid\"",
 				"text": ""
 			}
 		},
 		{
-			"id": "n_el_f2h3",
+			"id": "e_c1",
 			"data": {
 				"vsgdata": {
 					"x": 900,
+					"y": 1100,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Flip Card 1",
+				"tag": "div",
+				"attrsText": "class=\"card\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_c1h",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
+					"y": 1050,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "C1 Title",
+				"tag": "h3",
+				"attrsText": "style=\"color:#38bdf8; font-size:1.5rem; margin-top:0;\"",
+				"text": "3D Flip Events"
+			}
+		},
+		{
+			"id": "e_c1p",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
 					"y": 1150,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Title 2",
-				"tag": "h3",
-				"attrsText": "",
-				"text": "Zero-Overhead"
+				"name": "C1 Text",
+				"tag": "p",
+				"attrsText": "style=\"color:#94a3b8\"",
+				"text": "Click this card to trigger a complex 180-degree rotation powered by spatial JS."
 			}
 		},
 		{
-			"id": "n_el_f2p",
+			"id": "e_c2",
 			"data": {
 				"vsgdata": {
 					"x": 900,
-					"y": 1250,
+					"y": 1300,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Desc 2",
-				"tag": "p",
-				"attrsText": "",
-				"text": "The custom VSG compiler parses your graph into native, highly optimized HTML/CSS/JS without any runtime bloat."
-			}
-		},
-		{
-			"id": "n_el_f3",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 1400,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Card Routing",
+				"name": "Flip Card 2",
 				"tag": "div",
-				"attrsText": "class=\"feature-card\"",
+				"attrsText": "class=\"card\"",
 				"text": ""
 			}
 		},
 		{
-			"id": "n_el_f3h3",
+			"id": "e_c2h",
 			"data": {
 				"vsgdata": {
-					"x": 900,
+					"x": 1200,
+					"y": 1250,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "C2 Title",
+				"tag": "h3",
+				"attrsText": "style=\"color:#c084fc; font-size:1.5rem; margin-top:0;\"",
+				"text": "Ripple Binding"
+			}
+		},
+		{
+			"id": "e_c2p",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
 					"y": 1350,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Title 3",
-				"tag": "h3",
-				"attrsText": "",
-				"text": "Visual Routing"
+				"name": "C2 Text",
+				"tag": "p",
+				"attrsText": "style=\"color:#94a3b8\"",
+				"text": "Dynamic calculation of bounds to spawn perfect ripple elements on click."
 			}
 		},
 		{
-			"id": "n_el_f3p",
+			"id": "e_para",
 			"data": {
 				"vsgdata": {
-					"x": 900,
-					"y": 1450,
+					"x": 600,
+					"y": 1600,
 					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Desc 3",
-				"tag": "p",
+				"name": "Parallax Container",
+				"tag": "div",
+				"attrsText": "class=\"parallax-box\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_parin",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1600,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Parallax Inner",
+				"tag": "div",
+				"attrsText": "class=\"parallax-inner\"",
+				"text": "Hover & Move Mouse"
+			}
+		},
+		{
+			"id": "e_news",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 2200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Newsletter Section",
+				"tag": "section",
 				"attrsText": "",
-				"text": "Bind JS events dynamically across hundreds of files using smart multi-edge deductive algorithms."
+				"text": ""
+			}
+		},
+		{
+			"id": "e_nbox",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 2200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Newsletter Box",
+				"tag": "div",
+				"attrsText": "class=\"newsletter\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_nh2",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 2000,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "News Title",
+				"tag": "h2",
+				"attrsText": "style=\"margin-top:0\"",
+				"text": "Join the Revolution"
+			}
+		},
+		{
+			"id": "e_nflex",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 2200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "News Form",
+				"tag": "form",
+				"attrsText": "class=\"flex-center\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_inp",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
+					"y": 2100,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Input",
+				"tag": "input",
+				"attrsText": "type=\"email\" placeholder=\"Enter your email\" required",
+				"text": ""
+			}
+		},
+		{
+			"id": "e_sbtn",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
+					"y": 2300,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Submit Button",
+				"tag": "button",
+				"attrsText": "class=\"btn primary\"",
+				"text": "Subscribe"
+			}
+		},
+		{
+			"id": "e_foot",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 2600,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Footer",
+				"tag": "footer",
+				"attrsText": "",
+				"text": "© 2026 V-Builder Inc. All rights reserved. Built with infinite spatial logic."
 			}
 		}
 	],
 	"edges": [
 		{
 			"id": "e0",
-			"srcId": "n_css_main",
-			"dstId": "n_css_body",
+			"srcId": "n_html_index",
+			"dstId": "n_css_main",
 			"data": {
-				"rootId": "n_css_main",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e1",
-			"srcId": "n_css_body",
-			"dstId": "n_css_nav",
+			"srcId": "n_html_index",
+			"dstId": "n_js_app",
 			"data": {
-				"rootId": "n_css_main",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e2",
-			"srcId": "n_css_nav",
-			"dstId": "n_css_nava",
+			"srcId": "n_css_main",
+			"dstId": "c_body",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -839,8 +1374,8 @@
 		},
 		{
 			"id": "e3",
-			"srcId": "n_css_nava",
-			"dstId": "n_css_navhover",
+			"srcId": "c_body",
+			"dstId": "c_light",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -849,8 +1384,8 @@
 		},
 		{
 			"id": "e4",
-			"srcId": "n_css_navhover",
-			"dstId": "n_css_logo",
+			"srcId": "c_light",
+			"dstId": "c_container",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -859,8 +1394,8 @@
 		},
 		{
 			"id": "e5",
-			"srcId": "n_css_logo",
-			"dstId": "n_css_navlinks",
+			"srcId": "c_container",
+			"dstId": "c_flex_center",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -869,8 +1404,8 @@
 		},
 		{
 			"id": "e6",
-			"srcId": "n_css_navlinks",
-			"dstId": "n_css_hero",
+			"srcId": "c_flex_center",
+			"dstId": "c_nav",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -879,8 +1414,8 @@
 		},
 		{
 			"id": "e7",
-			"srcId": "n_css_hero",
-			"dstId": "n_css_heroh1",
+			"srcId": "c_nav",
+			"dstId": "c_nav_light",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -889,8 +1424,8 @@
 		},
 		{
 			"id": "e8",
-			"srcId": "n_css_heroh1",
-			"dstId": "n_css_herop",
+			"srcId": "c_nav_light",
+			"dstId": "c_logo",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -899,8 +1434,8 @@
 		},
 		{
 			"id": "e9",
-			"srcId": "n_css_herop",
-			"dstId": "n_css_btn",
+			"srcId": "c_logo",
+			"dstId": "c_navlinks",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -909,8 +1444,8 @@
 		},
 		{
 			"id": "e10",
-			"srcId": "n_css_btn",
-			"dstId": "n_css_btnhov",
+			"srcId": "c_navlinks",
+			"dstId": "c_nava",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -919,8 +1454,8 @@
 		},
 		{
 			"id": "e11",
-			"srcId": "n_css_btnhov",
-			"dstId": "n_css_grid",
+			"srcId": "c_nava",
+			"dstId": "c_navahov",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -929,8 +1464,8 @@
 		},
 		{
 			"id": "e12",
-			"srcId": "n_css_grid",
-			"dstId": "n_css_card",
+			"srcId": "c_navahov",
+			"dstId": "c_hero",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -939,8 +1474,8 @@
 		},
 		{
 			"id": "e13",
-			"srcId": "n_css_card",
-			"dstId": "n_css_cardhov",
+			"srcId": "c_hero",
+			"dstId": "c_hero_bg",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -949,8 +1484,8 @@
 		},
 		{
 			"id": "e14",
-			"srcId": "n_css_cardhov",
-			"dstId": "n_css_cardh3",
+			"srcId": "c_hero_bg",
+			"dstId": "c_h1",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -959,8 +1494,8 @@
 		},
 		{
 			"id": "e15",
-			"srcId": "n_css_cardh3",
-			"dstId": "n_css_cardp",
+			"srcId": "c_h1",
+			"dstId": "c_h1_span",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -969,8 +1504,8 @@
 		},
 		{
 			"id": "e16",
-			"srcId": "n_css_cardp",
-			"dstId": "n_css_ripple",
+			"srcId": "c_h1_span",
+			"dstId": "c_hero_p",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -979,8 +1514,8 @@
 		},
 		{
 			"id": "e17",
-			"srcId": "n_css_ripple",
-			"dstId": "n_css_keyf",
+			"srcId": "c_hero_p",
+			"dstId": "c_btngroup",
 			"data": {
 				"rootId": "n_css_main",
 				"order": 0,
@@ -989,38 +1524,228 @@
 		},
 		{
 			"id": "e18",
-			"srcId": "n_js_app",
-			"dstId": "n_js_click",
+			"srcId": "c_btngroup",
+			"dstId": "c_btn",
 			"data": {
-				"rootId": "n_js_app",
+				"rootId": "n_css_main",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e19",
-			"srcId": "n_js_app",
-			"dstId": "n_js_card",
+			"srcId": "c_btn",
+			"dstId": "c_btn_pri",
 			"data": {
-				"rootId": "n_js_app",
+				"rootId": "n_css_main",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e20",
-			"srcId": "n_js_app",
-			"dstId": "n_js_nav_home",
+			"srcId": "c_btn_pri",
+			"dstId": "c_btn_pri_hov",
 			"data": {
-				"rootId": "n_js_app",
+				"rootId": "n_css_main",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e21",
+			"srcId": "c_btn_pri_hov",
+			"dstId": "c_btn_sec",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e22",
+			"srcId": "c_btn_sec",
+			"dstId": "c_btn_sec_light",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e23",
+			"srcId": "c_btn_sec_light",
+			"dstId": "c_btn_sec_hov",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e24",
+			"srcId": "c_btn_sec_hov",
+			"dstId": "c_section",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e25",
+			"srcId": "c_section",
+			"dstId": "c_sec_light",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e26",
+			"srcId": "c_sec_light",
+			"dstId": "c_h2",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e27",
+			"srcId": "c_h2",
+			"dstId": "c_grid",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e28",
+			"srcId": "c_grid",
+			"dstId": "c_card",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e29",
+			"srcId": "c_card",
+			"dstId": "c_card_light",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e30",
+			"srcId": "c_card_light",
+			"dstId": "c_card_hov",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e31",
+			"srcId": "c_card_hov",
+			"dstId": "c_para",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e32",
+			"srcId": "c_para",
+			"dstId": "c_para_in",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e33",
+			"srcId": "c_para_in",
+			"dstId": "c_news",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e34",
+			"srcId": "c_news",
+			"dstId": "c_input",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e35",
+			"srcId": "c_input",
+			"dstId": "c_input_light",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e36",
+			"srcId": "c_input_light",
+			"dstId": "c_input_foc",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e37",
+			"srcId": "c_input_foc",
+			"dstId": "c_ripple",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e38",
+			"srcId": "c_ripple",
+			"dstId": "c_keyf",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e39",
+			"srcId": "c_keyf",
+			"dstId": "c_footer",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e40",
 			"srcId": "n_js_app",
-			"dstId": "n_js_nav_feat",
+			"dstId": "j_nav",
 			"data": {
 				"rootId": "n_js_app",
 				"order": 0,
@@ -1028,359 +1753,379 @@
 			}
 		},
 		{
-			"id": "e22",
-			"srcId": "n_html_index",
-			"dstId": "n_css_main",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e23",
-			"srcId": "n_html_index",
-			"dstId": "n_js_app",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e24",
-			"srcId": "n_html_feat",
-			"dstId": "n_css_main",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e25",
-			"srcId": "n_html_feat",
-			"dstId": "n_js_app",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e26",
-			"srcId": "n_html_index",
-			"dstId": "n_el_nav",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e27",
-			"srcId": "n_html_index",
-			"dstId": "n_el_hero",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e28",
-			"srcId": "n_html_feat",
-			"dstId": "n_el_nav",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e29",
-			"srcId": "n_html_feat",
-			"dstId": "n_el_fhero",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e30",
-			"srcId": "n_html_feat",
-			"dstId": "n_el_fgrid",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 3,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e31",
-			"srcId": "n_el_nav",
-			"dstId": "n_el_logo",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e32",
-			"srcId": "n_el_nav",
-			"dstId": "n_el_links",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e33",
-			"srcId": "n_el_links",
-			"dstId": "n_el_link1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e34",
-			"srcId": "n_el_links",
-			"dstId": "n_el_link2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e35",
-			"srcId": "n_el_nav",
-			"dstId": "n_el_logo",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e36",
-			"srcId": "n_el_nav",
-			"dstId": "n_el_links",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e37",
-			"srcId": "n_el_links",
-			"dstId": "n_el_link1",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e38",
-			"srcId": "n_el_links",
-			"dstId": "n_el_link2",
-			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e39",
-			"srcId": "n_el_hero",
-			"dstId": "n_el_heroh1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e40",
-			"srcId": "n_el_hero",
-			"dstId": "n_el_herop",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
 			"id": "e41",
-			"srcId": "n_el_hero",
-			"dstId": "n_el_btn",
+			"srcId": "n_js_app",
+			"dstId": "j_rip",
 			"data": {
-				"rootId": "n_html_index",
-				"order": 3,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e42",
-			"srcId": "n_el_fhero",
-			"dstId": "n_el_fheroh1",
+			"srcId": "n_js_app",
+			"dstId": "j_flip",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e43",
-			"srcId": "n_el_fhero",
-			"dstId": "n_el_fherop",
+			"srcId": "n_js_app",
+			"dstId": "j_theme",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e44",
-			"srcId": "n_el_fgrid",
-			"dstId": "n_el_f1",
+			"srcId": "n_js_app",
+			"dstId": "j_pmv",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e45",
-			"srcId": "n_el_fgrid",
-			"dstId": "n_el_f2",
+			"srcId": "n_js_app",
+			"dstId": "j_plv",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e46",
-			"srcId": "n_el_fgrid",
-			"dstId": "n_el_f3",
+			"srcId": "n_js_app",
+			"dstId": "j_sub",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 3,
+				"rootId": "n_js_app",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e47",
-			"srcId": "n_el_f1",
-			"dstId": "n_el_f1h3",
+			"srcId": "n_html_index",
+			"dstId": "e_nav",
 			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
 				"order": 1,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e48",
-			"srcId": "n_el_f1",
-			"dstId": "n_el_f1p",
+			"srcId": "e_nav",
+			"dstId": "e_logo",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
+				"rootId": "n_html_index",
+				"order": 1,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e49",
-			"srcId": "n_el_f2",
-			"dstId": "n_el_f2h3",
+			"srcId": "e_nav",
+			"dstId": "e_links",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 1,
+				"rootId": "n_html_index",
+				"order": 2,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e50",
-			"srcId": "n_el_f2",
-			"dstId": "n_el_f2p",
+			"srcId": "e_links",
+			"dstId": "e_l1",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e51",
-			"srcId": "n_el_f3",
-			"dstId": "n_el_f3h3",
-			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
 				"order": 1,
 				"enabled": true
 			}
 		},
 		{
-			"id": "e52",
-			"srcId": "n_el_f3",
-			"dstId": "n_el_f3p",
+			"id": "e51",
+			"srcId": "e_links",
+			"dstId": "e_l2",
 			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
 				"order": 2,
 				"enabled": true
 			}
 		},
 		{
-			"id": "e53",
-			"srcId": "n_el_link1",
-			"dstId": "n_js_nav_home",
+			"id": "e52",
+			"srcId": "e_links",
+			"dstId": "e_l3",
 			"data": {
 				"rootId": "n_html_index",
-				"order": 0,
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e53",
+			"srcId": "n_html_index",
+			"dstId": "e_hero",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e54",
-			"srcId": "n_el_link1",
-			"dstId": "n_js_nav_home",
+			"srcId": "e_hero",
+			"dstId": "e_h1",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 0,
+				"rootId": "n_html_index",
+				"order": 1,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e55",
-			"srcId": "n_el_link2",
-			"dstId": "n_js_nav_feat",
+			"srcId": "e_h1",
+			"dstId": "e_h1_span",
 			"data": {
 				"rootId": "n_html_index",
-				"order": 0,
+				"order": 1,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e56",
-			"srcId": "n_el_link2",
-			"dstId": "n_js_nav_feat",
+			"srcId": "e_hero",
+			"dstId": "e_hp",
 			"data": {
-				"rootId": "n_html_feat",
-				"order": 0,
+				"rootId": "n_html_index",
+				"order": 2,
 				"enabled": true
 			}
 		},
 		{
 			"id": "e57",
-			"srcId": "n_el_btn",
-			"dstId": "n_js_click",
+			"srcId": "e_hero",
+			"dstId": "e_hbg",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e58",
+			"srcId": "e_hbg",
+			"dstId": "e_btn1",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e59",
+			"srcId": "e_hbg",
+			"dstId": "e_btn2",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e60",
+			"srcId": "n_html_index",
+			"dstId": "e_sec",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e61",
+			"srcId": "e_sec",
+			"dstId": "e_sh2",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e62",
+			"srcId": "e_sec",
+			"dstId": "e_grid",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e63",
+			"srcId": "e_grid",
+			"dstId": "e_c1",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e64",
+			"srcId": "e_grid",
+			"dstId": "e_c2",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e65",
+			"srcId": "e_c1",
+			"dstId": "e_c1h",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e66",
+			"srcId": "e_c1",
+			"dstId": "e_c1p",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e67",
+			"srcId": "e_c2",
+			"dstId": "e_c2h",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e68",
+			"srcId": "e_c2",
+			"dstId": "e_c2p",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e69",
+			"srcId": "e_sec",
+			"dstId": "e_para",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e70",
+			"srcId": "e_para",
+			"dstId": "e_parin",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e71",
+			"srcId": "n_html_index",
+			"dstId": "e_news",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 4,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e72",
+			"srcId": "e_news",
+			"dstId": "e_nbox",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e73",
+			"srcId": "e_nbox",
+			"dstId": "e_nh2",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e74",
+			"srcId": "e_nbox",
+			"dstId": "e_nflex",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e75",
+			"srcId": "e_nflex",
+			"dstId": "e_inp",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e76",
+			"srcId": "e_nflex",
+			"dstId": "e_sbtn",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e77",
+			"srcId": "n_html_index",
+			"dstId": "e_foot",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 5,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e78",
+			"srcId": "e_l1",
+			"dstId": "j_nav",
 			"data": {
 				"rootId": "n_html_index",
 				"order": 0,
@@ -1388,31 +2133,101 @@
 			}
 		},
 		{
-			"id": "e58",
-			"srcId": "n_el_f1",
-			"dstId": "n_js_card",
+			"id": "e79",
+			"srcId": "e_l2",
+			"dstId": "j_nav",
 			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "e59",
-			"srcId": "n_el_f2",
-			"dstId": "n_js_card",
+			"id": "e80",
+			"srcId": "e_l3",
+			"dstId": "j_nav",
 			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "e60",
-			"srcId": "n_el_f3",
-			"dstId": "n_js_card",
+			"id": "e81",
+			"srcId": "e_btn1",
+			"dstId": "j_rip",
 			"data": {
-				"rootId": "n_html_feat",
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e82",
+			"srcId": "e_sbtn",
+			"dstId": "j_rip",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e83",
+			"srcId": "e_btn2",
+			"dstId": "j_theme",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e84",
+			"srcId": "e_c1",
+			"dstId": "j_flip",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e85",
+			"srcId": "e_c2",
+			"dstId": "j_flip",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e86",
+			"srcId": "e_para",
+			"dstId": "j_pmv",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e87",
+			"srcId": "e_para",
+			"dstId": "j_plv",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e88",
+			"srcId": "e_sbtn",
+			"dstId": "j_sub",
+			"data": {
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}

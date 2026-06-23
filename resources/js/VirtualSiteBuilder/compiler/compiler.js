@@ -72,6 +72,7 @@ export class VsbCompiler {
                 .filter(e => graph.getNode(e.dstId)?.data.type === "JS_EVENT")
                 .map(e => graph.getNode(e.dstId));
             
+            const declaredElements = new Set();
             for (const ev of jsEvents) {
                 const inEdges = graph.inEdges(ev.id) || [];
                 const boundElements = Array.from(new Set(inEdges
@@ -81,7 +82,10 @@ export class VsbCompiler {
                 for (const el of boundElements) {
                     const elId = `vsb_${el.id}`;
                     const evType = ev.data.event || "click";
-                    content += `  const el_${elId} = document.querySelector('[data-vsb-id="${el.id}"]');\n`;
+                    if (!declaredElements.has(elId)) {
+                        content += `  const el_${elId} = document.querySelector('[data-vsb-id="${el.id}"]');\n`;
+                        declaredElements.add(elId);
+                    }
                     content += `  if (el_${elId}) {\n`;
                     content += `    el_${elId}.addEventListener('${evType}', (event) => {\n`;
                     content += `      ${(ev.data.code || "").split('\n').join('\n      ')}\n`;

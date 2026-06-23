@@ -26,7 +26,8 @@ export class VsbJsEventData extends VsbElementData {
         const events = [
             "click", "dblclick", "pointerdown", "pointerup", "pointerenter", 
             "pointerleave", "pointermove", "input", "change", "keydown", 
-            "keyup", "submit", "focus", "blur", "wheel", "contextmenu"
+            "keyup", "submit", "focus", "blur", "wheel", "contextmenu",
+            "mouseenter", "mouseleave", "mousemove", "mousedown", "mouseup", "mouseover"
         ];
         for (const ev of events) {
             const opt = document.createElement("option");
