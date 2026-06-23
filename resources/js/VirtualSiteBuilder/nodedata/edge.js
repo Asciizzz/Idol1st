@@ -109,7 +109,32 @@ export class VsbEdgeData extends VsData {
 
         element.append(visiblePath, socket, arrow, hitPath);
 
-        const cache = { visiblePath, socket, arrow, hitPath, hover: false };
+        const foreignObject = document.createElementNS(SVG_NS, "foreignObject");
+        foreignObject.setAttribute("width", "36");
+        foreignObject.setAttribute("height", "22");
+        foreignObject.setAttribute("pointer-events", "auto");
+        
+        const input = document.createElement("input");
+        input.type = "text";
+        Object.assign(input.style, {
+            width: "100%", height: "100%", margin: "0", padding: "0",
+            textAlign: "center", fontSize: "12px", fontWeight: "bold",
+            background: "#18191c", color: "#d8dde8", 
+            border: "1px solid #3a3b40", borderRadius: "3px", outline: "none",
+            boxSizing: "border-box"
+        });
+
+        input.addEventListener("pointerdown", e => e.stopPropagation());
+        input.addEventListener("change", e => {
+            const val = parseInt(e.target.value, 10);
+            edge.data.order = isNaN(val) ? 0 : val;
+            e.target.value = edge.data.order;
+        });
+
+        foreignObject.append(input);
+        element.append(foreignObject);
+
+        const cache = { visiblePath, socket, arrow, hitPath, foreignObject, input, hover: false };
 
         hitPath.addEventListener("pointerenter", () => {
             cache.hover = true;
@@ -157,13 +182,25 @@ export class VsbEdgeData extends VsData {
         const bothFiles = isFileNode(srcNode.data?.type) && isFileNode(dstNode.data?.type);
 
         let pathD;
+        let midX, midY;
         if (bothFiles) {
             pathD = `M ${src.x} ${src.y} L ${dst.x} ${dst.y}`;
             cache.arrow.setAttribute("points", _arrowPoints(dst, src));
+            midX = (src.x + dst.x) / 2;
+            midY = (src.y + dst.y) / 2;
         } else {
             const controls = _cubicControls(src, dst);
             pathD = `M ${src.x} ${src.y} C ${controls.c1.x} ${controls.c1.y} ${controls.c2.x} ${controls.c2.y} ${dst.x} ${dst.y}`;
             cache.arrow.setAttribute("points", _arrowPoints(dst, controls.c2));
+            midX = 0.125 * src.x + 0.375 * controls.c1.x + 0.375 * controls.c2.x + 0.125 * dst.x;
+            midY = 0.125 * src.y + 0.375 * controls.c1.y + 0.375 * controls.c2.y + 0.125 * dst.y;
+        }
+
+        cache.foreignObject.setAttribute("x", String(midX - 18));
+        cache.foreignObject.setAttribute("y", String(midY - 11));
+
+        if (document.activeElement !== cache.input) {
+            cache.input.value = edge.data?.order ?? 0;
         }
 
         // Determine color
