@@ -10,5 +10,6 @@ export class VsbCtx {
         this.showEdgeInputs = true;
         this.showNodeInputs = false;
         this.showEventEdges = true;
+        this.showPreview = false;
     }
 }

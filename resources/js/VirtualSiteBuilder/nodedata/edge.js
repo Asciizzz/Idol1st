@@ -224,7 +224,7 @@ export class VsbEdgeData extends VsData {
         }
 
         const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
-        const opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
+        let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
         cache.visiblePath.setAttribute("d", pathD);
 

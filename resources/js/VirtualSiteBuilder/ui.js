@@ -1,4 +1,5 @@
 import * as nodetypes from "./nodedata/index.js";
+import { VsbCompiler } from "./compiler/compiler.js";
 
 export class VsbUI {
     constructor(vsgraph) {
@@ -43,6 +44,89 @@ export class VsbUI {
         this.addDefault = "ADD_ELEMENT";
         this.edgeDefault = "EDGE_ADD";
         this.activeSubMenu = null;
+
+        // Setup Preview Panel
+        this.previewPanelWidth = 50;
+        this.previewLogHeight = 150;
+        this.previewActiveHtml = null;
+
+        this.previewPanel = document.createElement("div");
+        Object.assign(this.previewPanel.style, {
+            position: "absolute", top: "0", right: "0", bottom: "0", width: `${this.previewPanelWidth}%`,
+            background: "#1e1e21", borderLeft: "2px solid #3a3b40",
+            display: "flex", flexDirection: "column", zIndex: "900",
+            pointerEvents: "auto", boxShadow: "-4px 0 16px rgba(0,0,0,0.5)",
+            fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
+        });
+
+        this.previewResizerX = document.createElement("div");
+        Object.assign(this.previewResizerX.style, {
+            position: "absolute", top: "0", left: "-4px", bottom: "0", width: "8px",
+            cursor: "ew-resize", zIndex: "901", background: "transparent"
+        });
+        this.previewPanel.append(this.previewResizerX);
+
+        this.previewTabs = document.createElement("div");
+        Object.assign(this.previewTabs.style, {
+            display: "flex", background: "#111112", borderBottom: "1px solid #3a3b40", padding: "8px 8px 0 8px", gap: "4px"
+        });
+
+        this.previewContent = document.createElement("div");
+        Object.assign(this.previewContent.style, {
+            flex: "1", position: "relative", background: "#18191c"
+        });
+
+        this.previewPanel.append(this.previewTabs, this.previewContent);
+        document.body.appendChild(this.previewPanel);
+
+        this.previewActiveTab = "preview";
+        this.previewActiveTab = "preview";
+        this.compiledData = null;
+        this.compileTimer = null;
+
+        this.triggerCompile = () => {
+            if (this.compileTimer) clearTimeout(this.compileTimer);
+            this.compileTimer = setTimeout(() => {
+                this.compiledData = VsbCompiler.compile(this.vsgraph.graph);
+                this.renderPreviewContent();
+            }, 100);
+        };
+
+        this.vsgraph.root.addEventListener("change", () => this.triggerCompile());
+
+        let isResizingX = false;
+        let isResizingY = false;
+
+        this.previewResizerX.addEventListener("pointerdown", (e) => {
+            isResizingX = true;
+            e.preventDefault();
+        });
+
+        document.addEventListener("pointermove", (e) => {
+            if (isResizingX) {
+                let newWidth = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
+                newWidth = Math.max(10, Math.min(newWidth, 90));
+                this.previewPanelWidth = newWidth;
+                this.previewPanel.style.width = `${newWidth}%`;
+                if (this.currentIframe) this.currentIframe.style.pointerEvents = "none";
+            }
+            if (isResizingY) {
+                let newHeight = window.innerHeight - e.clientY;
+                newHeight = Math.max(20, Math.min(newHeight, window.innerHeight - 100));
+                this.previewLogHeight = newHeight;
+                if (this.currentLogDiv) this.currentLogDiv.style.height = `${newHeight}px`;
+                if (this.currentIframe) this.currentIframe.style.pointerEvents = "none";
+            }
+        });
+
+        document.addEventListener("pointerup", () => {
+            isResizingX = false;
+            isResizingY = false;
+            if (this.currentIframe) this.currentIframe.style.pointerEvents = "auto";
+        });
+
+        // Disable default context menu across the editor
+        document.addEventListener("contextmenu", e => e.preventDefault());
 
         this.render();
 
@@ -91,6 +175,7 @@ export class VsbUI {
                     if (resolvedSrc && resolvedDst) {
                         this.vsgraph.graph.addEdge(resolvedSrc, resolvedDst, { data: new nodetypes.VsbEdgeData() });
                         this.vsgraph.render();
+                        this.triggerCompile();
                     }
                 }
                 
@@ -147,38 +232,48 @@ export class VsbUI {
                 node.data.vsgdata.x = pos.x;
                 node.data.vsgdata.y = pos.y;
                 this.vsgraph.render();
+                this.triggerCompile();
             };
 
-            if (this.ctx.mode === "DELETE") {
+            if (this.ctx.mode === "DELETE" && e.button === 0) {
                 if (clickedNodeId) {
                     this.vsgraph.graph.removeNode(clickedNodeId);
                     this.vsgraph.render();
+                    this.triggerCompile();
                     e.preventDefault();
                     e.stopPropagation();
                 } else if (clickedEdgeId) {
                     this.vsgraph.graph.removeEdge(clickedEdgeId);
                     this.vsgraph.render();
+                    this.triggerCompile();
                     e.preventDefault();
                     e.stopPropagation();
                 }
-            } else if (this.ctx.mode === "EDGE_ADD") {
+            } else if (this.ctx.mode === "EDGE_ADD" && e.button === 0) {
                 if (clickedNodeId) {
                     this.ctx.dragEdgeSrcId = clickedNodeId;
                     e.preventDefault();
                     e.stopPropagation();
                 }
-            } else if (this.ctx.mode === "EDGE_PAINT") {
+            } else if (this.ctx.mode === "EDGE_PAINT" && e.button === 0) {
                 if (clickedEdgeId && this.ctx.selectedFileNodeId) {
                     const edge = this.vsgraph.graph.getEdge(clickedEdgeId);
                     if (edge && edge.data.rootId !== this.ctx.selectedFileNodeId) {
                         edge.data.rootId = this.ctx.selectedFileNodeId;
                         this.vsgraph.render();
+                        this.triggerCompile();
                     }
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (this.ctx.mode.startsWith("ADD_")) {
-                if (!clickedNodeId && !clickedEdgeId) {
+                if (e.button === 2 && clickedNodeId) {
+                    this.vsgraph.graph.removeNode(clickedNodeId);
+                    this.vsgraph.render();
+                    this.triggerCompile();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.button === 0 && !clickedNodeId && !clickedEdgeId) {
                     const type = this.ctx.mode.substring(4);
                     if (type === "HTML") addNodeAtClick(nodetypes.VsbHtmlFileData);
                     else if (type === "CSS") addNodeAtClick(nodetypes.VsbCssFileData);
@@ -221,10 +316,150 @@ export class VsbUI {
                     if (edge && edge.data.rootId !== this.ctx.selectedFileNodeId) {
                         edge.data.rootId = this.ctx.selectedFileNodeId;
                         this.vsgraph.render();
+                        this.triggerCompile();
                     }
                 }
             }
         });
+    }
+
+    renderPreviewContent() {
+        if (!this.compiledData) return;
+
+        this.previewTabs.innerHTML = "";
+        const tabs = ["preview", "html", "css", "js"];
+        
+        for (const tab of tabs) {
+            const btn = document.createElement("div");
+            btn.textContent = tab.toUpperCase();
+            Object.assign(btn.style, {
+                padding: "6px 12px", cursor: "pointer", fontWeight: "bold", fontSize: "12px",
+                background: this.previewActiveTab === tab ? "#1e1e21" : "transparent",
+                color: this.previewActiveTab === tab ? "#fff" : "#8b93a7",
+                borderTopLeftRadius: "4px", borderTopRightRadius: "4px",
+                border: "1px solid transparent",
+                borderBottom: "none"
+            });
+            if (this.previewActiveTab === tab) {
+                btn.style.borderColor = "#3a3b40";
+            }
+            btn.onclick = () => {
+                this.previewActiveTab = tab;
+                this.renderPreviewContent();
+            };
+            this.previewTabs.append(btn);
+        }
+
+        const spacer = document.createElement("div");
+        spacer.style.flex = "1";
+        this.previewTabs.append(spacer);
+
+        const htmlFileNames = Object.keys(this.compiledData.htmlFiles);
+        if (!this.previewActiveHtml || !htmlFileNames.includes(this.previewActiveHtml)) {
+            this.previewActiveHtml = htmlFileNames[0] || null;
+        }
+
+        if (htmlFileNames.length > 0) {
+            const selectHtml = document.createElement("select");
+            Object.assign(selectHtml.style, {
+                background: "#18191c", color: "#d8dde8", border: "1px solid #3a3b40",
+                padding: "2px 6px", fontSize: "11px", outline: "none", borderRadius: "3px",
+                marginRight: "8px", alignSelf: "center", cursor: "pointer"
+            });
+            for (const fn of htmlFileNames) {
+                const opt = document.createElement("option");
+                opt.value = fn;
+                opt.textContent = fn;
+                if (fn === this.previewActiveHtml) opt.selected = true;
+                selectHtml.append(opt);
+            }
+            selectHtml.onchange = (e) => {
+                this.previewActiveHtml = e.target.value;
+                this.renderPreviewContent();
+            };
+            this.previewTabs.append(selectHtml);
+        }
+
+        this.previewContent.innerHTML = "";
+        
+        if (!this.compiledData) {
+            this.previewContent.innerHTML = "<div style='color: #8b93a7; padding: 20px; text-align: center; font-style: italic;'>Graph is empty. Start adding nodes to compile the site.</div>";
+            return;
+        }
+        
+        const createTextArea = (val) => {
+            const ta = document.createElement("textarea");
+            Object.assign(ta.style, {
+                position: "absolute", top: "0", left: "0", right: "0", bottom: "0",
+                width: "100%", height: "100%", boxSizing: "border-box", padding: "16px",
+                background: "transparent", color: "#d8dde8", border: "none", outline: "none",
+                resize: "none", fontFamily: "inherit", fontSize: "12px", whiteSpace: "pre"
+            });
+            ta.readOnly = true;
+            ta.value = val;
+            return ta;
+        };
+
+        if (this.previewActiveTab === "preview") {
+            const wrapper = document.createElement("div");
+            Object.assign(wrapper.style, {
+                position: "absolute", top: "0", left: "0", right: "0", bottom: "0",
+                display: "flex", flexDirection: "column"
+            });
+
+            this.currentIframe = document.createElement("iframe");
+            Object.assign(this.currentIframe.style, {
+                flex: "1", border: "none", background: "#fff", width: "100%"
+            });
+            this.currentIframe.srcdoc = VsbCompiler.generatePreviewHtml(this.compiledData, this.previewActiveHtml);
+            wrapper.append(this.currentIframe);
+
+            const resizerWrapper = document.createElement("div");
+            Object.assign(resizerWrapper.style, { position: "relative" });
+
+            const logResizer = document.createElement("div");
+            Object.assign(logResizer.style, {
+                position: "absolute", top: "-4px", left: "0", right: "0", height: "8px",
+                cursor: "ns-resize", zIndex: "10", background: "transparent"
+            });
+            logResizer.addEventListener("pointerdown", (e) => {
+                isResizingY = true;
+                e.preventDefault();
+            });
+            resizerWrapper.append(logResizer);
+            wrapper.append(resizerWrapper);
+
+            this.currentLogDiv = document.createElement("div");
+            Object.assign(this.currentLogDiv.style, { 
+                height: `${this.previewLogHeight}px`, borderTop: "2px solid #3a3b40",
+                padding: "8px", display: "flex", flexDirection: "column", gap: "4px",
+                overflowY: "auto", background: "#111112", fontSize: "11px"
+            });
+            if (this.compiledData.logs.length === 0) {
+                this.currentLogDiv.innerHTML = "<span style='color: #8b93a7; font-style: italic;'>[Console] Build successful. No warnings.</span>";
+            } else {
+                for (const log of this.compiledData.logs) {
+                    const l = document.createElement("div");
+                    l.textContent = `[${log.level.toUpperCase()}] ${log.msg}`;
+                    l.style.color = log.level === "warn" ? "#f7df1e" : "#ff4d4d";
+                    this.currentLogDiv.append(l);
+                }
+            }
+            wrapper.append(this.currentLogDiv);
+            this.previewContent.append(wrapper);
+        } else {
+            const filesObj = this.compiledData[`${this.previewActiveTab}Files`];
+            const fileNames = Object.keys(filesObj);
+            let val = "";
+            if (fileNames.length === 0) {
+                val = `No ${this.previewActiveTab.toUpperCase()} files generated.`;
+            } else {
+                for (const fn of fileNames) {
+                    val += `/* --- ${fn} --- */\n\n${filesObj[fn]}\n\n`;
+                }
+            }
+            this.previewContent.append(createTextArea(val));
+        }
     }
 
     setMode(mode) {
@@ -628,7 +863,12 @@ export class VsbUI {
             }
             toolbarRow.append(subRow);
         }
-
+        
         this.container.append(toolbarRow);
+
+        this.previewPanel.style.display = "flex";
+        if (!this.compiledData) {
+            this.triggerCompile();
+        }
     }
 }
