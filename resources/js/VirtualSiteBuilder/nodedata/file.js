@@ -13,7 +13,8 @@ export class VsbFileData extends VsbNodeData {
         const { element, cache } = VsbNodeData.createFn({ node, graph, vsgraph });
 
         const header = document.createElement("header");
-        const title  = document.createElement("div");
+        const title  = document.createElement("input");
+        title.type = "text";
         const meta   = document.createElement("div");
         const body   = document.createElement("div");
 
@@ -28,11 +29,37 @@ export class VsbFileData extends VsbNodeData {
             boxShadow:      "inset 0 -1px rgba(255, 255, 255, 0.06)",
         });
         Object.assign(title.style, {
+            flex:         "1 1 auto",
             minWidth:     "0",
             overflow:     "hidden",
             textOverflow: "ellipsis",
             whiteSpace:   "nowrap",
             fontWeight:   "650",
+            background:   "transparent",
+            border:       "none",
+            outline:      "none",
+            padding:      "0",
+            margin:       "0",
+            fontFamily:   "inherit",
+            fontSize:     "inherit",
+            fontWeight:   "650",
+            cursor:       "text",
+            color:        "inherit",
+            userSelect:   "auto"
+        });
+        
+        title.addEventListener("change", e => {
+            node.data.name = e.target.value;
+            if (vsgraph) vsgraph.render();
+        });
+        title.addEventListener("pointerdown", e => {
+            if (document.activeElement === title) {
+                e.stopPropagation();
+            }
+        });
+        title.addEventListener("keydown", e => {
+            e.stopPropagation();
+            if (e.key === "Enter") title.blur();
         });
         Object.assign(meta.style, {
             flex:          "0 0 auto",
@@ -82,13 +109,20 @@ export class VsbFileData extends VsbNodeData {
         cache.title.style.color = textColor;
         cache.meta.style.color = metaColor;
 
-        cache.title.textContent = node.data.name ?? node.id;
+        if (document.activeElement !== cache.title) {
+            cache.title.value = node.data.name ?? node.id;
+        }
         cache.meta.textContent  = this._fileTypeName();
 
-        const bodyText = this._bodyText(node);
+        const bodyText = this._bodyText?.(node, graph);
         const collapsed = node.data.vsgdata?.collapsed ?? false;
-        cache.body.hidden      = collapsed || bodyText === "";
-        cache.body.textContent = bodyText;
+        
+        if (bodyText !== undefined) {
+            cache.body.textContent = bodyText;
+            cache.body.hidden = collapsed || bodyText === "";
+        } else {
+            cache.body.hidden = collapsed;
+        }
     }
 
     static _bodyText(node) {

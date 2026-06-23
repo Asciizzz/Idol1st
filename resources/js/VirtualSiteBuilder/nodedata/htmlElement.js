@@ -1,106 +1,91 @@
-import { VsbNodeData, VsbNodeType } from "./node.js";
+import { VsbNodeType, autoExpand, inputStyle, textAreaStyle, createLabel } from "./node.js";
+import { VsbElementData } from "./elementNode.js";
 
-export class VsbHtmlElementData extends VsbNodeData {
-    constructor({ tag = "div", attrs = {}, text = "", jsEventIds = [], name = "New Element", vsgdata = {} } = {}) {
+export class VsbHtmlElementData extends VsbElementData {
+    constructor({ tag = "div", attrs = {}, attrsText = "", text = "", jsEventIds = [], name = "New Element", vsgdata = {} } = {}) {
         super({ type: VsbNodeType.ELEMENT, name, vsgdata });
         this.tag        = tag;
         this.attrs      = attrs ?? {};
         this.text       = text;
         this.jsEventIds = jsEventIds ?? [];
+
+        if (!attrsText && this.attrs && Object.keys(this.attrs).length > 0) {
+            this.attrsText = Object.entries(this.attrs).map(([k,v]) => `${k}: "${v}"`).join(", ");
+        } else {
+            this.attrsText = attrsText;
+        }
     }
 
     static createFn({ node, graph, vsgraph }) {
-        const { element, cache } = VsbNodeData.createFn({ node, graph, vsgraph });
+        const { element, cache } = VsbElementData.createFn({ node, graph, vsgraph });
 
-        const header   = document.createElement("header");
-        const title    = document.createElement("div");
-        const controls = document.createElement("div");
-        const input    = document.createElement("input");
-        const body     = document.createElement("div");
-
-        Object.assign(header.style, {
-            display:        "flex",
-            alignItems:     "center",
-            minHeight:      "24px",
-            padding:        "5px 9px",
-            background:     "#303137",
-            boxShadow:      "inset 0 -1px rgba(255, 255, 255, 0.06)",
-        });
-        Object.assign(title.style, {
-            minWidth:     "0",
-            overflow:     "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace:   "nowrap",
-            fontWeight:   "650",
-            color:        "#fff",
-        });
-        
-        Object.assign(controls.style, {
-            padding:      "6px 9px",
-            background:   "#25262a",
-            borderBottom: "1px solid rgba(0,0,0,0.2)"
-        });
-        Object.assign(input.style, {
-            width:        "100%",
-            boxSizing:    "border-box",
-            background:   "#18191c",
-            border:       "1px solid #3a3b40",
-            color:        "#d8dde8",
-            padding:      "3px 6px",
-            fontSize:     "11px",
-            fontFamily:   "ui-monospace, SFMono-Regular, Consolas, monospace",
-            outline:      "none",
-            borderRadius: "3px"
-        });
-        
-        // Prevent drag handler from stealing focus
-        input.addEventListener("pointerdown", e => e.stopPropagation());
-        input.addEventListener("change", e => {
+        const tagLabel = createLabel("HTML Tag");
+        tagLabel.style.marginTop = "0";
+        const tagInput = document.createElement("input");
+        Object.assign(tagInput.style, inputStyle);
+        tagInput.addEventListener("pointerdown", e => e.stopPropagation());
+        tagInput.addEventListener("keydown", e => e.stopPropagation());
+        tagInput.addEventListener("change", e => {
             node.data.tag = e.target.value;
             if (vsgraph) vsgraph.render();
         });
 
-        Object.assign(body.style, {
-            padding:      "8px 9px 9px",
-            color:        "#b9c0ce",
-            font:         "11px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace",
-            background:   "#232428",
-            overflowWrap: "anywhere",
+        const attrsLabel = createLabel("Attributes");
+        const attrsInput = document.createElement("textarea");
+        attrsInput.rows = 1;
+        Object.assign(attrsInput.style, textAreaStyle);
+        attrsInput.style.color = "#8b93a7";
+        attrsInput.placeholder = 'class: "btn", id: "app"';
+        attrsInput.addEventListener("pointerdown", e => e.stopPropagation());
+        attrsInput.addEventListener("keydown", e => e.stopPropagation());
+        attrsInput.addEventListener("input", e => autoExpand(e.target));
+        attrsInput.addEventListener("change", e => {
+            node.data.attrsText = e.target.value;
+            if (vsgraph) vsgraph.render();
         });
 
-        header.append(title);
-        controls.append(input);
-        element.append(header, controls, body);
+        const textLabel = createLabel("Inner Text");
+        const textInput = document.createElement("textarea");
+        textInput.rows = 1;
+        Object.assign(textInput.style, textAreaStyle);
+        textInput.placeholder = 'Inner text...';
+        textInput.addEventListener("pointerdown", e => e.stopPropagation());
+        textInput.addEventListener("keydown", e => e.stopPropagation());
+        textInput.addEventListener("input", e => autoExpand(e.target));
+        textInput.addEventListener("change", e => {
+            node.data.text = e.target.value;
+            if (vsgraph) vsgraph.render();
+        });
 
-        cache.header = header;
-        cache.title  = title;
-        cache.input  = input;
-        cache.body   = body;
+        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput);
+
+        cache.tagInput   = tagInput;
+        cache.attrsInput = attrsInput;
+        cache.textInput  = textInput;
 
         return { element, cache };
     }
 
     static renderFn({ node, element, graph, vsgraph, cache, ctx }) {
-        VsbNodeData.renderFn({ node, element, graph, vsgraph, cache, ctx });
+        VsbElementData.renderFn({ node, element, graph, vsgraph, cache, ctx });
 
         const data = node.data;
-        cache.title.textContent = data.name ?? node.id;
-        
-        if (document.activeElement !== cache.input) {
-            cache.input.value = data.tag ?? "div";
-        }
+        const collapsed = data.vsgdata?.collapsed ?? false;
 
-        const lines = [];
-        if (data.text) lines.push(data.text);
-        const attrs = data.attrs;
-        if (attrs && typeof attrs === "object") {
-            for (const [k, v] of Object.entries(attrs)) {
-                lines.push(`${k}="${v}"`);
+        if (!collapsed) {
+            if (document.activeElement !== cache.tagInput) {
+                cache.tagInput.value = data.tag ?? "div";
+            }
+
+            if (document.activeElement !== cache.attrsInput) {
+                cache.attrsInput.value = data.attrsText ?? "";
+                autoExpand(cache.attrsInput);
+            }
+
+            if (document.activeElement !== cache.textInput) {
+                cache.textInput.value = data.text ?? "";
+                autoExpand(cache.textInput);
             }
         }
-        const bodyText = lines.join("\n");
-        const collapsed = data.vsgdata?.collapsed ?? false;
-        cache.body.hidden      = collapsed || bodyText === "";
-        cache.body.textContent = bodyText;
     }
 }

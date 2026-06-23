@@ -1,5 +1,45 @@
 import { VsData } from "../../Alib/VsGraph/VsData.js";
 
+export function autoExpand(ta) {
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+}
+
+export const inputStyle = {
+    width:        "100%",
+    boxSizing:    "border-box",
+    background:   "#18191c",
+    border:       "1px solid #3a3b40",
+    color:        "#d8dde8",
+    padding:      "5px 7px",
+    fontSize:     "11px",
+    lineHeight:   "1.7",
+    fontFamily:   "ui-monospace, SFMono-Regular, Consolas, monospace",
+    outline:      "none",
+    borderRadius: "3px"
+};
+
+export const textAreaStyle = {
+    ...inputStyle,
+    resize:       "none",
+    overflow:     "hidden"
+};
+
+export const createLabel = (text) => {
+    const label = document.createElement("div");
+    label.textContent = text;
+    Object.assign(label.style, {
+        fontSize:      "9px",
+        fontWeight:    "bold",
+        color:         "#72798a",
+        textTransform: "uppercase",
+        letterSpacing: "0.5px",
+        marginBottom:  "3px",
+        marginTop:     "8px"
+    });
+    return label;
+};
+
 export const VsbNodeType = Object.freeze({
     HTML:      "HTML",
     ELEMENT:   "ELEMENT",
