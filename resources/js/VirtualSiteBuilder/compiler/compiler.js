@@ -74,9 +74,9 @@ export class VsbCompiler {
             
             for (const ev of jsEvents) {
                 const inEdges = graph.inEdges(ev.id) || [];
-                const boundElements = inEdges
+                const boundElements = Array.from(new Set(inEdges
                     .filter(e => graph.getNode(e.srcId)?.data.type === "ELEMENT")
-                    .map(e => graph.getNode(e.srcId));
+                    .map(e => graph.getNode(e.srcId))));
                 
                 for (const el of boundElements) {
                     const elId = `vsb_${el.id}`;
@@ -148,15 +148,15 @@ export class VsbCompiler {
                     .map(e => graph.getNode(e.dstId));
 
                 // Validate events attached to this element
-                const attachedEvents = elOutEdges
+                const attachedEvents = Array.from(new Set(elOutEdges
                     .filter(e => graph.getNode(e.dstId)?.data.type === "JS_EVENT")
-                    .map(e => graph.getNode(e.dstId));
+                    .map(e => graph.getNode(e.dstId))));
                 
                 for (const ev of attachedEvents) {
                     const evInEdges = graph.inEdges(ev.id) || [];
-                    const ownerJsNodes = evInEdges
+                    const ownerJsNodes = Array.from(new Set(evInEdges
                         .filter(e => graph.getNode(e.srcId)?.data.type === "JS")
-                        .map(e => graph.getNode(e.srcId));
+                        .map(e => graph.getNode(e.srcId))));
                     
                     if (ownerJsNodes.length > 0) {
                         const isIncluded = ownerJsNodes.some(js => includedJs.some(inc => inc.id === js.id));

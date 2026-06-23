@@ -94,23 +94,23 @@ export class VsbUI {
 
         this.vsgraph.root.addEventListener("change", () => this.triggerCompile());
 
-        let isResizingX = false;
-        let isResizingY = false;
+        this.isResizingX = false;
+        this.isResizingY = false;
 
         this.previewResizerX.addEventListener("pointerdown", (e) => {
-            isResizingX = true;
+            this.isResizingX = true;
             e.preventDefault();
         });
 
         document.addEventListener("pointermove", (e) => {
-            if (isResizingX) {
+            if (this.isResizingX) {
                 let newWidth = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
                 newWidth = Math.max(10, Math.min(newWidth, 90));
                 this.previewPanelWidth = newWidth;
                 this.previewPanel.style.width = `${newWidth}%`;
                 if (this.currentIframe) this.currentIframe.style.pointerEvents = "none";
             }
-            if (isResizingY) {
+            if (this.isResizingY) {
                 let newHeight = window.innerHeight - e.clientY;
                 newHeight = Math.max(20, Math.min(newHeight, window.innerHeight - 100));
                 this.previewLogHeight = newHeight;
@@ -120,8 +120,8 @@ export class VsbUI {
         });
 
         document.addEventListener("pointerup", () => {
-            isResizingX = false;
-            isResizingY = false;
+            this.isResizingX = false;
+            this.isResizingY = false;
             if (this.currentIframe) this.currentIframe.style.pointerEvents = "auto";
         });
 
@@ -423,7 +423,7 @@ export class VsbUI {
                 cursor: "ns-resize", zIndex: "10", background: "transparent"
             });
             logResizer.addEventListener("pointerdown", (e) => {
-                isResizingY = true;
+                this.isResizingY = true;
                 e.preventDefault();
             });
             resizerWrapper.append(logResizer);

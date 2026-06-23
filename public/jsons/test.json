@@ -1,289 +1,1418 @@
 {
-	"label": "vsb_demo",
-	"_nextNodeId": 12,
-	"_nextEdgeId": 11,
+	"label": "Idol1st Showcase",
+	"_nextNodeId": 48,
+	"_nextEdgeId": 61,
 	"nodes": [
 		{
-			"id": "vsb_demo_n0",
+			"id": "n_html_index",
 			"data": {
 				"vsgdata": {
-					"x": 280,
-					"y": -140,
-					"z": 2,
-					"fileColor": "#00ffff"
+					"x": 0,
+					"y": 0,
+					"z": 0
 				},
 				"type": "HTML",
-				"name": "home.html",
-				"slug": "home"
+				"name": "index.html"
 			}
 		},
 		{
-			"id": "vsb_demo_n1",
+			"id": "n_html_feat",
 			"data": {
 				"vsgdata": {
-					"x": 280,
-					"y": 130,
-					"z": 2,
-					"fileColor": "#ff0000"
+					"x": 0,
+					"y": 800,
+					"z": 0
 				},
 				"type": "HTML",
-				"name": "about.html",
-				"slug": "about"
+				"name": "features.html"
 			}
 		},
 		{
-			"id": "vsb_demo_n2",
+			"id": "n_css_main",
 			"data": {
 				"vsgdata": {
-					"x": -260,
-					"y": -190,
-					"fileColor": "#ffeb8f"
+					"x": -400,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS",
+				"name": "main.css"
+			}
+		},
+		{
+			"id": "n_js_app",
+			"data": {
+				"vsgdata": {
+					"x": -400,
+					"y": -200,
+					"z": 0
 				},
 				"type": "JS",
 				"name": "app.js"
 			}
 		},
 		{
-			"id": "vsb_demo_n3",
+			"id": "n_css_body",
 			"data": {
 				"vsgdata": {
-					"x": -260,
-					"y": 20,
-					"fileColor": "#ffff00"
+					"x": -700,
+					"y": 0,
+					"z": 0
 				},
-				"type": "CSS",
-				"name": "base.css"
+				"type": "CSS_RULE",
+				"name": "body",
+				"selector": "body",
+				"declarations": {
+					"margin": "0",
+					"font-family": "\"Outfit\", \"Inter\", sans-serif",
+					"background": "#0a0a0f",
+					"color": "#e2e8f0",
+					"overflow-x": "hidden",
+					"transition": "opacity 0.4s ease-in-out"
+				}
 			}
 		},
 		{
-			"id": "vsb_demo_n4",
+			"id": "n_css_nav",
 			"data": {
 				"vsgdata": {
-					"x": -260,
-					"y": 230,
-					"fileColor": "#75bdff"
+					"x": -1000,
+					"y": 0,
+					"z": 0
 				},
-				"type": "CSS",
-				"name": "theme.css"
+				"type": "CSS_RULE",
+				"name": "nav",
+				"selector": "nav",
+				"declarations": {
+					"display": "flex",
+					"justify-content": "space-between",
+					"align-items": "center",
+					"padding": "20px 60px",
+					"background": "rgba(10, 10, 15, 0.8)",
+					"backdrop-filter": "blur(12px)",
+					"border-bottom": "1px solid rgba(255, 255, 255, 0.05)",
+					"position": "sticky",
+					"top": "0",
+					"z-index": "100"
+				}
 			}
 		},
 		{
-			"id": "vsb_demo_n5",
+			"id": "n_css_nava",
 			"data": {
 				"vsgdata": {
-					"x": 560,
-					"y": -20
+					"x": -1300,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "nav .nav-link, nav .logo",
+				"selector": "nav .nav-link, nav .logo",
+				"declarations": {
+					"color": "#f8fafc",
+					"text-decoration": "none",
+					"font-weight": "600",
+					"cursor": "pointer",
+					"transition": "color 0.2s ease"
+				}
+			}
+		},
+		{
+			"id": "n_css_navhover",
+			"data": {
+				"vsgdata": {
+					"x": -1600,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "nav .nav-link:hover",
+				"selector": "nav .nav-link:hover",
+				"declarations": {
+					"color": "#60a5fa",
+					"text-shadow": "0 0 10px rgba(96, 165, 250, 0.5)"
+				}
+			}
+		},
+		{
+			"id": "n_css_logo",
+			"data": {
+				"vsgdata": {
+					"x": -1900,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".logo",
+				"selector": ".logo",
+				"declarations": {
+					"font-size": "1.5rem",
+					"font-weight": "800",
+					"background": "linear-gradient(to right, #60a5fa, #c084fc)",
+					"-webkit-background-clip": "text",
+					"-webkit-text-fill-color": "transparent"
+				}
+			}
+		},
+		{
+			"id": "n_css_navlinks",
+			"data": {
+				"vsgdata": {
+					"x": -2200,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "nav .links",
+				"selector": "nav .links",
+				"declarations": {
+					"display": "flex",
+					"gap": "32px"
+				}
+			}
+		},
+		{
+			"id": "n_css_hero",
+			"data": {
+				"vsgdata": {
+					"x": -2500,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".hero",
+				"selector": ".hero",
+				"declarations": {
+					"min-height": "80vh",
+					"display": "flex",
+					"flex-direction": "column",
+					"justify-content": "center",
+					"align-items": "center",
+					"text-align": "center",
+					"padding": "0 20px",
+					"background": "radial-gradient(circle at 50% -20%, rgba(56, 189, 248, 0.15) 0%, rgba(10, 10, 15, 0) 60%)"
+				}
+			}
+		},
+		{
+			"id": "n_css_heroh1",
+			"data": {
+				"vsgdata": {
+					"x": -2800,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".hero h1",
+				"selector": ".hero h1",
+				"declarations": {
+					"font-size": "4.5rem",
+					"line-height": "1.1",
+					"font-weight": "800",
+					"margin-bottom": "24px",
+					"letter-spacing": "-0.02em",
+					"background": "linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)",
+					"-webkit-background-clip": "text",
+					"-webkit-text-fill-color": "transparent"
+				}
+			}
+		},
+		{
+			"id": "n_css_herop",
+			"data": {
+				"vsgdata": {
+					"x": -3100,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".hero p",
+				"selector": ".hero p",
+				"declarations": {
+					"font-size": "1.25rem",
+					"color": "#94a3b8",
+					"max-width": "600px",
+					"margin-bottom": "40px",
+					"line-height": "1.6"
+				}
+			}
+		},
+		{
+			"id": "n_css_btn",
+			"data": {
+				"vsgdata": {
+					"x": -3400,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".btn",
+				"selector": ".btn",
+				"declarations": {
+					"padding": "16px 36px",
+					"border-radius": "999px",
+					"background": "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+					"color": "#fff",
+					"font-weight": "600",
+					"font-size": "1.1rem",
+					"cursor": "pointer",
+					"box-shadow": "0 4px 20px rgba(139, 92, 246, 0.4)",
+					"transition": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+					"position": "relative",
+					"overflow": "hidden"
+				}
+			}
+		},
+		{
+			"id": "n_css_btnhov",
+			"data": {
+				"vsgdata": {
+					"x": -3700,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".btn:hover",
+				"selector": ".btn:hover",
+				"declarations": {
+					"transform": "translateY(-2px)",
+					"box-shadow": "0 8px 30px rgba(139, 92, 246, 0.6)"
+				}
+			}
+		},
+		{
+			"id": "n_css_grid",
+			"data": {
+				"vsgdata": {
+					"x": -4000,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".features-grid",
+				"selector": ".features-grid",
+				"declarations": {
+					"display": "grid",
+					"grid-template-columns": "repeat(auto-fit, minmax(300px, 1fr))",
+					"gap": "32px",
+					"padding": "80px 60px",
+					"max-width": "1200px",
+					"margin": "0 auto"
+				}
+			}
+		},
+		{
+			"id": "n_css_card",
+			"data": {
+				"vsgdata": {
+					"x": -4300,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".feature-card",
+				"selector": ".feature-card",
+				"declarations": {
+					"background": "rgba(255, 255, 255, 0.03)",
+					"border": "1px solid rgba(255, 255, 255, 0.05)",
+					"padding": "40px",
+					"border-radius": "24px",
+					"backdrop-filter": "blur(10px)",
+					"transition": "transform 0.4s ease, border-color 0.4s ease",
+					"cursor": "pointer",
+					"perspective": "1000px"
+				}
+			}
+		},
+		{
+			"id": "n_css_cardhov",
+			"data": {
+				"vsgdata": {
+					"x": -4600,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".feature-card:hover",
+				"selector": ".feature-card:hover",
+				"declarations": {
+					"transform": "translateY(-10px)",
+					"border-color": "rgba(96, 165, 250, 0.3)",
+					"background": "rgba(255, 255, 255, 0.05)"
+				}
+			}
+		},
+		{
+			"id": "n_css_cardh3",
+			"data": {
+				"vsgdata": {
+					"x": -4900,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".feature-card h3",
+				"selector": ".feature-card h3",
+				"declarations": {
+					"color": "#f8fafc",
+					"font-size": "1.5rem",
+					"margin-top": "0",
+					"margin-bottom": "16px",
+					"background": "linear-gradient(90deg, #60a5fa, #c084fc)",
+					"-webkit-background-clip": "text",
+					"-webkit-text-fill-color": "transparent"
+				}
+			}
+		},
+		{
+			"id": "n_css_cardp",
+			"data": {
+				"vsgdata": {
+					"x": -5200,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".feature-card p",
+				"selector": ".feature-card p",
+				"declarations": {
+					"color": "#94a3b8",
+					"line-height": "1.6",
+					"margin": "0"
+				}
+			}
+		},
+		{
+			"id": "n_css_ripple",
+			"data": {
+				"vsgdata": {
+					"x": -5500,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": ".ripple",
+				"selector": ".ripple",
+				"declarations": {
+					"position": "absolute",
+					"border-radius": "50%",
+					"background": "rgba(255, 255, 255, 0.5)",
+					"transform": "scale(0)",
+					"animation": "ripple 0.6s linear",
+					"pointer-events": "none"
+				}
+			}
+		},
+		{
+			"id": "n_css_keyf",
+			"data": {
+				"vsgdata": {
+					"x": -5800,
+					"y": 0,
+					"z": 0
+				},
+				"type": "CSS_RULE",
+				"name": "@keyframes ripple",
+				"selector": "@keyframes ripple",
+				"declarations": {
+					"to": "transform: scale(4); opacity: 0"
+				}
+			}
+		},
+		{
+			"id": "n_js_click",
+			"data": {
+				"vsgdata": {
+					"x": 400,
+					"y": -400,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Ripple Effect",
+				"event": "click",
+				"code": "\nconst rect = event.currentTarget.getBoundingClientRect();\nconst circle = document.createElement(\"span\");\nconst diameter = Math.max(rect.width, rect.height);\nconst radius = diameter / 2;\ncircle.style.width = circle.style.height = `${diameter}px`;\ncircle.style.left = `${event.clientX - rect.left - radius}px`;\ncircle.style.top = `${event.clientY - rect.top - radius}px`;\ncircle.classList.add(\"ripple\");\nconst existing = event.currentTarget.querySelector('.ripple');\nif (existing) existing.remove();\nevent.currentTarget.appendChild(circle);\nsetTimeout(() => alert(\"Stunning visual logic compilation initialized!\"), 400);\n"
+			}
+		},
+		{
+			"id": "n_js_card",
+			"data": {
+				"vsgdata": {
+					"x": 800,
+					"y": -400,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Card Flip",
+				"event": "click",
+				"code": "\nconst target = event.currentTarget;\ntarget.style.transform = 'rotateY(180deg)';\nsetTimeout(() => {\n  target.style.transform = 'rotateY(0deg) translateY(-10px)';\n}, 600);\n"
+			}
+		},
+		{
+			"id": "n_js_nav_home",
+			"data": {
+				"vsgdata": {
+					"x": 1200,
+					"y": -400,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Route Home",
+				"event": "click",
+				"code": "document.body.style.opacity = \"0\";\nsetTimeout(() => window.location.href = \"index.html\", 400);"
+			}
+		},
+		{
+			"id": "n_js_nav_feat",
+			"data": {
+				"vsgdata": {
+					"x": 1600,
+					"y": -400,
+					"z": 0
+				},
+				"type": "JS_EVENT",
+				"name": "Route Feat",
+				"event": "click",
+				"code": "document.body.style.opacity = \"0\";\nsetTimeout(() => window.location.href = \"features.html\", 400);"
+			}
+		},
+		{
+			"id": "n_el_nav",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 300,
+					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "Shared Header",
-				"tag": "header",
-				"attrs": {},
-				"text": "shared shell",
-				"jsEventIds": [
-					"vsb_demo_n11"
-				]
+				"name": "Shared Nav",
+				"tag": "nav",
+				"attrsText": "",
+				"text": ""
 			}
 		},
 		{
-			"id": "vsb_demo_n6",
+			"id": "n_el_logo",
 			"data": {
 				"vsgdata": {
-					"x": 830,
-					"y": -140
+					"x": 600,
+					"y": 150,
+					"z": 0
 				},
 				"type": "ELEMENT",
 				"name": "Logo",
-				"tag": "strong",
-				"attrs": {},
-				"text": "VSB",
-				"jsEventIds": []
+				"tag": "div",
+				"attrsText": "class=\"logo\"",
+				"text": "Idol1st"
 			}
 		},
 		{
-			"id": "vsb_demo_n7",
+			"id": "n_el_links",
 			"data": {
 				"vsgdata": {
-					"x": 830,
-					"y": 130
+					"x": 600,
+					"y": 450,
+					"z": 0
 				},
 				"type": "ELEMENT",
-				"name": "About Nav",
-				"tag": "nav",
-				"attrs": {},
-				"text": "About / Contact",
-				"jsEventIds": []
+				"name": "Links Container",
+				"tag": "div",
+				"attrsText": "class=\"links\"",
+				"text": ""
 			}
 		},
 		{
-			"id": "vsb_demo_n8",
+			"id": "n_el_link1",
 			"data": {
 				"vsgdata": {
-					"x": -520,
-					"y": 120
+					"x": 900,
+					"y": 350,
+					"z": 0
 				},
-				"type": "CSS_RULE",
-				"name": "Shared Header Rule",
-				"selector": ".shared-header",
-				"declarations": {
-					"background-color": "#31445f",
-					"color": "#f5f9ff",
-					"display": "flex",
-					"gap": "12px"
-				}
+				"type": "ELEMENT",
+				"name": "Nav Home",
+				"tag": "div",
+				"attrsText": "class=\"nav-link\"",
+				"text": "Home"
 			}
 		},
 		{
-			"id": "vsb_demo_n9",
+			"id": "n_el_link2",
 			"data": {
 				"vsgdata": {
-					"x": -780,
-					"y": 20
+					"x": 900,
+					"y": 550,
+					"z": 0
 				},
-				"type": "CSS_RULE",
-				"name": "Logo Rule",
-				"selector": ".shared-header strong",
-				"declarations": {
-					"color": "crimson"
-				}
+				"type": "ELEMENT",
+				"name": "Nav Features",
+				"tag": "div",
+				"attrsText": "class=\"nav-link\"",
+				"text": "Features"
 			}
 		},
 		{
-			"id": "vsb_demo_n10",
+			"id": "n_el_hero",
 			"data": {
 				"vsgdata": {
-					"x": -780,
-					"y": 230
+					"x": 300,
+					"y": -100,
+					"z": 0
 				},
-				"type": "CSS_RULE",
-				"name": "Theme Rule",
-				"selector": ".shared-header",
-				"declarations": {
-					"background-color": "black",
-					"color": "white"
-				}
+				"type": "ELEMENT",
+				"name": "Hero Section",
+				"tag": "section",
+				"attrsText": "class=\"hero\"",
+				"text": ""
 			}
 		},
 		{
-			"id": "vsb_demo_n11",
+			"id": "n_el_heroh1",
 			"data": {
 				"vsgdata": {
-					"x": -520,
-					"y": -190
+					"x": 600,
+					"y": -200,
+					"z": 0
 				},
-				"type": "JS_EVENT",
-				"name": "Shared Click Event",
-				"event": "click",
-				"code": "event.currentTarget.dataset.ready = 'true';"
+				"type": "ELEMENT",
+				"name": "Hero Title",
+				"tag": "h1",
+				"attrsText": "",
+				"text": "Engineering Perfection."
+			}
+		},
+		{
+			"id": "n_el_herop",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": -100,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Hero Desc",
+				"tag": "p",
+				"attrsText": "",
+				"text": "Architect highly scalable web graphs with pure visual intuition. Write logic seamlessly. Compile instantly."
+			}
+		},
+		{
+			"id": "n_el_btn",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 0,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "CTA Button",
+				"tag": "div",
+				"attrsText": "class=\"btn\"",
+				"text": "Initialize System"
+			}
+		},
+		{
+			"id": "n_el_fhero",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 700,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Feat Hero",
+				"tag": "section",
+				"attrsText": "class=\"hero\" style=\"min-height:40vh\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "n_el_fheroh1",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 600,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Feat Title",
+				"tag": "h1",
+				"attrsText": "",
+				"text": "Next-Gen Architecture."
+			}
+		},
+		{
+			"id": "n_el_fherop",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 800,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Feat Desc",
+				"tag": "p",
+				"attrsText": "",
+				"text": "Unleash extreme developer velocity with spatial logic mapping."
+			}
+		},
+		{
+			"id": "n_el_fgrid",
+			"data": {
+				"vsgdata": {
+					"x": 300,
+					"y": 1200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Grid Wrap",
+				"tag": "section",
+				"attrsText": "class=\"features-grid\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "n_el_f1",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 1000,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Card Spatial",
+				"tag": "div",
+				"attrsText": "class=\"feature-card\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "n_el_f1h3",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 950,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Title 1",
+				"tag": "h3",
+				"attrsText": "",
+				"text": "Spatial Logic"
+			}
+		},
+		{
+			"id": "n_el_f1p",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1050,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Desc 1",
+				"tag": "p",
+				"attrsText": "",
+				"text": "Arrange structural components, visual styling vines, and Javascript logic blocks in a completely unified canvas."
+			}
+		},
+		{
+			"id": "n_el_f2",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 1200,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Card Compiler",
+				"tag": "div",
+				"attrsText": "class=\"feature-card\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "n_el_f2h3",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1150,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Title 2",
+				"tag": "h3",
+				"attrsText": "",
+				"text": "Zero-Overhead"
+			}
+		},
+		{
+			"id": "n_el_f2p",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1250,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Desc 2",
+				"tag": "p",
+				"attrsText": "",
+				"text": "The custom VSG compiler parses your graph into native, highly optimized HTML/CSS/JS without any runtime bloat."
+			}
+		},
+		{
+			"id": "n_el_f3",
+			"data": {
+				"vsgdata": {
+					"x": 600,
+					"y": 1400,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Card Routing",
+				"tag": "div",
+				"attrsText": "class=\"feature-card\"",
+				"text": ""
+			}
+		},
+		{
+			"id": "n_el_f3h3",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1350,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Title 3",
+				"tag": "h3",
+				"attrsText": "",
+				"text": "Visual Routing"
+			}
+		},
+		{
+			"id": "n_el_f3p",
+			"data": {
+				"vsgdata": {
+					"x": 900,
+					"y": 1450,
+					"z": 0
+				},
+				"type": "ELEMENT",
+				"name": "Desc 3",
+				"tag": "p",
+				"attrsText": "",
+				"text": "Bind JS events dynamically across hundreds of files using smart multi-edge deductive algorithms."
 			}
 		}
 	],
 	"edges": [
 		{
-			"id": "vsb_demo_e0",
-			"srcId": "vsb_demo_n0",
-			"dstId": "vsb_demo_n2",
+			"id": "e0",
+			"srcId": "n_css_main",
+			"dstId": "n_css_body",
 			"data": {
-				"rootId": "vsb_demo_n0",
-				"order": 2,
+				"rootId": "n_css_main",
+				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e1",
-			"srcId": "vsb_demo_n0",
-			"dstId": "vsb_demo_n3",
+			"id": "e1",
+			"srcId": "n_css_body",
+			"dstId": "n_css_nav",
 			"data": {
-				"rootId": "vsb_demo_n0",
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e2",
+			"srcId": "n_css_nav",
+			"dstId": "n_css_nava",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e3",
+			"srcId": "n_css_nava",
+			"dstId": "n_css_navhover",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e4",
+			"srcId": "n_css_navhover",
+			"dstId": "n_css_logo",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e5",
+			"srcId": "n_css_logo",
+			"dstId": "n_css_navlinks",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e6",
+			"srcId": "n_css_navlinks",
+			"dstId": "n_css_hero",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e7",
+			"srcId": "n_css_hero",
+			"dstId": "n_css_heroh1",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e8",
+			"srcId": "n_css_heroh1",
+			"dstId": "n_css_herop",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e9",
+			"srcId": "n_css_herop",
+			"dstId": "n_css_btn",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e10",
+			"srcId": "n_css_btn",
+			"dstId": "n_css_btnhov",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e11",
+			"srcId": "n_css_btnhov",
+			"dstId": "n_css_grid",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e12",
+			"srcId": "n_css_grid",
+			"dstId": "n_css_card",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e13",
+			"srcId": "n_css_card",
+			"dstId": "n_css_cardhov",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e14",
+			"srcId": "n_css_cardhov",
+			"dstId": "n_css_cardh3",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e15",
+			"srcId": "n_css_cardh3",
+			"dstId": "n_css_cardp",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e16",
+			"srcId": "n_css_cardp",
+			"dstId": "n_css_ripple",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e17",
+			"srcId": "n_css_ripple",
+			"dstId": "n_css_keyf",
+			"data": {
+				"rootId": "n_css_main",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e18",
+			"srcId": "n_js_app",
+			"dstId": "n_js_click",
+			"data": {
+				"rootId": "n_js_app",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e19",
+			"srcId": "n_js_app",
+			"dstId": "n_js_card",
+			"data": {
+				"rootId": "n_js_app",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e20",
+			"srcId": "n_js_app",
+			"dstId": "n_js_nav_home",
+			"data": {
+				"rootId": "n_js_app",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e21",
+			"srcId": "n_js_app",
+			"dstId": "n_js_nav_feat",
+			"data": {
+				"rootId": "n_js_app",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e22",
+			"srcId": "n_html_index",
+			"dstId": "n_css_main",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e23",
+			"srcId": "n_html_index",
+			"dstId": "n_js_app",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e24",
+			"srcId": "n_html_feat",
+			"dstId": "n_css_main",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e25",
+			"srcId": "n_html_feat",
+			"dstId": "n_js_app",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 0,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e26",
+			"srcId": "n_html_index",
+			"dstId": "n_el_nav",
+			"data": {
+				"rootId": "n_html_index",
 				"order": 1,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e2",
-			"srcId": "vsb_demo_n0",
-			"dstId": "vsb_demo_n5",
+			"id": "e27",
+			"srcId": "n_html_index",
+			"dstId": "n_el_hero",
 			"data": {
-				"rootId": "vsb_demo_n0",
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e28",
+			"srcId": "n_html_feat",
+			"dstId": "n_el_nav",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e29",
+			"srcId": "n_html_feat",
+			"dstId": "n_el_fhero",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e30",
+			"srcId": "n_html_feat",
+			"dstId": "n_el_fgrid",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e31",
+			"srcId": "n_el_nav",
+			"dstId": "n_el_logo",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e32",
+			"srcId": "n_el_nav",
+			"dstId": "n_el_links",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e33",
+			"srcId": "n_el_links",
+			"dstId": "n_el_link1",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e34",
+			"srcId": "n_el_links",
+			"dstId": "n_el_link2",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e35",
+			"srcId": "n_el_nav",
+			"dstId": "n_el_logo",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e36",
+			"srcId": "n_el_nav",
+			"dstId": "n_el_links",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e37",
+			"srcId": "n_el_links",
+			"dstId": "n_el_link1",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e38",
+			"srcId": "n_el_links",
+			"dstId": "n_el_link2",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e39",
+			"srcId": "n_el_hero",
+			"dstId": "n_el_heroh1",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e40",
+			"srcId": "n_el_hero",
+			"dstId": "n_el_herop",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e41",
+			"srcId": "n_el_hero",
+			"dstId": "n_el_btn",
+			"data": {
+				"rootId": "n_html_index",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e42",
+			"srcId": "n_el_fhero",
+			"dstId": "n_el_fheroh1",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e43",
+			"srcId": "n_el_fhero",
+			"dstId": "n_el_fherop",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e44",
+			"srcId": "n_el_fgrid",
+			"dstId": "n_el_f1",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e45",
+			"srcId": "n_el_fgrid",
+			"dstId": "n_el_f2",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e46",
+			"srcId": "n_el_fgrid",
+			"dstId": "n_el_f3",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 3,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e47",
+			"srcId": "n_el_f1",
+			"dstId": "n_el_f1h3",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e48",
+			"srcId": "n_el_f1",
+			"dstId": "n_el_f1p",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e49",
+			"srcId": "n_el_f2",
+			"dstId": "n_el_f2h3",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e50",
+			"srcId": "n_el_f2",
+			"dstId": "n_el_f2p",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e51",
+			"srcId": "n_el_f3",
+			"dstId": "n_el_f3h3",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 1,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e52",
+			"srcId": "n_el_f3",
+			"dstId": "n_el_f3p",
+			"data": {
+				"rootId": "n_html_feat",
+				"order": 2,
+				"enabled": true
+			}
+		},
+		{
+			"id": "e53",
+			"srcId": "n_el_link1",
+			"dstId": "n_js_nav_home",
+			"data": {
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e3",
-			"srcId": "vsb_demo_n5",
-			"dstId": "vsb_demo_n6",
+			"id": "e54",
+			"srcId": "n_el_link1",
+			"dstId": "n_js_nav_home",
 			"data": {
-				"rootId": "vsb_demo_n0",
+				"rootId": "n_html_feat",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e4",
-			"srcId": "vsb_demo_n1",
-			"dstId": "vsb_demo_n5",
+			"id": "e55",
+			"srcId": "n_el_link2",
+			"dstId": "n_js_nav_feat",
 			"data": {
-				"rootId": "vsb_demo_n1",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e5",
-			"srcId": "vsb_demo_n5",
-			"dstId": "vsb_demo_n7",
+			"id": "e56",
+			"srcId": "n_el_link2",
+			"dstId": "n_js_nav_feat",
 			"data": {
-				"rootId": "vsb_demo_n1",
+				"rootId": "n_html_feat",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e6",
-			"srcId": "vsb_demo_n3",
-			"dstId": "vsb_demo_n8",
+			"id": "e57",
+			"srcId": "n_el_btn",
+			"dstId": "n_js_click",
 			"data": {
-				"rootId": "vsb_demo_n3",
+				"rootId": "n_html_index",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e7",
-			"srcId": "vsb_demo_n8",
-			"dstId": "vsb_demo_n9",
+			"id": "e58",
+			"srcId": "n_el_f1",
+			"dstId": "n_js_card",
 			"data": {
-				"rootId": "vsb_demo_n3",
+				"rootId": "n_html_feat",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e8",
-			"srcId": "vsb_demo_n4",
-			"dstId": "vsb_demo_n8",
+			"id": "e59",
+			"srcId": "n_el_f2",
+			"dstId": "n_js_card",
 			"data": {
-				"rootId": "vsb_demo_n4",
+				"rootId": "n_html_feat",
 				"order": 0,
 				"enabled": true
 			}
 		},
 		{
-			"id": "vsb_demo_e9",
-			"srcId": "vsb_demo_n8",
-			"dstId": "vsb_demo_n10",
+			"id": "e60",
+			"srcId": "n_el_f3",
+			"dstId": "n_js_card",
 			"data": {
-				"rootId": "vsb_demo_n4",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "vsb_demo_e10",
-			"srcId": "vsb_demo_n2",
-			"dstId": "vsb_demo_n11",
-			"data": {
-				"rootId": "vsb_demo_n2",
+				"rootId": "n_html_feat",
 				"order": 0,
 				"enabled": true
 			}
