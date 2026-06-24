@@ -20,58 +20,58 @@ export class BgRenderer {
             
             // Cool VTuber-style WGSL Shader
             const shaderCode = `
-struct Uniforms {
-    time: f32,
-    padding: f32,
-    resolution: vec2<f32>,
-};
-@group(0) @binding(0) var<uniform> uniforms: Uniforms;
+            struct Uniforms {
+                time: f32,
+                padding: f32,
+                resolution: vec2<f32>,
+            };
+            @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 
-struct VertexOutput {
-    @builtin(position) position: vec4<f32>,
-    @location(0) uv: vec2<f32>,
-};
+            struct VertexOutput {
+                @builtin(position) position: vec4<f32>,
+                @location(0) uv: vec2<f32>,
+            };
 
-@vertex
-fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> VertexOutput {
-    // Generate a full-screen triangle
-    var pos = array<vec2<f32>, 3>(
-        vec2<f32>(-1.0, -1.0),
-        vec2<f32>(3.0, -1.0),
-        vec2<f32>(-1.0, 3.0)
-    );
-    var output : VertexOutput;
-    output.position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
-    output.uv = pos[VertexIndex] * 0.5 + 0.5;
-    return output;
-}
+            @vertex
+            fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> VertexOutput {
+                // Generate a full-screen triangle
+                var pos = array<vec2<f32>, 3>(
+                    vec2<f32>(-1.0, -1.0),
+                    vec2<f32>(3.0, -1.0),
+                    vec2<f32>(-1.0, 3.0)
+                );
+                var output : VertexOutput;
+                output.position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+                output.uv = pos[VertexIndex] * 0.5 + 0.5;
+                return output;
+            }
 
-@fragment
-fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    // Slow down the overall animation time
-    let t = uniforms.time * 0.15;
-    var uv = in.uv;
-    
-    // Abstract VTuber aesthetic: Floating waves, stars, or geometric gradients
-    // Base colors (Idol Pop)
-    let color1 = vec3<f32>(0.15, 0.05, 0.25); // Deep Purple
-    let color2 = vec3<f32>(0.4, 0.1, 0.3);    // Deep Pink
-    let color3 = vec3<f32>(0.1, 0.2, 0.4);    // Deep Blue
-    
-    // Gentle wavy distortion
-    uv.x = uv.x + sin(uv.y * 3.0 + t) * 0.05;
-    uv.y = uv.y + cos(uv.x * 2.0 - t * 0.8) * 0.05;
+            @fragment
+            fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+                // Slow down the overall animation time
+                let t = uniforms.time * 0.15;
+                var uv = in.uv;
+                
+                // Abstract VTuber aesthetic: Floating waves, stars, or geometric gradients
+                // Base colors (Idol Pop)
+                let color1 = vec3<f32>(0.15, 0.05, 0.25); // Deep Purple
+                let color2 = vec3<f32>(0.4, 0.1, 0.3);    // Deep Pink
+                let color3 = vec3<f32>(0.1, 0.2, 0.4);    // Deep Blue
+                
+                // Gentle wavy distortion
+                uv.x = uv.x + sin(uv.y * 3.0 + t) * 0.05;
+                uv.y = uv.y + cos(uv.x * 2.0 - t * 0.8) * 0.05;
 
-    // Smooth, slow gradient mix
-    let mixVal = (sin(uv.x * 3.0 - t * 1.2) + cos(uv.y * 3.0 + t)) * 0.5 + 0.5;
-    var finalColor = mix(color1, color2, mixVal);
-    finalColor = mix(finalColor, color3, sin(uv.y * 2.0 - uv.x * 1.5 + t * 0.8) * 0.5 + 0.5);
+                // Smooth, slow gradient mix
+                let mixVal = (sin(uv.x * 3.0 - t * 1.2) + cos(uv.y * 3.0 + t)) * 0.5 + 0.5;
+                var finalColor = mix(color1, color2, mixVal);
+                finalColor = mix(finalColor, color3, sin(uv.y * 2.0 - uv.x * 1.5 + t * 0.8) * 0.5 + 0.5);
 
-    // Keep it relatively dark so the UI remains legible
-    finalColor = finalColor * 0.8;
-    
-    return vec4<f32>(finalColor, 1.0);
-}
+                // Keep it relatively dark so the UI remains legible
+                finalColor = finalColor * 0.8;
+                
+                return vec4<f32>(finalColor, 1.0);
+            }
             `;
             
             const module = device.createShaderModule({ code: shaderCode });
