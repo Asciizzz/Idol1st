@@ -7,9 +7,16 @@ export class VsbCtx {
         this.selectedNodeId     = null;
         this.selectedFileNodeId = null;
         this.mode = "CURSOR";
+
         this.showEdgeInputs = true;
         this.showNodeInputs = false;
-        this.showEventEdges = true;
+        this.showEdgeErrors = true;
+        this.showElementEdges = true;
+        this.showIncludeEdges = true;
+        this.showCssEdges = true;
+        this.showJsEdges = true;
+        this.showAssetEdges = true;
+        this.showScriptEventEdges = true;
         this.showPreview = false;
     }
 }

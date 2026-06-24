@@ -64,6 +64,50 @@ function _arrowPoints(tip, control) {
 
 const isFileNode = (type) => type === VsbNodeType.HTML || type === VsbNodeType.CSS || type === VsbNodeType.JS;
 
+function _getEdgeError(edge, srcNode, dstNode, graph) {
+    const stype = srcNode.data?.type;
+    const dtype = dstNode.data?.type;
+
+    const validSrcDst = {
+        "HTML": ["ELEMENT", "CSS", "JS"],
+        "CSS": ["CSS_RULE"],
+        "JS": ["JS_EVENT"],
+        "ELEMENT": ["ELEMENT", "CSS_RULE", "JS_EVENT", "ASSET_IMAGE", "ASSET_AUDIO"],
+        "CSS_RULE": ["CSS_RULE"],
+        "JS_EVENT": [],
+        "ASSET_IMAGE": [],
+        "ASSET_AUDIO": []
+    };
+
+    if (validSrcDst[stype] && !validSrcDst[stype].includes(dtype)) {
+        if (stype === "JS_EVENT" && dtype === "JS_EVENT") {
+            return "JS Event to JS Event connection is forbidden.";
+        }
+        return `Invalid direction: ${stype} cannot connect to ${dtype}.`;
+    }
+
+    if (dtype === "ELEMENT") {
+        const inEdges = graph.inEdges(dstNode.id) || [];
+        const parentEdges = inEdges.filter(e => {
+            const p = graph.getNode(e.srcId);
+            return p && (p.data.type === "ELEMENT" || p.data.type === "HTML");
+        });
+        if (parentEdges.length > 1) {
+            return "Element node cannot have multiple parents.";
+        }
+    }
+    
+    if (dtype === "JS_EVENT") {
+        const inEdges = graph.inEdges(dstNode.id) || [];
+        const jsParents = inEdges.filter(e => graph.getNode(e.srcId)?.data.type === "JS");
+        if (jsParents.length > 1) {
+            return "JS Event cannot belong to multiple JS files.";
+        }
+    }
+
+    return null;
+}
+
 export class VsbEdgeData extends VsData {
     constructor({ rootId = null, order = 0, enabled = true } = {}) {
         super();
@@ -131,10 +175,22 @@ export class VsbEdgeData extends VsData {
             e.target.value = edge.data.order;
         });
 
-        foreignObject.append(input);
+        const errorIcon = document.createElement("div");
+        Object.assign(errorIcon.style, {
+            width: "100%", height: "100%", margin: "0", padding: "0",
+            background: "#ff3333", color: "#ffffff",
+            borderRadius: "50%", display: "none",
+            alignItems: "center", justifyContent: "center",
+            fontWeight: "bold", fontSize: "16px", cursor: "help",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.5)"
+        });
+        errorIcon.textContent = "×";
+        errorIcon.addEventListener("pointerdown", e => e.stopPropagation());
+
+        foreignObject.append(input, errorIcon);
         element.append(foreignObject);
 
-        const cache = { visiblePath, socket, arrow, hitPath, foreignObject, input, hover: false };
+        const cache = { visiblePath, socket, arrow, hitPath, foreignObject, input, errorIcon, hover: false };
 
         hitPath.addEventListener("pointerenter", () => {
             cache.hover = true;
@@ -196,6 +252,9 @@ export class VsbEdgeData extends VsData {
             midY = 0.125 * src.y + 0.375 * controls.c1.y + 0.375 * controls.c2.y + 0.125 * dst.y;
         }
 
+        const errorMsg = _getEdgeError(edge, srcNode, dstNode, graph);
+        const hasError = !!errorMsg && (ctx?.showEdgeErrors ?? true);
+
         cache.foreignObject.setAttribute("x", String(midX - 18));
         cache.foreignObject.setAttribute("y", String(midY - 11));
 
@@ -204,18 +263,48 @@ export class VsbEdgeData extends VsData {
         }
 
         const showInput = ctx?.showEdgeInputs ?? false;
-        cache.foreignObject.style.display = showInput ? "block" : "none";
+        
+        if (hasError) {
+            cache.foreignObject.style.display = "block";
+            cache.input.style.display = "none";
+            cache.errorIcon.style.display = "flex";
+            cache.errorIcon.title = errorMsg;
+        } else {
+            cache.foreignObject.style.display = showInput ? "block" : "none";
+            cache.input.style.display = "block";
+            cache.errorIcon.style.display = "none";
+        }
+
+        // Determine category for filtering
+        const stype = srcNode.data?.type;
+        const dtype = dstNode.data?.type;
+        let edgeCategory = "showElementEdges";
+        if ((stype === "HTML" && dtype === "ELEMENT") || (stype === "ELEMENT" && dtype === "ELEMENT")) {
+            edgeCategory = "showElementEdges";
+        } else if ((stype === "HTML" && (dtype === "CSS" || dtype === "JS")) || (dtype === "HTML" && (stype === "CSS" || stype === "JS"))) {
+            edgeCategory = "showIncludeEdges";
+        } else if (stype === "CSS" || stype === "CSS_RULE" || (stype === "ELEMENT" && dtype === "CSS_RULE")) {
+            edgeCategory = "showCssEdges";
+        } else if (stype === "JS" && dtype === "JS_EVENT") {
+            edgeCategory = "showJsEdges";
+        } else if (stype === "ELEMENT" && dtype === "JS_EVENT") {
+            edgeCategory = "showScriptEventEdges";
+        } else if (stype === "ELEMENT" && (dtype === "ASSET_IMAGE" || dtype === "ASSET_AUDIO")) {
+            edgeCategory = "showAssetEdges";
+        }
+
+        const isVisible = ctx?.[edgeCategory] ?? true;
 
         // Determine color
-        let color = "rgba(235, 238, 246, 0.46)"; // Default gray
-        
-        if (bothFiles) {
-            color = "rgba(255, 255, 255, 0.7)"; // Included files
+        let color = "rgba(235, 238, 246, 0.46)";
+        if (hasError) {
+            color = "#ff3333";
+        } else if (bothFiles) {
+            color = "rgba(255, 255, 255, 0.7)";
         } else {
             const rootId = edge.data?.rootId;
             const rootNode = rootId ? graph.getNode(rootId) : null;
             if (rootNode && isFileNode(rootNode.data?.type)) {
-                // Paint edge matching the root file's explicit fileColor, fallback to its type color
                 color = rootNode.data.vsgdata?.fileColor 
                      ?? rootNode.data.constructor._fileTypeColor?.() 
                      ?? "rgba(235, 238, 246, 0.46)";
@@ -225,25 +314,28 @@ export class VsbEdgeData extends VsData {
         const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
         let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
-        cache.visiblePath.setAttribute("d", pathD);
-
-        const isEventEdge = srcNode.data?.type === "ELEMENT" && dstNode.data?.type === "JS_EVENT";
-        const isAssetEdge = srcNode.data?.type === "ELEMENT" && (dstNode.data?.type === "ASSET_IMAGE" || dstNode.data?.type === "ASSET_AUDIO");
-        
-        if (isAssetEdge) {
-            color = "#ffffff";
+        if (edgeCategory === "showAssetEdges") {
+            if (!hasError) color = "#ffffff";
             cache.visiblePath.setAttribute("stroke-dasharray", "2 4");
             cache.visiblePath.setAttribute("stroke-linecap", "round");
-            if (ctx && !ctx.showAssetEdges && ctx.showAssetEdges !== undefined) opacity = "0"; // Optional: filter
-        } else if (isEventEdge) {
-            color = "#f7df1e";
+        } else if (edgeCategory === "showScriptEventEdges" || edgeCategory === "showJsEdges") {
+            if (!hasError) color = "#f7df1e";
             cache.visiblePath.setAttribute("stroke-dasharray", "4 4");
-            if (ctx && !ctx.showEventEdges) opacity = "0";
         } else {
             cache.visiblePath.removeAttribute("stroke-dasharray");
         }
 
+        if (hasError) {
+            cache.visiblePath.removeAttribute("stroke-dasharray");
+            cache.visiblePath.setAttribute("stroke-width", cache.hover ? "5" : "4");
+        } else {
+            cache.visiblePath.setAttribute("stroke-width", cache.hover ? "3" : "2");
+        }
+
+        cache.visiblePath.setAttribute("d", pathD);
         cache.visiblePath.setAttribute("stroke", color);
+        
+        if (!isVisible) opacity = "0";
         cache.visiblePath.style.opacity = opacity;
 
         cache.socket.setAttribute("cx", String(src.x));
@@ -255,7 +347,8 @@ export class VsbEdgeData extends VsData {
         cache.arrow.style.opacity = opacity;
 
         cache.hitPath.setAttribute("d", pathD);
-        if (isEventEdge && ctx && !ctx.showEventEdges) {
+
+        if (!isVisible) {
             element.style.pointerEvents = "none";
             cache.foreignObject.style.display = "none";
         } else {

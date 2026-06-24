@@ -547,7 +547,7 @@ export class VsbUI {
             this.render();
             this.vsgraph.render();
         } else if (key === "7") {
-            this.ctx.showEventEdges = !this.ctx.showEventEdges;
+            this.ctx.showEdgeErrors = !this.ctx.showEdgeErrors;
             this.render();
             this.vsgraph.render();
         }
@@ -719,7 +719,10 @@ export class VsbUI {
             }
             
             wrapper.append(btn);
-            btn.addEventListener("click", onClick);
+            btn.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                onClick(e);
+            });
             return wrapper;
         };
 
@@ -801,11 +804,40 @@ export class VsbUI {
                 this.render();
                 this.vsgraph.render();
             }),
-            createIconBtn(`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`, "7", this.ctx.showEventEdges, () => {
-                this.ctx.showEventEdges = !this.ctx.showEventEdges;
+            createIconBtn(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`, "7", this.ctx.showEdgeErrors, () => {
+                this.ctx.showEdgeErrors = !this.ctx.showEdgeErrors;
                 this.render();
                 this.vsgraph.render();
             })
+        );
+
+        const handleEdgeToggle = (type, e) => {
+            const allTypes = ["showElementEdges", "showIncludeEdges", "showCssEdges", "showJsEdges", "showAssetEdges", "showScriptEventEdges"];
+            if (e.shiftKey) {
+                allTypes.forEach(t => this.ctx[t] = false);
+                this.ctx[type] = true;
+            } else if (e.ctrlKey || e.metaKey) {
+                allTypes.forEach(t => this.ctx[t] = true);
+                this.ctx[type] = false;
+            } else {
+                this.ctx[type] = !this.ctx[type];
+            }
+            this.render();
+            this.vsgraph.render();
+        };
+
+        const mkEdgeIcon = (label, active, type) => {
+            return createIconBtn(`<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16" font-size="11" font-family="monospace" font-weight="bold" text-anchor="middle" fill="currentColor">${label}</text></svg>`, null, active, (e) => handleEdgeToggle(type, e));
+        };
+
+        mainCol.append(
+            separator.cloneNode(),
+            mkEdgeIcon("EL", this.ctx.showElementEdges, "showElementEdges"),
+            mkEdgeIcon("IN", this.ctx.showIncludeEdges, "showIncludeEdges"),
+            mkEdgeIcon("CS", this.ctx.showCssEdges, "showCssEdges"),
+            mkEdgeIcon("JS", this.ctx.showJsEdges, "showJsEdges"),
+            mkEdgeIcon("AS", this.ctx.showAssetEdges, "showAssetEdges"),
+            mkEdgeIcon("EV", this.ctx.showScriptEventEdges, "showScriptEventEdges")
         );
 
         if (this.activeSubMenu) {
