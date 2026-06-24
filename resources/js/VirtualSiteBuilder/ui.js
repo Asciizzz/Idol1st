@@ -1,5 +1,5 @@
 import * as nodetypes from "./nodedata/index.js";
-import { VsbCompiler } from "./compiler/compiler.js";
+import { VsbCompiler } from "./compiler.js";
 
 export class VsbUI {
     constructor(vsgraph) {
