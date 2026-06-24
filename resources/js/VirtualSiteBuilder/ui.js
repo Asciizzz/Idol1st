@@ -587,23 +587,23 @@ export class VsbUI {
         selText.innerHTML = `Selected Node: ${selName}`;
         headerRow.append(selText);
 
-        if (this.ctx.mode !== "CURSOR" || this.activeSubMenu) {
-            const separator = document.createElement("div");
-            separator.textContent = "|";
-            separator.style.color = "#666";
-            
-            const modeText = document.createElement("div");
-            modeText.style.color = "#fff";
-            modeText.style.fontWeight = "bold";
-            
-            if (this.activeSubMenu === "ADD") modeText.textContent = `Mode: Add > ...`;
-            else if (this.activeSubMenu === "EDGE") modeText.textContent = `Mode: Edge > ...`;
-            else if (this.ctx.mode.startsWith("ADD_")) modeText.textContent = `Mode: Add > ${this.ctx.mode.substring(4)}`;
-            else if (this.ctx.mode.startsWith("EDGE_")) modeText.textContent = `Mode: Edge > ${this.ctx.mode.substring(5)}`;
-            else if (this.ctx.mode === "DELETE") modeText.textContent = `Mode: Delete`;
-            
-            headerRow.append(separator, modeText);
-        }
+        const breadcrumbSep = document.createElement("div");
+        breadcrumbSep.textContent = "|";
+        breadcrumbSep.style.color = "#666";
+        
+        const modeText = document.createElement("div");
+        modeText.style.color = "#fff";
+        modeText.style.fontWeight = "bold";
+        
+        if (this.activeSubMenu === "ADD") modeText.textContent = `Mode: Add > ...`;
+        else if (this.activeSubMenu === "EDGE") modeText.textContent = `Mode: Edge > ...`;
+        else if (this.ctx.mode.startsWith("ADD_")) modeText.textContent = `Mode: Add > ${this.ctx.mode.substring(4)}`;
+        else if (this.ctx.mode.startsWith("EDGE_")) modeText.textContent = `Mode: Edge > ${this.ctx.mode.substring(5)}`;
+        else if (this.ctx.mode === "DELETE") modeText.textContent = `Mode: Delete`;
+        else if (this.ctx.mode === "CURSOR") modeText.textContent = `Mode: Cursor`;
+        else modeText.textContent = `Mode: ${this.ctx.mode}`;
+        
+        headerRow.append(breadcrumbSep, modeText);
 
         this.container.append(headerRow);
 
