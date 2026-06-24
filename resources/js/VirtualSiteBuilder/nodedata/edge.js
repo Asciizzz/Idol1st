@@ -228,7 +228,14 @@ export class VsbEdgeData extends VsData {
         cache.visiblePath.setAttribute("d", pathD);
 
         const isEventEdge = srcNode.data?.type === "ELEMENT" && dstNode.data?.type === "JS_EVENT";
-        if (isEventEdge) {
+        const isAssetEdge = srcNode.data?.type === "ELEMENT" && (dstNode.data?.type === "ASSET_IMAGE" || dstNode.data?.type === "ASSET_AUDIO");
+        
+        if (isAssetEdge) {
+            color = "#ffffff";
+            cache.visiblePath.setAttribute("stroke-dasharray", "2 4");
+            cache.visiblePath.setAttribute("stroke-linecap", "round");
+            if (ctx && !ctx.showAssetEdges && ctx.showAssetEdges !== undefined) opacity = "0"; // Optional: filter
+        } else if (isEventEdge) {
             color = "#f7df1e";
             cache.visiblePath.setAttribute("stroke-dasharray", "4 4");
             if (ctx && !ctx.showEventEdges) opacity = "0";

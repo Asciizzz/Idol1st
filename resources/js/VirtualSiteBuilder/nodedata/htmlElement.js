@@ -58,19 +58,26 @@ export class VsbHtmlElementData extends VsbElementData {
             if (vsgraph) vsgraph.render();
         });
 
+        const assetLabel = createLabel("Asset Src");
+        const assetList = document.createElement("div");
+        Object.assign(assetList.style, {
+            marginTop: "6px", fontSize: "11px", color: "#b9c0ce",
+            display: "flex", flexDirection: "column", gap: "2px"
+        });
+
         const eventsLabel = createLabel("Events");
-        
         const boundEventsList = document.createElement("div");
         Object.assign(boundEventsList.style, {
             marginTop: "6px", fontSize: "11px", color: "#b9c0ce",
             display: "flex", flexDirection: "column", gap: "2px"
         });
 
-        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput, eventsLabel, boundEventsList);
+        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput, assetLabel, assetList, eventsLabel, boundEventsList);
 
         cache.tagInput   = tagInput;
         cache.attrsInput = attrsInput;
         cache.textInput  = textInput;
+        cache.assetList  = assetList;
         cache.boundEventsList = boundEventsList;
 
         return { element, cache };
@@ -98,6 +105,7 @@ export class VsbHtmlElementData extends VsbElementData {
             }
 
             const boundEvents = [];
+            const connectedAssets = [];
             const outEdges = graph.outEdges(node.id) || [];
             for (const e of outEdges) {
                 const dst = graph.getNode(e.dstId);
@@ -105,6 +113,11 @@ export class VsbHtmlElementData extends VsbElementData {
                     boundEvents.push({ 
                         eventName: dst.data.name ?? dst.id,
                         eventType: dst.data.event ?? "click"
+                    });
+                } else if (dst && (dst.data.type === "ASSET_IMAGE" || dst.data.type === "ASSET_AUDIO")) {
+                    connectedAssets.push({
+                        icon: dst.data.type === "ASSET_IMAGE" ? "🖼️" : "🎵",
+                        filename: dst.data.filename
                     });
                 }
             }
@@ -118,6 +131,23 @@ export class VsbHtmlElementData extends VsbElementData {
                 });
                 row.textContent = `[${be.eventType}] ${be.eventName}`;
                 cache.boundEventsList.append(row);
+            }
+
+            cache.assetList.innerHTML = "";
+            if (connectedAssets.length > 0) {
+                const asset = connectedAssets[0];
+                const row = document.createElement("div");
+                Object.assign(row.style, {
+                    padding: "4px 8px", background: "#18191c", color: "#d8dde8",
+                    borderLeft: "3px solid #ffffff", fontWeight: "bold"
+                });
+                row.textContent = `${asset.icon} ${asset.filename}`;
+                cache.assetList.append(row);
+            } else {
+                const empty = document.createElement("div");
+                empty.textContent = "No asset connected";
+                empty.style.color = "#72798a";
+                cache.assetList.append(empty);
             }
         }
     }

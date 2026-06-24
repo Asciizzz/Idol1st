@@ -27,6 +27,16 @@ body {
         radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.1), transparent 25%);
 }
 
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
 .glass-panel {
     background: var(--bg-glass);
     backdrop-filter: blur(12px);

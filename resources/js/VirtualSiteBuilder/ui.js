@@ -161,7 +161,9 @@ export class VsbUI {
                         ["CSS", "CSS_RULE"],
                         ["JS", "JS_EVENT"],
                         ["ELEMENT", "CSS_RULE"],
-                        ["ELEMENT", "JS_EVENT"]
+                        ["ELEMENT", "JS_EVENT"],
+                        ["ELEMENT", "ASSET_IMAGE"],
+                        ["ELEMENT", "ASSET_AUDIO"]
                     ];
 
                     let resolvedSrc = null;
@@ -173,6 +175,17 @@ export class VsbUI {
                     }
 
                     if (resolvedSrc && resolvedDst) {
+                        const srcNode = this.vsgraph.graph.getNode(resolvedSrc);
+                        const dstNode = this.vsgraph.graph.getNode(resolvedDst);
+                        if (srcNode.data.type === "ELEMENT" && dstNode.data.type.startsWith("ASSET_")) {
+                            const outEdges = this.vsgraph.graph.outEdges(resolvedSrc) || [];
+                            for (const e of outEdges) {
+                                const eDst = this.vsgraph.graph.getNode(e.dstId);
+                                if (eDst && eDst.data.type.startsWith("ASSET_")) {
+                                    this.vsgraph.graph.removeEdge(e.id);
+                                }
+                            }
+                        }
                         this.vsgraph.graph.addEdge(resolvedSrc, resolvedDst, { data: new nodetypes.VsbEdgeData() });
                         this.vsgraph.render();
                         this.triggerCompile();
@@ -281,6 +294,8 @@ export class VsbUI {
                     else if (type === "ELEMENT") addNodeAtClick(nodetypes.VsbHtmlElementData);
                     else if (type === "CSS_RULE") addNodeAtClick(nodetypes.VsbCssRuleData);
                     else if (type === "JS_EVENT") addNodeAtClick(nodetypes.VsbJsEventData);
+                    else if (type === "ASSET_IMAGE") addNodeAtClick(nodetypes.VsbAssetImageData);
+                    else if (type === "ASSET_AUDIO") addNodeAtClick(nodetypes.VsbAssetAudioData);
                     e.preventDefault();
                 }
             }
@@ -490,6 +505,8 @@ export class VsbUI {
             else if (key === "4") { this.addDefault = "ADD_ELEMENT"; this.setMode(this.addDefault); }
             else if (key === "5") { this.addDefault = "ADD_CSS_RULE"; this.setMode(this.addDefault); }
             else if (key === "6") { this.addDefault = "ADD_JS_EVENT"; this.setMode(this.addDefault); }
+            else if (key === "7") { this.addDefault = "ADD_ASSET_IMAGE"; this.setMode(this.addDefault); }
+            else if (key === "8") { this.addDefault = "ADD_ASSET_AUDIO"; this.setMode(this.addDefault); }
             
             this.activeSubMenu = null;
             this.render();
@@ -716,6 +733,8 @@ export class VsbUI {
         const getAddLabel = (mode) => {
             switch(mode) {
                 case "ADD_HTML": return "HTML";
+                case "ADD_ASSET_IMAGE": return "Image Asset";
+                case "ADD_ASSET_AUDIO": return "Audio Asset";
                 case "ADD_CSS": return "CSS";
                 case "ADD_JS": return "JS";
                 case "ADD_ELEMENT": return "HTML Element";
@@ -853,7 +872,9 @@ export class VsbUI {
                     createSubBtn("JS", "3", this.ctx.mode === "ADD_JS", () => { this.addDefault = "ADD_JS"; this.setMode("ADD_JS"); this.activeSubMenu = null; }),
                     createSubBtn("HTML Element", "4", this.ctx.mode === "ADD_ELEMENT", () => { this.addDefault = "ADD_ELEMENT"; this.setMode("ADD_ELEMENT"); this.activeSubMenu = null; }),
                     createSubBtn("CSS Rule", "5", this.ctx.mode === "ADD_CSS_RULE", () => { this.addDefault = "ADD_CSS_RULE"; this.setMode("ADD_CSS_RULE"); this.activeSubMenu = null; }),
-                    createSubBtn("JS Event", "6", this.ctx.mode === "ADD_JS_EVENT", () => { this.addDefault = "ADD_JS_EVENT"; this.setMode("ADD_JS_EVENT"); this.activeSubMenu = null; })
+                    createSubBtn("JS Event", "6", this.ctx.mode === "ADD_JS_EVENT", () => { this.addDefault = "ADD_JS_EVENT"; this.setMode("ADD_JS_EVENT"); this.activeSubMenu = null; }),
+                    createSubBtn("Image Asset", "7", this.ctx.mode === "ADD_ASSET_IMAGE", () => { this.addDefault = "ADD_ASSET_IMAGE"; this.setMode("ADD_ASSET_IMAGE"); this.activeSubMenu = null; }),
+                    createSubBtn("Audio Asset", "8", this.ctx.mode === "ADD_ASSET_AUDIO", () => { this.addDefault = "ADD_ASSET_AUDIO"; this.setMode("ADD_ASSET_AUDIO"); this.activeSubMenu = null; })
                 );
             } else if (this.activeSubMenu === "EDGE") {
                 subRow.append(

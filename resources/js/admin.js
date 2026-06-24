@@ -1,4 +1,5 @@
 import { DashboardRenderer } from "./AdminPanel/DashboardRenderer.js";
+import { BgRenderer } from "./AdminPanel/BgRenderer.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Mock JSON payload representing SaaS platform metrics
@@ -80,4 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderer = new DashboardRenderer('dashboard-container');
     renderer.render(mockDashboardData);
+
+    // Initialize WebGPU Animated Background
+    BgRenderer.init('bg-canvas');
 });

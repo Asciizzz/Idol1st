@@ -12,10 +12,14 @@ import { VsbJsEventData } from "./jsEvent.js";
 import { VsbCssFileData } from "./cssFile.js";
 import { VsbCssRuleData } from "./cssRule.js";
 
+import { VsbAssetImageData } from "./assetImage.js";
+import { VsbAssetAudioData } from "./assetAudio.js";
+
 export {
     VsbNodeData, VsbNodeType, VsbEdgeData,
     VsbFileData,
     VsbHtmlFileData, VsbHtmlElementData,
     VsbJsFileData, VsbJsEventData,
     VsbCssFileData, VsbCssRuleData,
+    VsbAssetImageData, VsbAssetAudioData,
 };

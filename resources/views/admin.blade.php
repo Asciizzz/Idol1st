@@ -11,6 +11,7 @@
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
 <body>
+    <canvas id="bg-canvas"></canvas>
     <div class="admin-wrapper">
         <aside class="sidebar glass-panel">
             <div class="logo">Idol1st Admin</div>

@@ -47,6 +47,8 @@ export const VsbNodeType = Object.freeze({
     JS_EVENT:  "JS_EVENT",
     CSS:       "CSS",
     CSS_RULE:  "CSS_RULE",
+    ASSET_IMAGE: "ASSET_IMAGE",
+    ASSET_AUDIO: "ASSET_AUDIO",
     UNDEFINED: "UNDEFINED",
 });
 

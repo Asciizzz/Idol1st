@@ -27,9 +27,9 @@ const pass = flow.addNode({ payload: [
 ]});
 const end = flow.addNode({ payload: [new Awgpu.EndFrame()] });
 
-flow.addLink(root.id, pass.id, { order: 0 });
-flow.addLink(root.id, end.id, { order: 1 });
-flow.sortOutgoingLinks(root.id, (a, b) => a.order - b.order);
+flow.addLink(root.id, pass.id, { data: { order: 0 } });
+flow.addLink(root.id, end.id, { data: { order: 1 } });
+flow.sortOutgoingLinks(root.id, (a, b) => a.data.order - b.data.order);
 
 // Execute
 flow.run(root.id, { ctx: backend.newCtx() });
@@ -502,9 +502,9 @@ const drawMesh    = flow.addNode({ payload: [
 ]});
 const endpass     = flow.addNode({ payload: [new Awgpu.EndPass()] });
 
-flow.addLink(renderPass.id, shaderA.id,  { order: 0 });
-flow.addLink(renderPass.id, shaderB.id,  { order: 1 });
-flow.addLink(renderPass.id, endpass.id,  { order: 2 });
+flow.addLink(renderPass.id, shaderA.id,  { data: { order: 0 } });
+flow.addLink(renderPass.id, shaderB.id,  { data: { order: 1 } });
+flow.addLink(renderPass.id, endpass.id,  { data: { order: 2 } });
 // Sort outgoing edges based on <order>
 flow.sortOutgoingLinks(renderPass.id, (a, b) => a.data.order - b.data.order);
 // 2 Shader nodes use the same DrawMesh node
