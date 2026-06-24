@@ -122,15 +122,25 @@ export class VsbCompiler {
             // Build DOM tree
             const rootElements = fileOutEdges
                 .filter(e => graph.getNode(e.dstId)?.data.type === "ELEMENT")
-                .sort((a, b) => {
-                    const aEdge = fileOutEdges.find(e => e.dstId === a.id);
-                    const bEdge = fileOutEdges.find(e => e.dstId === b.id);
-                    return (aEdge?.data.order || 0) - (bEdge?.data.order || 0);
-                })
+                .sort((a, b) => (a.data?.order || 0) - (b.data?.order || 0))
                 .map(e => graph.getNode(e.dstId));
             
             const renderElement = (elNode, indent = "  ") => {
-                let html = `${indent}<${elNode.data.tag || "div"} data-vsb-id="${elNode.id}"`;
+                const tag = (elNode.data.tag || "div").toLowerCase();
+                let html = `${indent}<${tag} data-vsb-id="${elNode.id}"`;
+                
+                // Inject Asset Src if applicable
+                if (tag === "img" || tag === "audio" || tag === "video") {
+                    const outEdges = graph.outEdges(elNode.id) || [];
+                    const assetNode = outEdges
+                        .map(e => graph.getNode(e.dstId))
+                        .find(dst => dst && (dst.data.type === "ASSET_IMAGE" || dst.data.type === "ASSET_AUDIO"));
+                    
+                    if (assetNode && assetNode.data.url) {
+                        html += ` src="${assetNode.data.url}"`;
+                    }
+                }
+
                 if (elNode.data.attrsText) {
                     const attrRegex = /([\w-]+)\s*:\s*("[^"]*"|'[^']*')/g;
                     let match;
@@ -143,12 +153,20 @@ export class VsbCompiler {
                         html += ` ${elNode.data.attrsText.trim()}`;
                     }
                 }
+                
+                const isSelfClosing = ["img", "input", "br", "hr", "meta", "link"].includes(tag);
+                
+                if (isSelfClosing) {
+                    html += ` />\n`;
+                    return html;
+                }
+                
                 html += `>\n`;
 
                 const elOutEdges = graph.outEdges(elNode.id) || [];
                 const children = elOutEdges
                     .filter(e => e.data.rootId === htmlFile.id && graph.getNode(e.dstId)?.data.type === "ELEMENT")
-                    .sort((a, b) => a.data.order - b.data.order)
+                    .sort((a, b) => (a.data?.order || 0) - (b.data?.order || 0))
                     .map(e => graph.getNode(e.dstId));
 
                 // Validate events attached to this element
@@ -179,7 +197,7 @@ export class VsbCompiler {
                     }
                 }
 
-                html += `${indent}</${elNode.data.tag || "div"}>\n`;
+                html += `${indent}</${tag}>\n`;
                 return html;
             };
 

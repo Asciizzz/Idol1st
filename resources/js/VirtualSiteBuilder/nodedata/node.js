@@ -123,11 +123,10 @@ export class VsbNodeData extends VsData {
         const allowInput = vsgraph?.ctx?.showNodeInputs ?? false;
         if (cache.lastAllowInput !== allowInput) {
             cache.lastAllowInput = allowInput;
-            const inputs = element.querySelectorAll("input, textarea");
-            inputs.forEach(input => {
-                input.style.pointerEvents = allowInput ? "auto" : "none";
-                input.readOnly = !allowInput;
-            });
+            if (cache.title) {
+                cache.title.style.pointerEvents = allowInput ? "auto" : "none";
+                cache.title.readOnly = !allowInput;
+            }
         }
     }
 }

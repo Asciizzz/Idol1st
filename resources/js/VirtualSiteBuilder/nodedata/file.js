@@ -84,12 +84,12 @@ export class VsbFileData extends VsbNodeData {
                     padding: 0;
                 }
                 .vsb-color-picker::-webkit-color-swatch {
-                    border: 1.5px solid rgba(0, 0, 0, 0.3);
+                    border: 2px solid var(--vsb-cp-border, rgba(0, 0, 0, 0.3));
                     border-radius: 50%;
                     box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
                 }
                 .vsb-color-picker::-moz-color-swatch {
-                    border: 1.5px solid rgba(0, 0, 0, 0.3);
+                    border: 2px solid var(--vsb-cp-border, rgba(0, 0, 0, 0.3));
                     border-radius: 50%;
                     box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
                 }
@@ -161,10 +161,12 @@ export class VsbFileData extends VsbNodeData {
         cache.header.style.background = `linear-gradient(105deg, ${fileColor} 0%, ${fileColor} 75%, ${typeColor} 75%, ${typeColor} 100%)`;
         cache.title.style.color = textColor;
         cache.meta.style.color = metaColor;
+        cache.colorInput.style.setProperty("--vsb-cp-border", textColor);
 
         if (document.activeElement !== cache.title) {
             cache.title.value = node.data.name ?? node.id;
         }
+
         cache.colorInput.value = fileColor;
         
         cache.meta.textContent  = this._fileTypeName();
