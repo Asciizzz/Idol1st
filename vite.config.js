@@ -5,7 +5,9 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
+                'resources/css/admin.css',
                 'resources/js/vsb.js',
+                'resources/js/admin.js',
             ],
             refresh: true,
         }),
