@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
+
 class AuthEditorController extends Controller
 {
     public function showEditor(Request $request): View
@@ -85,5 +89,60 @@ class AuthEditorController extends Controller
         $safeSlug  = $safeSlug !== '' ? $safeSlug : 'untitled';
 
         return sprintf('%s_%s.json', $sessionId, $safeSlug);
+    }
+
+    /**
+     * POST /api/auth/login
+     *
+     * Validates credentials and issues a Sanctum token.
+     * Response shape matches idol_saas_api.yaml § Fan - Auth › login,
+     * using `user` instead of `fan` since this is the VSB editor layer.
+     */
+    public function login(LoginRequest $request): JsonResponse
+    {
+        if (! Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials.',
+            ], 401);
+        }
+
+        $user  = Auth::user();
+        $token = $user->createToken('editor-token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'token'   => $token,
+            'user'    => new UserResource($user),
+        ]);
+    }
+
+    /**
+     * POST /api/auth/logout
+     *
+     * Revokes the current access token.
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        // Revoke only the token that was used to authenticate this request.
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out successfully.',
+        ]);
+    }
+
+    /**
+     * GET /api/auth/me
+     *
+     * Returns the authenticated user's profile.
+     */
+    public function me(Request $request): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'user'    => new UserResource($request->user()),
+        ]);
     }
 }
