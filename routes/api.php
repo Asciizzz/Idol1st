@@ -10,6 +10,9 @@ use App\Http\Controllers\CompilerController;
 use App\Http\Controllers\PublishController;
 use App\Http\Controllers\AdminController;
 
+use App\Http\Controllers\Admin\TenantController;
+use App\Http\Controllers\Admin\PlanController;
+
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthEditorController::class, 'login']);
@@ -40,8 +43,26 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// Tenant management (admin only)
 Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(function () {
     Route::get('users',    [AdminController::class, 'users']);
     Route::get('projects', [AdminController::class, 'projects']);
     Route::get('stats',    [AdminController::class, 'stats']);
+
+    // Plans
+    Route::get('plans',  [PlanController::class, 'index']);
+    Route::post('plans', [PlanController::class, 'store']);
+
+    // Tenants
+    Route::get('tenants',    [TenantController::class, 'index']);
+    Route::post('tenants',   [TenantController::class, 'store']);
+
+    Route::prefix('tenants/{tenantId}')->group(function () {
+        Route::get('/',           [TenantController::class, 'show']);
+        Route::patch('/',         [TenantController::class, 'update']);
+        Route::post('suspend',    [TenantController::class, 'suspend']);
+        Route::post('reactivate', [TenantController::class, 'reactivate']);
+        Route::post('impersonate',[TenantController::class, 'impersonate']);
+        Route::put('plan',        [TenantController::class, 'assignPlan']);
+    });
 });
