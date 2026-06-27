@@ -1,2234 +1,2123 @@
 {
-	"label": "V-Builder Pro",
-	"_nextNodeId": 79,
-	"_nextEdgeId": 89,
-	"nodes": [
-		{
-			"id": "n_html_index",
-			"data": {
-				"vsgdata": {
-					"x": 0,
-					"y": 0,
-					"z": 0
-				},
-				"type": "HTML",
-				"name": "index.html"
-			}
-		},
-		{
-			"id": "n_css_main",
-			"data": {
-				"vsgdata": {
-					"x": -400,
-					"y": 0,
-					"z": 0
-				},
-				"type": "CSS",
-				"name": "main.css"
-			}
-		},
-		{
-			"id": "n_js_app",
-			"data": {
-				"vsgdata": {
-					"x": -400,
-					"y": -200,
-					"z": 0
-				},
-				"type": "JS",
-				"name": "app.js"
-			}
-		},
-		{
-			"id": "c_body",
-			"data": {
-				"vsgdata": {
-					"x": -700,
-					"y": 0,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body",
-				"selector": "body",
-				"declarations": {
-					"margin": "0",
-					"font-family": "\"Outfit\", \"Inter\", sans-serif",
-					"background": "#060608",
-					"color": "#f8fafc",
-					"overflow-x": "hidden",
-					"transition": "background 0.5s ease, color 0.5s ease"
-				}
-			}
-		},
-		{
-			"id": "c_light",
-			"data": {
-				"vsgdata": {
-					"x": -950,
-					"y": 150,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme",
-				"selector": "body.light-theme",
-				"declarations": {
-					"background": "#f1f5f9",
-					"color": "#0f172a"
-				}
-			}
-		},
-		{
-			"id": "c_container",
-			"data": {
-				"vsgdata": {
-					"x": -1200,
-					"y": 300,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".container",
-				"selector": ".container",
-				"declarations": {
-					"max-width": "1200px",
-					"margin": "0 auto",
-					"padding": "0 20px"
-				}
-			}
-		},
-		{
-			"id": "c_flex_center",
-			"data": {
-				"vsgdata": {
-					"x": -1450,
-					"y": 450,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".flex-center",
-				"selector": ".flex-center",
-				"declarations": {
-					"display": "flex",
-					"justify-content": "center",
-					"align-items": "center"
-				}
-			}
-		},
-		{
-			"id": "c_nav",
-			"data": {
-				"vsgdata": {
-					"x": -1700,
-					"y": 600,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "nav",
-				"selector": "nav",
-				"declarations": {
-					"display": "flex",
-					"justify-content": "space-between",
-					"align-items": "center",
-					"padding": "20px 40px",
-					"background": "rgba(6, 6, 8, 0.7)",
-					"backdrop-filter": "blur(16px)",
-					"border-bottom": "1px solid rgba(255, 255, 255, 0.05)",
-					"position": "sticky",
-					"top": "0",
-					"z-index": "100"
-				}
-			}
-		},
-		{
-			"id": "c_nav_light",
-			"data": {
-				"vsgdata": {
-					"x": -1950,
-					"y": 750,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme nav",
-				"selector": "body.light-theme nav",
-				"declarations": {
-					"background": "rgba(255, 255, 255, 0.7)",
-					"border-bottom": "1px solid rgba(0, 0, 0, 0.05)"
-				}
-			}
-		},
-		{
-			"id": "c_logo",
-			"data": {
-				"vsgdata": {
-					"x": -2200,
-					"y": 900,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".logo",
-				"selector": ".logo",
-				"declarations": {
-					"font-size": "1.75rem",
-					"font-weight": "900",
-					"background": "linear-gradient(to right, #38bdf8, #818cf8, #c084fc)",
-					"-webkit-background-clip": "text",
-					"-webkit-text-fill-color": "transparent"
-				}
-			}
-		},
-		{
-			"id": "c_navlinks",
-			"data": {
-				"vsgdata": {
-					"x": -2450,
-					"y": 1050,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".nav-links",
-				"selector": ".nav-links",
-				"declarations": {
-					"display": "flex",
-					"gap": "30px"
-				}
-			}
-		},
-		{
-			"id": "c_nava",
-			"data": {
-				"vsgdata": {
-					"x": -2700,
-					"y": 1200,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".nav-item",
-				"selector": ".nav-item",
-				"declarations": {
-					"cursor": "pointer",
-					"font-weight": "600",
-					"transition": "color 0.2s",
-					"color": "#94a3b8"
-				}
-			}
-		},
-		{
-			"id": "c_navahov",
-			"data": {
-				"vsgdata": {
-					"x": -2950,
-					"y": 1350,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".nav-item:hover",
-				"selector": ".nav-item:hover",
-				"declarations": {
-					"color": "#38bdf8"
-				}
-			}
-		},
-		{
-			"id": "c_hero",
-			"data": {
-				"vsgdata": {
-					"x": -3200,
-					"y": 1500,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".hero",
-				"selector": ".hero",
-				"declarations": {
-					"min-height": "90vh",
-					"display": "flex",
-					"flex-direction": "column",
-					"justify-content": "center",
-					"align-items": "center",
-					"text-align": "center",
-					"position": "relative",
-					"overflow": "hidden"
-				}
-			}
-		},
-		{
-			"id": "c_hero_bg",
-			"data": {
-				"vsgdata": {
-					"x": -3450,
-					"y": 1650,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".hero::before",
-				"selector": ".hero::before",
-				"declarations": {
-					"content": "\"\"",
-					"position": "absolute",
-					"top": "-50%",
-					"left": "-50%",
-					"width": "200%",
-					"height": "200%",
-					"background": "radial-gradient(circle at center, rgba(129, 140, 248, 0.15) 0%, transparent 50%)",
-					"z-index": "-1"
-				}
-			}
-		},
-		{
-			"id": "c_h1",
-			"data": {
-				"vsgdata": {
-					"x": -3700,
-					"y": 1800,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "h1",
-				"selector": "h1",
-				"declarations": {
-					"font-size": "5rem",
-					"font-weight": "800",
-					"line-height": "1.1",
-					"letter-spacing": "-0.03em",
-					"margin-bottom": "24px"
-				}
-			}
-		},
-		{
-			"id": "c_h1_span",
-			"data": {
-				"vsgdata": {
-					"x": -3950,
-					"y": 1950,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "h1 span",
-				"selector": "h1 span",
-				"declarations": {
-					"background": "linear-gradient(135deg, #38bdf8, #c084fc)",
-					"-webkit-background-clip": "text",
-					"-webkit-text-fill-color": "transparent"
-				}
-			}
-		},
-		{
-			"id": "c_hero_p",
-			"data": {
-				"vsgdata": {
-					"x": -4200,
-					"y": 2100,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".hero p",
-				"selector": ".hero p",
-				"declarations": {
-					"font-size": "1.25rem",
-					"color": "#94a3b8",
-					"max-width": "600px",
-					"margin-bottom": "40px",
-					"line-height": "1.6"
-				}
-			}
-		},
-		{
-			"id": "c_btngroup",
-			"data": {
-				"vsgdata": {
-					"x": -4450,
-					"y": 2250,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn-group",
-				"selector": ".btn-group",
-				"declarations": {
-					"display": "flex",
-					"gap": "20px"
-				}
-			}
-		},
-		{
-			"id": "c_btn",
-			"data": {
-				"vsgdata": {
-					"x": -4700,
-					"y": 2400,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn",
-				"selector": ".btn",
-				"declarations": {
-					"padding": "16px 32px",
-					"border-radius": "99px",
-					"font-weight": "700",
-					"font-size": "1.1rem",
-					"cursor": "pointer",
-					"border": "none",
-					"transition": "all 0.3s ease",
-					"position": "relative",
-					"overflow": "hidden"
-				}
-			}
-		},
-		{
-			"id": "c_btn_pri",
-			"data": {
-				"vsgdata": {
-					"x": -4950,
-					"y": 2550,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn.primary",
-				"selector": ".btn.primary",
-				"declarations": {
-					"background": "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-					"color": "#fff",
-					"box-shadow": "0 10px 25px rgba(99, 102, 241, 0.4)"
-				}
-			}
-		},
-		{
-			"id": "c_btn_pri_hov",
-			"data": {
-				"vsgdata": {
-					"x": -5200,
-					"y": 2700,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn.primary:hover",
-				"selector": ".btn.primary:hover",
-				"declarations": {
-					"transform": "translateY(-3px)",
-					"box-shadow": "0 15px 35px rgba(99, 102, 241, 0.6)"
-				}
-			}
-		},
-		{
-			"id": "c_btn_sec",
-			"data": {
-				"vsgdata": {
-					"x": -5450,
-					"y": 2850,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn.secondary",
-				"selector": ".btn.secondary",
-				"declarations": {
-					"background": "rgba(255,255,255,0.1)",
-					"color": "#fff",
-					"backdrop-filter": "blur(10px)"
-				}
-			}
-		},
-		{
-			"id": "c_btn_sec_light",
-			"data": {
-				"vsgdata": {
-					"x": -5700,
-					"y": 3000,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme .btn.secondary",
-				"selector": "body.light-theme .btn.secondary",
-				"declarations": {
-					"background": "rgba(0,0,0,0.1)",
-					"color": "#000"
-				}
-			}
-		},
-		{
-			"id": "c_btn_sec_hov",
-			"data": {
-				"vsgdata": {
-					"x": -5950,
-					"y": 3150,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".btn.secondary:hover",
-				"selector": ".btn.secondary:hover",
-				"declarations": {
-					"background": "rgba(255,255,255,0.2)"
-				}
-			}
-		},
-		{
-			"id": "c_section",
-			"data": {
-				"vsgdata": {
-					"x": -6200,
-					"y": 3300,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "section",
-				"selector": "section",
-				"declarations": {
-					"padding": "100px 20px",
-					"border-top": "1px solid rgba(255,255,255,0.05)"
-				}
-			}
-		},
-		{
-			"id": "c_sec_light",
-			"data": {
-				"vsgdata": {
-					"x": -6450,
-					"y": 3450,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme section",
-				"selector": "body.light-theme section",
-				"declarations": {
-					"border-top": "1px solid rgba(0,0,0,0.05)"
-				}
-			}
-		},
-		{
-			"id": "c_h2",
-			"data": {
-				"vsgdata": {
-					"x": -6700,
-					"y": 3600,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "h2",
-				"selector": "h2",
-				"declarations": {
-					"font-size": "3rem",
-					"text-align": "center",
-					"margin-bottom": "60px",
-					"font-weight": "800"
-				}
-			}
-		},
-		{
-			"id": "c_grid",
-			"data": {
-				"vsgdata": {
-					"x": -6950,
-					"y": 3750,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".grid",
-				"selector": ".grid",
-				"declarations": {
-					"display": "grid",
-					"grid-template-columns": "repeat(auto-fit, minmax(300px, 1fr))",
-					"gap": "40px",
-					"max-width": "1000px",
-					"margin": "0 auto"
-				}
-			}
-		},
-		{
-			"id": "c_card",
-			"data": {
-				"vsgdata": {
-					"x": -7200,
-					"y": 3900,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".card",
-				"selector": ".card",
-				"declarations": {
-					"background": "rgba(255,255,255,0.02)",
-					"border": "1px solid rgba(255,255,255,0.05)",
-					"border-radius": "20px",
-					"padding": "40px",
-					"cursor": "pointer",
-					"transition": "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s",
-					"transform-style": "preserve-3d",
-					"position": "relative"
-				}
-			}
-		},
-		{
-			"id": "c_card_light",
-			"data": {
-				"vsgdata": {
-					"x": -7450,
-					"y": 4050,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme .card",
-				"selector": "body.light-theme .card",
-				"declarations": {
-					"background": "#fff",
-					"border": "1px solid rgba(0,0,0,0.1)",
-					"box-shadow": "0 10px 30px rgba(0,0,0,0.05)"
-				}
-			}
-		},
-		{
-			"id": "c_card_hov",
-			"data": {
-				"vsgdata": {
-					"x": -7700,
-					"y": 4200,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".card:hover",
-				"selector": ".card:hover",
-				"declarations": {
-					"box-shadow": "0 20px 40px rgba(0,0,0,0.3)",
-					"border-color": "rgba(129, 140, 248, 0.5)"
-				}
-			}
-		},
-		{
-			"id": "c_para",
-			"data": {
-				"vsgdata": {
-					"x": -7950,
-					"y": 4350,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".parallax-box",
-				"selector": ".parallax-box",
-				"declarations": {
-					"width": "100%",
-					"max-width": "800px",
-					"height": "400px",
-					"margin": "60px auto",
-					"border-radius": "30px",
-					"background": "linear-gradient(135deg, #1e293b, #0f172a)",
-					"display": "flex",
-					"justify-content": "center",
-					"align-items": "center",
-					"overflow": "hidden",
-					"position": "relative"
-				}
-			}
-		},
-		{
-			"id": "c_para_in",
-			"data": {
-				"vsgdata": {
-					"x": -8200,
-					"y": 4500,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".parallax-inner",
-				"selector": ".parallax-inner",
-				"declarations": {
-					"width": "80%",
-					"height": "80%",
-					"background": "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2))",
-					"border-radius": "20px",
-					"backdrop-filter": "blur(10px)",
-					"border": "1px solid rgba(255,255,255,0.1)",
-					"transition": "transform 0.1s ease-out",
-					"display": "flex",
-					"justify-content": "center",
-					"align-items": "center",
-					"font-size": "2rem",
-					"font-weight": "bold"
-				}
-			}
-		},
-		{
-			"id": "c_news",
-			"data": {
-				"vsgdata": {
-					"x": -8450,
-					"y": 4650,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".newsletter",
-				"selector": ".newsletter",
-				"declarations": {
-					"background": "linear-gradient(to right, rgba(56, 189, 248, 0.1), rgba(192, 132, 252, 0.1))",
-					"padding": "80px 20px",
-					"text-align": "center",
-					"border-radius": "40px",
-					"margin": "0 auto",
-					"max-width": "1000px"
-				}
-			}
-		},
-		{
-			"id": "c_input",
-			"data": {
-				"vsgdata": {
-					"x": -8700,
-					"y": 4800,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "input",
-				"selector": "input",
-				"declarations": {
-					"padding": "16px 24px",
-					"border-radius": "99px",
-					"border": "1px solid rgba(255,255,255,0.2)",
-					"background": "rgba(0,0,0,0.2)",
-					"color": "#fff",
-					"font-size": "1.1rem",
-					"width": "300px",
-					"margin-right": "10px",
-					"outline": "none"
-				}
-			}
-		},
-		{
-			"id": "c_input_light",
-			"data": {
-				"vsgdata": {
-					"x": -8950,
-					"y": 4950,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "body.light-theme input",
-				"selector": "body.light-theme input",
-				"declarations": {
-					"background": "#fff",
-					"border": "1px solid #ccc",
-					"color": "#000"
-				}
-			}
-		},
-		{
-			"id": "c_input_foc",
-			"data": {
-				"vsgdata": {
-					"x": -9200,
-					"y": 5100,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "input:focus",
-				"selector": "input:focus",
-				"declarations": {
-					"border-color": "#38bdf8"
-				}
-			}
-		},
-		{
-			"id": "c_ripple",
-			"data": {
-				"vsgdata": {
-					"x": -9450,
-					"y": 5250,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": ".ripple",
-				"selector": ".ripple",
-				"declarations": {
-					"position": "absolute",
-					"border-radius": "50%",
-					"background": "rgba(255, 255, 255, 0.4)",
-					"transform": "scale(0)",
-					"animation": "ripple 0.6s linear",
-					"pointer-events": "none"
-				}
-			}
-		},
-		{
-			"id": "c_keyf",
-			"data": {
-				"vsgdata": {
-					"x": -9700,
-					"y": 5400,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "@keyframes ripple",
-				"selector": "@keyframes ripple",
-				"code": "to { transform: scale(4); opacity: 0; }"
-			}
-		},
-		{
-			"id": "c_footer",
-			"data": {
-				"vsgdata": {
-					"x": -9950,
-					"y": 5550,
-					"z": 0
-				},
-				"type": "CSS_RULE",
-				"name": "footer",
-				"selector": "footer",
-				"declarations": {
-					"text-align": "center",
-					"padding": "40px",
-					"color": "#64748b",
-					"border-top": "1px solid rgba(255,255,255,0.05)",
-					"margin-top": "60px"
-				}
-			}
-		},
-		{
-			"id": "j_nav",
-			"data": {
-				"vsgdata": {
-					"x": 400,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Alert Route",
-				"event": "click",
-				"code": "alert(\"Simulated routing to: \" + event.currentTarget.innerText);"
-			}
-		},
-		{
-			"id": "j_rip",
-			"data": {
-				"vsgdata": {
-					"x": 800,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Ripple Effect",
-				"event": "click",
-				"code": "\nconst rect = event.currentTarget.getBoundingClientRect();\nconst circle = document.createElement(\"span\");\nconst diameter = Math.max(rect.width, rect.height);\ncircle.style.width = circle.style.height = `${diameter}px`;\ncircle.style.left = `${event.clientX - rect.left - diameter/2}px`;\ncircle.style.top = `${event.clientY - rect.top - diameter/2}px`;\ncircle.classList.add(\"ripple\");\nconst existing = event.currentTarget.querySelector('.ripple');\nif (existing) existing.remove();\nevent.currentTarget.appendChild(circle);\n"
-			}
-		},
-		{
-			"id": "j_flip",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Card Flip",
-				"event": "click",
-				"code": "\nconst target = event.currentTarget;\ntarget.style.transform = 'rotateY(180deg) scale(1.05)';\nsetTimeout(() => {\n  target.style.transform = 'rotateY(0deg) scale(1)';\n}, 800);\n"
-			}
-		},
-		{
-			"id": "j_theme",
-			"data": {
-				"vsgdata": {
-					"x": 1600,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Theme Toggle",
-				"event": "click",
-				"code": "\ndocument.body.classList.toggle('light-theme');\nevent.currentTarget.innerText = document.body.classList.contains('light-theme') ? 'Dark Mode' : 'Light Mode';\n"
-			}
-		},
-		{
-			"id": "j_pmv",
-			"data": {
-				"vsgdata": {
-					"x": 2000,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Parallax Move",
-				"event": "mousemove",
-				"code": "\nconst inner = event.currentTarget.querySelector('.parallax-inner');\nif(!inner) return;\nconst rect = event.currentTarget.getBoundingClientRect();\nconst x = event.clientX - rect.left;\nconst y = event.clientY - rect.top;\nconst moveX = (x - rect.width/2) / 10;\nconst moveY = (y - rect.height/2) / 10;\ninner.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.05)`;\n"
-			}
-		},
-		{
-			"id": "j_plv",
-			"data": {
-				"vsgdata": {
-					"x": 2400,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Parallax Leave",
-				"event": "mouseleave",
-				"code": "\nconst inner = event.currentTarget.querySelector('.parallax-inner');\nif(inner) inner.style.transform = 'translate(0, 0) scale(1)';\n"
-			}
-		},
-		{
-			"id": "j_sub",
-			"data": {
-				"vsgdata": {
-					"x": 2800,
-					"y": -600,
-					"z": 0
-				},
-				"type": "JS_EVENT",
-				"name": "Form Submit",
-				"event": "click",
-				"code": "\nevent.preventDefault();\nconst btn = event.currentTarget;\nif(btn.disabled) return;\nconst prev = btn.innerText;\nbtn.innerText = \"Processing...\";\nbtn.style.opacity = \"0.7\";\nbtn.disabled = true;\nsetTimeout(() => {\n  btn.innerText = \"Subscribed!\";\n  btn.style.background = \"#10b981\";\n  btn.style.opacity = \"1\";\n  setTimeout(() => {\n     btn.innerText = prev;\n     btn.style.background = \"\";\n     btn.disabled = false;\n  }, 2500);\n}, 1000);\n"
-			}
-		},
-		{
-			"id": "e_nav",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": -200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Navbar",
-				"tag": "nav",
-				"attrsText": "",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_logo",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": -300,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Logo",
-				"tag": "div",
-				"attrsText": "class=\"logo\"",
-				"text": "V-BUILDER"
-			}
-		},
-		{
-			"id": "e_links",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": -100,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Nav Links",
-				"tag": "div",
-				"attrsText": "class=\"nav-links\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_l1",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": -200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Link Solutions",
-				"tag": "div",
-				"attrsText": "class=\"nav-item\"",
-				"text": "Solutions"
-			}
-		},
-		{
-			"id": "e_l2",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": -100,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Link Demos",
-				"tag": "div",
-				"attrsText": "class=\"nav-item\"",
-				"text": "Interactive Demos"
-			}
-		},
-		{
-			"id": "e_l3",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 0,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Link Pricing",
-				"tag": "div",
-				"attrsText": "class=\"nav-item\"",
-				"text": "Pricing"
-			}
-		},
-		{
-			"id": "e_hero",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 400,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Hero Section",
-				"tag": "section",
-				"attrsText": "class=\"hero\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_h1",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Hero Title",
-				"tag": "h1",
-				"attrsText": "",
-				"text": "The Future is "
-			}
-		},
-		{
-			"id": "e_h1_span",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Hero Highlight",
-				"tag": "span",
-				"attrsText": "",
-				"text": "Visual."
-			}
-		},
-		{
-			"id": "e_hp",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 400,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Hero Desc",
-				"tag": "p",
-				"attrsText": "",
-				"text": "Build fully functional, script-injected, and beautifully styled web graphs. Welcome to the ultimate spatial engineering playground."
-			}
-		},
-		{
-			"id": "e_hbg",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 600,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Hero Btn Group",
-				"tag": "div",
-				"attrsText": "class=\"btn-group\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_btn1",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 500,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Btn Primary",
-				"tag": "button",
-				"attrsText": "class=\"btn primary\"",
-				"text": "Launch App"
-			}
-		},
-		{
-			"id": "e_btn2",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 700,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Btn Secondary",
-				"tag": "button",
-				"attrsText": "class=\"btn secondary\"",
-				"text": "Light Mode"
-			}
-		},
-		{
-			"id": "e_sec",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 1400,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Demo Section",
-				"tag": "section",
-				"attrsText": "",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_sh2",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 1000,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Section Title",
-				"tag": "h2",
-				"attrsText": "",
-				"text": "Interactive Elements"
-			}
-		},
-		{
-			"id": "e_grid",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 1200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Card Grid",
-				"tag": "div",
-				"attrsText": "class=\"grid\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_c1",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 1100,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Flip Card 1",
-				"tag": "div",
-				"attrsText": "class=\"card\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_c1h",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 1050,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "C1 Title",
-				"tag": "h3",
-				"attrsText": "style=\"color:#38bdf8; font-size:1.5rem; margin-top:0;\"",
-				"text": "3D Flip Events"
-			}
-		},
-		{
-			"id": "e_c1p",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 1150,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "C1 Text",
-				"tag": "p",
-				"attrsText": "style=\"color:#94a3b8\"",
-				"text": "Click this card to trigger a complex 180-degree rotation powered by spatial JS."
-			}
-		},
-		{
-			"id": "e_c2",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 1300,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Flip Card 2",
-				"tag": "div",
-				"attrsText": "class=\"card\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_c2h",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 1250,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "C2 Title",
-				"tag": "h3",
-				"attrsText": "style=\"color:#c084fc; font-size:1.5rem; margin-top:0;\"",
-				"text": "Ripple Binding"
-			}
-		},
-		{
-			"id": "e_c2p",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 1350,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "C2 Text",
-				"tag": "p",
-				"attrsText": "style=\"color:#94a3b8\"",
-				"text": "Dynamic calculation of bounds to spawn perfect ripple elements on click."
-			}
-		},
-		{
-			"id": "e_para",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 1600,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Parallax Container",
-				"tag": "div",
-				"attrsText": "class=\"parallax-box\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_parin",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 1600,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Parallax Inner",
-				"tag": "div",
-				"attrsText": "class=\"parallax-inner\"",
-				"text": "Hover & Move Mouse"
-			}
-		},
-		{
-			"id": "e_news",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 2200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Newsletter Section",
-				"tag": "section",
-				"attrsText": "",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_nbox",
-			"data": {
-				"vsgdata": {
-					"x": 600,
-					"y": 2200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Newsletter Box",
-				"tag": "div",
-				"attrsText": "class=\"newsletter\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_nh2",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 2000,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "News Title",
-				"tag": "h2",
-				"attrsText": "style=\"margin-top:0\"",
-				"text": "Join the Revolution"
-			}
-		},
-		{
-			"id": "e_nflex",
-			"data": {
-				"vsgdata": {
-					"x": 900,
-					"y": 2200,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "News Form",
-				"tag": "form",
-				"attrsText": "class=\"flex-center\"",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_inp",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 2100,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Input",
-				"tag": "input",
-				"attrsText": "type=\"email\" placeholder=\"Enter your email\" required",
-				"text": ""
-			}
-		},
-		{
-			"id": "e_sbtn",
-			"data": {
-				"vsgdata": {
-					"x": 1200,
-					"y": 2300,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Submit Button",
-				"tag": "button",
-				"attrsText": "class=\"btn primary\"",
-				"text": "Subscribe"
-			}
-		},
-		{
-			"id": "e_foot",
-			"data": {
-				"vsgdata": {
-					"x": 300,
-					"y": 2600,
-					"z": 0
-				},
-				"type": "ELEMENT",
-				"name": "Footer",
-				"tag": "footer",
-				"attrsText": "",
-				"text": "© 2026 V-Builder Inc. All rights reserved. Built with infinite spatial logic."
-			}
-		}
-	],
-	"edges": [
-		{
-			"id": "e0",
-			"srcId": "n_html_index",
-			"dstId": "n_css_main",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e1",
-			"srcId": "n_html_index",
-			"dstId": "n_js_app",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e2",
-			"srcId": "n_css_main",
-			"dstId": "c_body",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e3",
-			"srcId": "c_body",
-			"dstId": "c_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e4",
-			"srcId": "c_light",
-			"dstId": "c_container",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e5",
-			"srcId": "c_container",
-			"dstId": "c_flex_center",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e6",
-			"srcId": "c_flex_center",
-			"dstId": "c_nav",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e7",
-			"srcId": "c_nav",
-			"dstId": "c_nav_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e8",
-			"srcId": "c_nav_light",
-			"dstId": "c_logo",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e9",
-			"srcId": "c_logo",
-			"dstId": "c_navlinks",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e10",
-			"srcId": "c_navlinks",
-			"dstId": "c_nava",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e11",
-			"srcId": "c_nava",
-			"dstId": "c_navahov",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e12",
-			"srcId": "c_navahov",
-			"dstId": "c_hero",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e13",
-			"srcId": "c_hero",
-			"dstId": "c_hero_bg",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e14",
-			"srcId": "c_hero_bg",
-			"dstId": "c_h1",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e15",
-			"srcId": "c_h1",
-			"dstId": "c_h1_span",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e16",
-			"srcId": "c_h1_span",
-			"dstId": "c_hero_p",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e17",
-			"srcId": "c_hero_p",
-			"dstId": "c_btngroup",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e18",
-			"srcId": "c_btngroup",
-			"dstId": "c_btn",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e19",
-			"srcId": "c_btn",
-			"dstId": "c_btn_pri",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e20",
-			"srcId": "c_btn_pri",
-			"dstId": "c_btn_pri_hov",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e21",
-			"srcId": "c_btn_pri_hov",
-			"dstId": "c_btn_sec",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e22",
-			"srcId": "c_btn_sec",
-			"dstId": "c_btn_sec_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e23",
-			"srcId": "c_btn_sec_light",
-			"dstId": "c_btn_sec_hov",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e24",
-			"srcId": "c_btn_sec_hov",
-			"dstId": "c_section",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e25",
-			"srcId": "c_section",
-			"dstId": "c_sec_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e26",
-			"srcId": "c_sec_light",
-			"dstId": "c_h2",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e27",
-			"srcId": "c_h2",
-			"dstId": "c_grid",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e28",
-			"srcId": "c_grid",
-			"dstId": "c_card",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e29",
-			"srcId": "c_card",
-			"dstId": "c_card_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e30",
-			"srcId": "c_card_light",
-			"dstId": "c_card_hov",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e31",
-			"srcId": "c_card_hov",
-			"dstId": "c_para",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e32",
-			"srcId": "c_para",
-			"dstId": "c_para_in",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e33",
-			"srcId": "c_para_in",
-			"dstId": "c_news",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e34",
-			"srcId": "c_news",
-			"dstId": "c_input",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e35",
-			"srcId": "c_input",
-			"dstId": "c_input_light",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e36",
-			"srcId": "c_input_light",
-			"dstId": "c_input_foc",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e37",
-			"srcId": "c_input_foc",
-			"dstId": "c_ripple",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e38",
-			"srcId": "c_ripple",
-			"dstId": "c_keyf",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e39",
-			"srcId": "c_keyf",
-			"dstId": "c_footer",
-			"data": {
-				"rootId": "n_css_main",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e40",
-			"srcId": "n_js_app",
-			"dstId": "j_nav",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e41",
-			"srcId": "n_js_app",
-			"dstId": "j_rip",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e42",
-			"srcId": "n_js_app",
-			"dstId": "j_flip",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e43",
-			"srcId": "n_js_app",
-			"dstId": "j_theme",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e44",
-			"srcId": "n_js_app",
-			"dstId": "j_pmv",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e45",
-			"srcId": "n_js_app",
-			"dstId": "j_plv",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e46",
-			"srcId": "n_js_app",
-			"dstId": "j_sub",
-			"data": {
-				"rootId": "n_js_app",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e47",
-			"srcId": "n_html_index",
-			"dstId": "e_nav",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e48",
-			"srcId": "e_nav",
-			"dstId": "e_logo",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e49",
-			"srcId": "e_nav",
-			"dstId": "e_links",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e50",
-			"srcId": "e_links",
-			"dstId": "e_l1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e51",
-			"srcId": "e_links",
-			"dstId": "e_l2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e52",
-			"srcId": "e_links",
-			"dstId": "e_l3",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 3,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e53",
-			"srcId": "n_html_index",
-			"dstId": "e_hero",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e54",
-			"srcId": "e_hero",
-			"dstId": "e_h1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e55",
-			"srcId": "e_h1",
-			"dstId": "e_h1_span",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e56",
-			"srcId": "e_hero",
-			"dstId": "e_hp",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e57",
-			"srcId": "e_hero",
-			"dstId": "e_hbg",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 3,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e58",
-			"srcId": "e_hbg",
-			"dstId": "e_btn1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e59",
-			"srcId": "e_hbg",
-			"dstId": "e_btn2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e60",
-			"srcId": "n_html_index",
-			"dstId": "e_sec",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 3,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e61",
-			"srcId": "e_sec",
-			"dstId": "e_sh2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e62",
-			"srcId": "e_sec",
-			"dstId": "e_grid",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e63",
-			"srcId": "e_grid",
-			"dstId": "e_c1",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e64",
-			"srcId": "e_grid",
-			"dstId": "e_c2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e65",
-			"srcId": "e_c1",
-			"dstId": "e_c1h",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e66",
-			"srcId": "e_c1",
-			"dstId": "e_c1p",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e67",
-			"srcId": "e_c2",
-			"dstId": "e_c2h",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e68",
-			"srcId": "e_c2",
-			"dstId": "e_c2p",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e69",
-			"srcId": "e_sec",
-			"dstId": "e_para",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 3,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e70",
-			"srcId": "e_para",
-			"dstId": "e_parin",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e71",
-			"srcId": "n_html_index",
-			"dstId": "e_news",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 4,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e72",
-			"srcId": "e_news",
-			"dstId": "e_nbox",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e73",
-			"srcId": "e_nbox",
-			"dstId": "e_nh2",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e74",
-			"srcId": "e_nbox",
-			"dstId": "e_nflex",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e75",
-			"srcId": "e_nflex",
-			"dstId": "e_inp",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 1,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e76",
-			"srcId": "e_nflex",
-			"dstId": "e_sbtn",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 2,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e77",
-			"srcId": "n_html_index",
-			"dstId": "e_foot",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 5,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e78",
-			"srcId": "e_l1",
-			"dstId": "j_nav",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e79",
-			"srcId": "e_l2",
-			"dstId": "j_nav",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e80",
-			"srcId": "e_l3",
-			"dstId": "j_nav",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e81",
-			"srcId": "e_btn1",
-			"dstId": "j_rip",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e82",
-			"srcId": "e_sbtn",
-			"dstId": "j_rip",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e83",
-			"srcId": "e_btn2",
-			"dstId": "j_theme",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e84",
-			"srcId": "e_c1",
-			"dstId": "j_flip",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e85",
-			"srcId": "e_c2",
-			"dstId": "j_flip",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e86",
-			"srcId": "e_para",
-			"dstId": "j_pmv",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e87",
-			"srcId": "e_para",
-			"dstId": "j_plv",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		},
-		{
-			"id": "e88",
-			"srcId": "e_sbtn",
-			"dstId": "j_sub",
-			"data": {
-				"rootId": "n_html_index",
-				"order": 0,
-				"enabled": true
-			}
-		}
-	]
+    "label": "VTuber Pro Site",
+    "_nextNodeId": 1001,
+    "_nextEdgeId": 1091,
+    "nodes": [
+        {
+            "id": "css_main",
+            "data": {
+                "vsgdata": {
+                    "x": -400,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS",
+                "name": "main.css",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "js_app",
+            "data": {
+                "vsgdata": {
+                    "x": -400,
+                    "y": -400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "JS",
+                "name": "app.js",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_body",
+            "data": {
+                "vsgdata": {
+                    "x": -700,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "body",
+                "selector": "body",
+                "code": "margin: 0;\nfont-family: 'Quicksand', sans-serif;\nbackground: #fff0f5;\ncolor: #4a4a4a;\noverflow-x: hidden;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_nav",
+            "data": {
+                "vsgdata": {
+                    "x": -1000,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "nav",
+                "selector": "nav",
+                "code": "display: flex;\njustify-content: space-around;\nalign-items: center;\npadding: 15px 30px;\nbackground: #ff69b4;\nbox-shadow: 0 4px 15px rgba(255,105,180,0.4);\nposition: sticky;\ntop: 0;\nz-index: 100;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_logo",
+            "data": {
+                "vsgdata": {
+                    "x": -1300,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".logo",
+                "selector": ".logo",
+                "code": "font-size: 2rem;\nfont-weight: 800;\ncolor: #fff;\ntext-shadow: 2px 2px 0px #ff1493;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_nav_link",
+            "data": {
+                "vsgdata": {
+                    "x": -1300,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".nav-link",
+                "selector": ".nav-link",
+                "code": "color: #fff;\ntext-decoration: none;\nfont-weight: bold;\nfont-size: 1.1rem;\ncursor: pointer;\ntransition: transform 0.2s, color 0.2s;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_nav_link_hov",
+            "data": {
+                "vsgdata": {
+                    "x": -1000,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".nav-link:hover",
+                "selector": ".nav-link:hover",
+                "code": "color: #ffe4e1;\ntransform: scale(1.1);",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_hero",
+            "data": {
+                "vsgdata": {
+                    "x": -700,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".hero",
+                "selector": ".hero",
+                "code": "display: flex;\nflex-direction: column;\nalign-items: center;\njustify-content: center;\nmin-height: 80vh;\ntext-align: center;\npadding: 40px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_hero_title",
+            "data": {
+                "vsgdata": {
+                    "x": -700,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".hero h1",
+                "selector": ".hero h1",
+                "code": "font-size: 4rem;\ncolor: #ff1493;\nmargin-bottom: 20px;\ntext-transform: uppercase;\nletter-spacing: 2px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_hero_subtitle",
+            "data": {
+                "vsgdata": {
+                    "x": -1000,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".hero p",
+                "selector": ".hero p",
+                "code": "font-size: 1.5rem;\ncolor: #ff69b4;\nmax-width: 600px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_section",
+            "data": {
+                "vsgdata": {
+                    "x": -1300,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "section",
+                "selector": "section",
+                "code": "padding: 60px 20px;\nmax-width: 1000px;\nmargin: 0 auto;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_card_grid",
+            "data": {
+                "vsgdata": {
+                    "x": -1300,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".card-grid",
+                "selector": ".card-grid",
+                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\ngap: 30px;\nmargin-top: 40px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_card",
+            "data": {
+                "vsgdata": {
+                    "x": -1000,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".card",
+                "selector": ".card",
+                "code": "background: #fff;\nborder-radius: 20px;\npadding: 20px;\nbox-shadow: 0 10px 30px rgba(255,105,180,0.15);\ntransition: transform 0.3s ease;\nborder: 2px solid #ffe4e1;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_card_hov",
+            "data": {
+                "vsgdata": {
+                    "x": -700,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".card:hover",
+                "selector": ".card:hover",
+                "code": "transform: translateY(-10px);\nborder-color: #ff69b4;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_btn",
+            "data": {
+                "vsgdata": {
+                    "x": -700,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".btn",
+                "selector": ".btn",
+                "code": "background: linear-gradient(45deg, #ff69b4, #ff1493);\ncolor: #fff;\npadding: 15px 40px;\nborder: none;\nborder-radius: 30px;\nfont-size: 1.2rem;\nfont-weight: bold;\ncursor: pointer;\nbox-shadow: 0 5px 15px rgba(255,20,147,0.3);\ntransition: all 0.3s ease;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_btn_hov",
+            "data": {
+                "vsgdata": {
+                    "x": -1000,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": ".btn:hover",
+                "selector": ".btn:hover",
+                "code": "transform: scale(1.05);\nbox-shadow: 0 8px 20px rgba(255,20,147,0.5);",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_gallery_img",
+            "data": {
+                "vsgdata": {
+                    "x": -1300,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Gallery Image",
+                "selector": ".gallery-img",
+                "code": "width: 100%;\nheight: 200px;\nobject-fit: cover;\nborder-radius: 10px;\nmargin-bottom: 15px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_nav_links",
+            "data": {
+                "vsgdata": {
+                    "x": -500,
+                    "y": 700,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Nav Flex",
+                "selector": "",
+                "code": "display:flex;\ngap: 20px;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_sec_title",
+            "data": {
+                "vsgdata": {
+                    "x": -750,
+                    "y": 750,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Sec Title",
+                "selector": "",
+                "code": "color: #ff1493;\ntext-align: center;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_lore_grid",
+            "data": {
+                "vsgdata": {
+                    "x": -550,
+                    "y": 850,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Lore Grid",
+                "selector": "",
+                "code": "display: flex;\ngap: 30px;\nalign-items: center;\njustify-content: center;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_lore_img",
+            "data": {
+                "vsgdata": {
+                    "x": -800,
+                    "y": 900,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Lore Img",
+                "selector": "",
+                "code": "border-radius: 20px;\nmax-width: 300px;\nbox-shadow: 0 10px 30px rgba(0,0,0,0.2);",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_lore_txt",
+            "data": {
+                "vsgdata": {
+                    "x": -450,
+                    "y": 1000,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Lore Txt",
+                "selector": "",
+                "code": "font-size: 1.2rem;\nline-height: 1.8;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "in_card_txt",
+            "data": {
+                "vsgdata": {
+                    "x": -750,
+                    "y": 1050,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Card Txt",
+                "selector": "",
+                "code": "text-align:center;\nfont-weight:bold;\ncolor: #ff69b4;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "c_inline_img",
+            "data": {
+                "vsgdata": {
+                    "x": -500,
+                    "y": 1150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "CSS_RULE",
+                "name": "Hero Img",
+                "selector": "",
+                "code": "width: 100%;\nmax-width: 400px;\nborder-radius: 50%;\nborder: 8px solid #ffe4e1;\nbox-shadow: 0 10px 30px rgba(255,105,180,0.3);\nmargin-top: 30px;\nobject-fit: cover;",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "j_nav_alert",
+            "data": {
+                "vsgdata": {
+                    "x": 400,
+                    "y": -400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "JS_EVENT",
+                "name": "Nav Link Click",
+                "event": "click",
+                "code": "alert('Navigating to: ' + event.currentTarget.innerText.trim().toLowerCase() + '.html');",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "j_btn_alert",
+            "data": {
+                "vsgdata": {
+                    "x": 800,
+                    "y": -400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "JS_EVENT",
+                "name": "Subscribe Click",
+                "event": "click",
+                "code": "alert('Thank you for supporting!');\nevent.currentTarget.innerText = 'Subscribed! 💖';",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "html_index",
+            "data": {
+                "vsgdata": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "HTML",
+                "name": "index",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_nav",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Navbar",
+                "tag": "nav",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_logo",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": -300,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Logo",
+                "tag": "div",
+                "attrsText": "class='logo'",
+                "text": "🌟 VTuber Site",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_links",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Nav Links",
+                "tag": "div",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_l1",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Home Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Home",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_l2",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "About Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "About",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_l3",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Gallery Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Gallery",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_hero",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 300,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Hero Section",
+                "tag": "section",
+                "attrsText": "class='hero'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_h1",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Hero Title",
+                "tag": "h1",
+                "attrsText": "",
+                "text": "Welcome to my Virtual World! ✨",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "idx_hp",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 300,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Hero Text",
+                "tag": "p",
+                "attrsText": "",
+                "text": "I'm a virtual idol streaming games, songs, and comfy chats. Join the family!",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "idx_hero_img",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Hero Image",
+                "tag": "img",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "idx_btn",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 500,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Subscribe Btn",
+                "tag": "button",
+                "attrsText": "class='btn'",
+                "text": "Become a Member!",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "idx_hero_asset",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 400,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ASSET_IMAGE",
+                "name": "Hero Character Art",
+                "url": "",
+                "filename": "Select Character Art",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "html_about",
+            "data": {
+                "vsgdata": {
+                    "x": 0,
+                    "y": 800,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "HTML",
+                "name": "about",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_nav",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 600,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Navbar",
+                "tag": "nav",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_logo",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 550,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Logo",
+                "tag": "div",
+                "attrsText": "class='logo'",
+                "text": "🌟 VTuber Site",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_links",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 650,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Nav Links",
+                "tag": "div",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_l1",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 550,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Home Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Home",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_l2",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 650,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "About Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "About",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_l3",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 750,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Gallery Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Gallery",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_sec",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 900,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "About Section",
+                "tag": "section",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_h1",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 800,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "About Title",
+                "tag": "h1",
+                "attrsText": "",
+                "text": "About Me",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "abt_grid",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 950,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Lore Grid",
+                "tag": "div",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_img_el",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 850,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Lore Image",
+                "tag": "img",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "abt_txt",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1050,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Lore Text",
+                "tag": "p",
+                "attrsText": "",
+                "text": "[Replace this text with your VTuber lore. Tell your fans about your backstory, your goals, and what makes your streams unique!]",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "abt_asset",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 850,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ASSET_IMAGE",
+                "name": "Full Body Art",
+                "url": "",
+                "filename": "Select Full Body Art",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "html_gallery",
+            "data": {
+                "vsgdata": {
+                    "x": 0,
+                    "y": 1600,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "HTML",
+                "name": "gallery",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_nav",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 1400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Navbar",
+                "tag": "nav",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_logo",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1350,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Logo",
+                "tag": "div",
+                "attrsText": "class='logo'",
+                "text": "🌟 VTuber Site",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_links",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1450,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Nav Links",
+                "tag": "div",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_l1",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1350,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Home Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Home",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_l2",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1450,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "About Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "About",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_l3",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1550,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Gallery Link",
+                "tag": "div",
+                "attrsText": "class='nav-link'",
+                "text": "Gallery",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_sec",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 1700,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Gallery Section",
+                "tag": "section",
+                "attrsText": "",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_h1",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1600,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Gallery Title",
+                "tag": "h1",
+                "attrsText": "",
+                "text": "Media Gallery",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_grid",
+            "data": {
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1800,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card Grid",
+                "tag": "div",
+                "attrsText": "class='card-grid'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_card1",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1700,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card 1",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cimg1",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1700,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card Img 1",
+                "tag": "img",
+                "attrsText": "class='gallery-img'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cp1",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1750,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Card Text 1",
+                "tag": "p",
+                "attrsText": "",
+                "text": "Stream Highlight 1",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_asset1",
+            "data": {
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 1700,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ASSET_IMAGE",
+                "name": "Screenshot 1",
+                "url": "",
+                "filename": "Select Screenshot",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_card2",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1850,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card 2",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cimg2",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1850,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card Img 2",
+                "tag": "img",
+                "attrsText": "class='gallery-img'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cp2",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1900,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Card Text 2",
+                "tag": "p",
+                "attrsText": "",
+                "text": "Stream Highlight 2",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_asset2",
+            "data": {
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 1850,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ASSET_IMAGE",
+                "name": "Screenshot 2",
+                "url": "",
+                "filename": "Select Screenshot",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_card3",
+            "data": {
+                "vsgdata": {
+                    "x": 900,
+                    "y": 2000,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card 3",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cimg3",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2000,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "type": "ELEMENT",
+                "name": "Card Img 3",
+                "tag": "img",
+                "attrsText": "class='gallery-img'",
+                "text": "",
+                "collapsed": true
+            }
+        },
+        {
+            "id": "gal_cp3",
+            "data": {
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2050,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ELEMENT",
+                "name": "Card Text 3",
+                "tag": "p",
+                "attrsText": "",
+                "text": "Stream Highlight 3",
+                "collapsed": false
+            }
+        },
+        {
+            "id": "gal_asset3",
+            "data": {
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "type": "ASSET_IMAGE",
+                "name": "Screenshot 3",
+                "url": "",
+                "filename": "Select Screenshot",
+                "collapsed": false
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "e1",
+            "srcId": "css_main",
+            "dstId": "c_body",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e2",
+            "srcId": "c_body",
+            "dstId": "c_nav",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e3",
+            "srcId": "c_nav",
+            "dstId": "c_logo",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e4",
+            "srcId": "c_logo",
+            "dstId": "c_nav_link",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e5",
+            "srcId": "c_nav_link",
+            "dstId": "c_nav_link_hov",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e6",
+            "srcId": "c_nav_link_hov",
+            "dstId": "c_hero",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e7",
+            "srcId": "c_hero",
+            "dstId": "c_hero_title",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e8",
+            "srcId": "c_hero_title",
+            "dstId": "c_hero_subtitle",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e9",
+            "srcId": "c_hero_subtitle",
+            "dstId": "c_section",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e10",
+            "srcId": "c_section",
+            "dstId": "c_card_grid",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e11",
+            "srcId": "c_card_grid",
+            "dstId": "c_card",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e12",
+            "srcId": "c_card",
+            "dstId": "c_card_hov",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e13",
+            "srcId": "c_card_hov",
+            "dstId": "c_btn",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e14",
+            "srcId": "c_btn",
+            "dstId": "c_btn_hov",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e15",
+            "srcId": "c_btn_hov",
+            "dstId": "c_gallery_img",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e16",
+            "srcId": "js_app",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "js_app",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e17",
+            "srcId": "js_app",
+            "dstId": "j_btn_alert",
+            "data": {
+                "rootId": "js_app",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e18",
+            "srcId": "html_index",
+            "dstId": "css_main",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e19",
+            "srcId": "html_index",
+            "dstId": "js_app",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e20",
+            "srcId": "html_index",
+            "dstId": "idx_nav",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e21",
+            "srcId": "idx_nav",
+            "dstId": "idx_logo",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e22",
+            "srcId": "idx_nav",
+            "dstId": "idx_links",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e23",
+            "srcId": "idx_links",
+            "dstId": "in_nav_links",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e24",
+            "srcId": "idx_links",
+            "dstId": "idx_l1",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e25",
+            "srcId": "idx_links",
+            "dstId": "idx_l2",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e26",
+            "srcId": "idx_links",
+            "dstId": "idx_l3",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e27",
+            "srcId": "idx_l1",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e28",
+            "srcId": "idx_l2",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e29",
+            "srcId": "idx_l3",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e30",
+            "srcId": "html_index",
+            "dstId": "idx_hero",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e31",
+            "srcId": "idx_hero",
+            "dstId": "idx_h1",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e32",
+            "srcId": "idx_hero",
+            "dstId": "idx_hp",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e33",
+            "srcId": "idx_hero",
+            "dstId": "idx_hero_img",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e34",
+            "srcId": "idx_hero",
+            "dstId": "idx_btn",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e35",
+            "srcId": "idx_btn",
+            "dstId": "j_btn_alert",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e36",
+            "srcId": "idx_hero_img",
+            "dstId": "c_inline_img",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e37",
+            "srcId": "idx_hero_img",
+            "dstId": "idx_hero_asset",
+            "data": {
+                "rootId": "html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e38",
+            "srcId": "html_about",
+            "dstId": "css_main",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e39",
+            "srcId": "html_about",
+            "dstId": "js_app",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e40",
+            "srcId": "html_about",
+            "dstId": "abt_nav",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e41",
+            "srcId": "abt_nav",
+            "dstId": "abt_logo",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e42",
+            "srcId": "abt_nav",
+            "dstId": "abt_links",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e43",
+            "srcId": "abt_links",
+            "dstId": "in_nav_links",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e44",
+            "srcId": "abt_links",
+            "dstId": "abt_l1",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e45",
+            "srcId": "abt_links",
+            "dstId": "abt_l2",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e46",
+            "srcId": "abt_links",
+            "dstId": "abt_l3",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e47",
+            "srcId": "abt_l1",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e48",
+            "srcId": "abt_l2",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e49",
+            "srcId": "abt_l3",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e50",
+            "srcId": "html_about",
+            "dstId": "abt_sec",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e51",
+            "srcId": "abt_h1",
+            "dstId": "in_sec_title",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e52",
+            "srcId": "abt_grid",
+            "dstId": "in_lore_grid",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e53",
+            "srcId": "abt_sec",
+            "dstId": "abt_h1",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e54",
+            "srcId": "abt_sec",
+            "dstId": "abt_grid",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e55",
+            "srcId": "abt_img_el",
+            "dstId": "in_lore_img",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e56",
+            "srcId": "abt_txt",
+            "dstId": "in_lore_txt",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e57",
+            "srcId": "abt_grid",
+            "dstId": "abt_img_el",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e58",
+            "srcId": "abt_grid",
+            "dstId": "abt_txt",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e59",
+            "srcId": "abt_img_el",
+            "dstId": "abt_asset",
+            "data": {
+                "rootId": "html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e60",
+            "srcId": "html_gallery",
+            "dstId": "css_main",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e61",
+            "srcId": "html_gallery",
+            "dstId": "js_app",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e62",
+            "srcId": "html_gallery",
+            "dstId": "gal_nav",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e63",
+            "srcId": "gal_nav",
+            "dstId": "gal_logo",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e64",
+            "srcId": "gal_nav",
+            "dstId": "gal_links",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e65",
+            "srcId": "gal_links",
+            "dstId": "in_nav_links",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e66",
+            "srcId": "gal_links",
+            "dstId": "gal_l1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e67",
+            "srcId": "gal_links",
+            "dstId": "gal_l2",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e68",
+            "srcId": "gal_links",
+            "dstId": "gal_l3",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e69",
+            "srcId": "gal_l1",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e70",
+            "srcId": "gal_l2",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e71",
+            "srcId": "gal_l3",
+            "dstId": "j_nav_alert",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e72",
+            "srcId": "html_gallery",
+            "dstId": "gal_sec",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e73",
+            "srcId": "gal_h1",
+            "dstId": "in_sec_title",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e74",
+            "srcId": "gal_sec",
+            "dstId": "gal_h1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e75",
+            "srcId": "gal_sec",
+            "dstId": "gal_grid",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e76",
+            "srcId": "gal_grid",
+            "dstId": "gal_card1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e77",
+            "srcId": "gal_cp1",
+            "dstId": "in_card_txt",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e78",
+            "srcId": "gal_card1",
+            "dstId": "gal_cimg1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e79",
+            "srcId": "gal_card1",
+            "dstId": "gal_cp1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e80",
+            "srcId": "gal_cimg1",
+            "dstId": "gal_asset1",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e81",
+            "srcId": "gal_grid",
+            "dstId": "gal_card2",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e82",
+            "srcId": "gal_cp2",
+            "dstId": "in_card_txt",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e83",
+            "srcId": "gal_card2",
+            "dstId": "gal_cimg2",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e84",
+            "srcId": "gal_card2",
+            "dstId": "gal_cp2",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e85",
+            "srcId": "gal_cimg2",
+            "dstId": "gal_asset2",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e86",
+            "srcId": "gal_grid",
+            "dstId": "gal_card3",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e87",
+            "srcId": "gal_cp3",
+            "dstId": "in_card_txt",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e88",
+            "srcId": "gal_card3",
+            "dstId": "gal_cimg3",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e89",
+            "srcId": "gal_card3",
+            "dstId": "gal_cp3",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e90",
+            "srcId": "gal_cimg3",
+            "dstId": "gal_asset3",
+            "data": {
+                "rootId": "html_gallery",
+                "order": 0,
+                "enabled": true
+            }
+        }
+    ]
 }

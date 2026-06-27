@@ -87,7 +87,7 @@ export class VsbUI {
         this.triggerCompile = () => {
             if (this.compileTimer) clearTimeout(this.compileTimer);
             this.compileTimer = setTimeout(() => {
-                this.compiledData = VsbCompiler.compile(this.vsgraph.graph);
+                this.compiledData = VsbCompiler.compile(this.vsgraph.graph, this.vsgraph.ctx);
                 this.renderPreviewContent();
             }, 100);
         };
@@ -342,7 +342,7 @@ export class VsbUI {
         if (!this.compiledData) return;
 
         this.previewTabs.innerHTML = "";
-        const tabs = ["preview", "html", "css", "js"];
+        const tabs = ["preview", "html", "css", "js", "assets"];
         
         for (const tab of tabs) {
             const btn = document.createElement("div");
@@ -462,6 +462,103 @@ export class VsbUI {
             }
             wrapper.append(this.currentLogDiv);
             this.previewContent.append(wrapper);
+        } else if (this.previewActiveTab === "assets") {
+            const assetManagerContainer = document.createElement("div");
+            Object.assign(assetManagerContainer.style, {
+                padding: "20px", color: "#fff", display: "flex", flexDirection: "column", height: "100%", boxSizing: "border-box"
+            });
+            
+            assetManagerContainer.innerHTML = `
+                <h3 style="margin-top: 0;">Global Asset Manager</h3>
+                <p style="font-size: 11px; color: #8b93a7;">Upload assets here to make them available to your ASSET nodes.</p>
+                <div style="border: 2px dashed #666; padding: 30px 20px; text-align: center; border-radius: 8px; cursor: pointer; margin-bottom: 20px; background: rgba(255,255,255,0.05);" id="vsb-asset-dropzone">
+                    <div style="font-size: 24px; margin-bottom: 8px;">☁️</div>
+                    <div style="font-weight: bold;">Click or Drag to Upload</div>
+                    <div style="font-size: 10px; color: #8b93a7; margin-top: 4px;">Supports Images & Audio</div>
+                    <input type="file" id="vsb-asset-upload-input" style="display: none;" multiple accept="image/*,audio/*" />
+                </div>
+                <h4 style="margin-bottom: 10px;">Available Assets</h4>
+                <div id="vsb-asset-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1;"></div>
+            `;
+            this.previewContent.append(assetManagerContainer);
+            
+            const fileInput = assetManagerContainer.querySelector("#vsb-asset-upload-input");
+            const dropzone = assetManagerContainer.querySelector("#vsb-asset-dropzone");
+            const list = assetManagerContainer.querySelector("#vsb-asset-list");
+            
+            const handleFiles = (files) => {
+                let changed = false;
+                for (let file of files) {
+                    const isImg = file.type.startsWith("image/");
+                    const isAud = file.type.startsWith("audio/");
+                    if (!isImg && !isAud) continue;
+                    
+                    const assetId = "a_" + Date.now() + "_" + Math.floor(Math.random()*1000);
+                    const url = URL.createObjectURL(file);
+                    
+                    const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                    const cleanName = baseName.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    const typeLabel = isImg ? "Image" : "Audio";
+                    const formattedName = cleanName + " " + typeLabel;
+                    
+                    this.ctx.registerAsset(assetId, {
+                        url,
+                        filename: formattedName,
+                        file,
+                        type: isImg ? "image" : "audio"
+                    });
+                    changed = true;
+                }
+                if (changed) {
+                    this.vsgraph.render();
+                    this.renderPreviewContent();
+                }
+            };
+
+            dropzone.addEventListener("click", () => fileInput.click());
+            fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
+            
+            dropzone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropzone.style.background = "rgba(255,255,255,0.1)";
+            });
+            dropzone.addEventListener("dragleave", (e) => {
+                e.preventDefault();
+                dropzone.style.background = "rgba(255,255,255,0.05)";
+            });
+            dropzone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropzone.style.background = "rgba(255,255,255,0.05)";
+                if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+            });
+
+            if (this.ctx.assets.size === 0) {
+                list.innerHTML = "<div style='color: #8b93a7; font-size: 11px; font-style: italic;'>No assets uploaded yet.</div>";
+            } else {
+                for (const [id, asset] of this.ctx.assets.entries()) {
+                    const item = document.createElement("div");
+                    Object.assign(item.style, {
+                        background: "#2a2a2e", padding: "10px", borderRadius: "4px",
+                        display: "flex", alignItems: "center", gap: "12px",
+                        border: "1px solid #3a3b40"
+                    });
+                    
+                    if (asset.type === "image") {
+                        item.innerHTML = `<img src="${asset.url}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; background: #000;" />
+                                          <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                              <span style="font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${asset.filename}</span>
+                                              <span style="font-size: 10px; color: #8b93a7;">Image</span>
+                                          </div>`;
+                    } else {
+                        item.innerHTML = `<div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: #18191c; border-radius: 4px; font-size: 24px;">🎵</div>
+                                          <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                              <span style="font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${asset.filename}</span>
+                                              <span style="font-size: 10px; color: #8b93a7;">Audio</span>
+                                          </div>`;
+                    }
+                    list.append(item);
+                }
+            }
         } else {
             const filesObj = this.compiledData[`${this.previewActiveTab}Files`];
             const fileNames = Object.keys(filesObj);
@@ -812,7 +909,7 @@ export class VsbUI {
         );
 
         const handleEdgeToggle = (type, e) => {
-            const allTypes = ["showElementEdges", "showIncludeEdges", "showCssEdges", "showJsEdges", "showAssetEdges", "showScriptEventEdges"];
+            const allTypes = ["showElementEdges", "showIncludeEdges", "showCssEdges", "showJsEdges", "showAssetEdges", "showScriptEventEdges", "showInlineStyleEdges"];
             if (e.shiftKey) {
                 allTypes.forEach(t => this.ctx[t] = false);
                 this.ctx[type] = true;
@@ -826,18 +923,47 @@ export class VsbUI {
             this.vsgraph.render();
         };
 
-        const mkEdgeIcon = (label, active, type) => {
-            return createIconBtn(`<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16" font-size="11" font-family="monospace" font-weight="bold" text-anchor="middle" fill="currentColor">${label}</text></svg>`, null, active, (e) => handleEdgeToggle(type, e));
+        const mkEdgeToggleBtn = (label, active, type, color) => {
+            const btn = document.createElement("div");
+            Object.assign(btn.style, {
+                boxSizing: "border-box", padding: "0 10px", height: "32px",
+                borderRadius: "6px", cursor: "pointer",
+                background: active ? "#ffffff" : "#1a1a1a",
+                color: active ? "#000000" : "#ffffff",
+                display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "8px",
+                fontSize: "11px", fontWeight: "bold", pointerEvents: "auto",
+                border: active ? "2px solid #ffffff" : "2px solid #333",
+                whiteSpace: "nowrap", width: "100%"
+            });
+            
+            const dot = document.createElement("div");
+            Object.assign(dot.style, {
+                width: "8px", height: "8px", borderRadius: "50%", background: color, border: active ? "1px solid rgba(0,0,0,0.5)" : "none"
+            });
+            
+            const text = document.createElement("div");
+            text.textContent = label;
+            
+            btn.append(dot, text);
+            
+            btn.addEventListener("pointerenter", () => { if (!active) btn.style.background = "#2a2a2a"; });
+            btn.addEventListener("pointerleave", () => { if (!active) btn.style.background = "#1a1a1a"; });
+            btn.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                handleEdgeToggle(type, e);
+            });
+            return btn;
         };
 
         mainCol.append(
             separator.cloneNode(),
-            mkEdgeIcon("EL", this.ctx.showElementEdges, "showElementEdges"),
-            mkEdgeIcon("IN", this.ctx.showIncludeEdges, "showIncludeEdges"),
-            mkEdgeIcon("CS", this.ctx.showCssEdges, "showCssEdges"),
-            mkEdgeIcon("JS", this.ctx.showJsEdges, "showJsEdges"),
-            mkEdgeIcon("AS", this.ctx.showAssetEdges, "showAssetEdges"),
-            mkEdgeIcon("EV", this.ctx.showScriptEventEdges, "showScriptEventEdges")
+            mkEdgeToggleBtn("HTML Includes", this.ctx.showIncludeEdges, "showIncludeEdges", "rgba(255,255,255,0.7)"),
+            mkEdgeToggleBtn("Element Structure", this.ctx.showElementEdges, "showElementEdges", "#e34c26"),
+            mkEdgeToggleBtn("CSS Rules", this.ctx.showCssEdges, "showCssEdges", "#264de4"),
+            mkEdgeToggleBtn("Inline Styles", this.ctx.showInlineStyleEdges, "showInlineStyleEdges", "#3b82f6"),
+            mkEdgeToggleBtn("JS Flow", this.ctx.showJsEdges, "showJsEdges", "#f7df1e"),
+            mkEdgeToggleBtn("JS Events", this.ctx.showScriptEventEdges, "showScriptEventEdges", "#f7df1e"),
+            mkEdgeToggleBtn("Assets", this.ctx.showAssetEdges, "showAssetEdges", "#ec4899")
         );
 
         if (this.activeSubMenu) {

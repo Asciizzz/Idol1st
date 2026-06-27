@@ -13,15 +13,10 @@ export class VsbWriter {
     constructor(graph) { this.graph = graph; }
 
     static addHtmlFile(graph, options = {}) { return graph.addNode({ data: new VsbHtmlFileData(options) }); }
-
     static addCssFile(graph, options = {}) { return graph.addNode({ data: new VsbCssFileData(options) }); }
-
     static addJsFile(graph, options = {}) { return graph.addNode({ data: new VsbJsFileData(options) }); }
-
     static addElement(graph, options = {}) { return graph.addNode({ data: new VsbHtmlElementData(options) }); }
-
     static addCssRule(graph, options = {}) { return graph.addNode({ data: new VsbCssRuleData(options) }); }
-
     static addJsEvent(graph, options = {}) { return graph.addNode({ data: new VsbJsEventData(options) }); }
 
     static addEdge(graph, srcId, dstId, options = {}) {

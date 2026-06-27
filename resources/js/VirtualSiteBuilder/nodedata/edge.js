@@ -283,8 +283,10 @@ export class VsbEdgeData extends VsData {
             edgeCategory = "showElementEdges";
         } else if ((stype === "HTML" && (dtype === "CSS" || dtype === "JS")) || (dtype === "HTML" && (stype === "CSS" || stype === "JS"))) {
             edgeCategory = "showIncludeEdges";
-        } else if (stype === "CSS" || stype === "CSS_RULE" || (stype === "ELEMENT" && dtype === "CSS_RULE")) {
+        } else if (stype === "CSS" || stype === "CSS_RULE") {
             edgeCategory = "showCssEdges";
+        } else if (stype === "ELEMENT" && dtype === "CSS_RULE") {
+            edgeCategory = "showInlineStyleEdges";
         } else if (stype === "JS" && dtype === "JS_EVENT") {
             edgeCategory = "showJsEdges";
         } else if (stype === "ELEMENT" && dtype === "JS_EVENT") {
@@ -314,13 +316,23 @@ export class VsbEdgeData extends VsData {
         const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
         let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
-        if (edgeCategory === "showAssetEdges") {
-            if (!hasError) color = "#ffffff";
+        if (stype === "ELEMENT" && dtype === "CSS_RULE") {
+            if (!hasError) color = "#3b82f6";
+            cache.visiblePath.setAttribute("stroke-dasharray", "6 6");
+            cache.visiblePath.setAttribute("stroke-linecap", "round");
+        } else if (edgeCategory === "showAssetEdges") {
+            if (!hasError) color = "#ec4899";
             cache.visiblePath.setAttribute("stroke-dasharray", "2 4");
             cache.visiblePath.setAttribute("stroke-linecap", "round");
-        } else if (edgeCategory === "showScriptEventEdges" || edgeCategory === "showJsEdges") {
+        } else if (edgeCategory === "showScriptEventEdges") {
             if (!hasError) color = "#f7df1e";
             cache.visiblePath.setAttribute("stroke-dasharray", "4 4");
+        } else if (edgeCategory === "showJsEdges") {
+            if (!hasError) color = "#f7df1e";
+            cache.visiblePath.removeAttribute("stroke-dasharray");
+        } else if (edgeCategory === "showElementEdges") {
+            if (!hasError) color = "#e34c26";
+            cache.visiblePath.removeAttribute("stroke-dasharray");
         } else {
             cache.visiblePath.removeAttribute("stroke-dasharray");
         }

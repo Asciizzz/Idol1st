@@ -53,6 +53,24 @@ class AuthEditorController extends Controller
         ]);
     }
 
+    public function uploadAsset(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'max:10240'], // 10MB max, adjust as needed
+        ]);
+
+        $file = $request->file('file');
+        
+        // Save to storage/app/public/editor-assets
+        $path = $file->store('editor-assets', 'public');
+
+        return response()->json([
+            'ok'   => true,
+            'url'  => Storage::url($path),
+            'name' => $file->getClientOriginalName(),
+        ]);
+    }
+
     // ---- Private helpers ----
 
     private function resolveDraft(Request $request): array

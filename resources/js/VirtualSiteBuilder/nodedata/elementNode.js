@@ -60,6 +60,27 @@ export class VsbElementData extends VsbNodeData {
             if (e.key === "Enter") title.blur();
         });
 
+        const collapseBtn = document.createElement("div");
+        collapseBtn.innerHTML = "▼";
+        Object.assign(collapseBtn.style, {
+            cursor: "pointer",
+            marginRight: "6px",
+            fontSize: "10px",
+            color: "inherit",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            userSelect: "none"
+        });
+        collapseBtn.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+            if (!node.data.vsgdata) node.data.vsgdata = {};
+            node.data.vsgdata.collapsed = !(node.data.vsgdata?.collapsed ?? false);
+            if (vsgraph) vsgraph.render();
+        });
+
+        header.append(collapseBtn, title);
+
         Object.assign(body.style, {
             padding:      "8px 9px 12px",
             background:   "#25262a",
@@ -67,7 +88,6 @@ export class VsbElementData extends VsbNodeData {
             flexDirection: "column"
         });
 
-        header.append(title);
         element.append(header, body);
 
         // Resize handles
@@ -106,6 +126,7 @@ export class VsbElementData extends VsbNodeData {
             // Recalculate true dx based on clamped width to keep node exactly centered
             const actualDx = (dragInfo.side === "right" ? (newWidth - dragInfo.startWidth) : -(newWidth - dragInfo.startWidth));
 
+            if (!node.data.vsgdata) node.data.vsgdata = {};
             node.data.vsgdata.width = newWidth;
             node.data.vsgdata.x = dragInfo.startXPos + actualDx / 2;
 
@@ -127,6 +148,7 @@ export class VsbElementData extends VsbNodeData {
         cache.header = header;
         cache.title  = title;
         cache.body   = body;
+        cache.collapseBtn = collapseBtn;
 
         return { element, cache };
     }
@@ -138,11 +160,20 @@ export class VsbElementData extends VsbNodeData {
         element.style.width = (node.data.vsgdata?.width ?? defaultWidth) + "px";
 
         const data = node.data;
+        const vsg = data.vsgdata;
+
+        if (cache.collapseBtn) {
+            cache.collapseBtn.innerHTML = vsg?.collapsed ? "▶" : "▼";
+        }
+
+        if (vsg?.collapsed) {
+            cache.body.style.display = "none";
+        } else {
+            cache.body.style.display = "flex";
+        }
+
         if (document.activeElement !== cache.title) {
             cache.title.value = data.name ?? node.id;
         }
-
-        const collapsed = data.vsgdata?.collapsed ?? false;
-        cache.body.hidden = collapsed;
     }
 }

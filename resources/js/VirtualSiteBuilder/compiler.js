@@ -1,5 +1,5 @@
 export class VsbCompiler {
-    static compile(graph) {
+    static compile(graph, ctx = null) {
         const result = {
             htmlFiles: {},
             cssFiles: {},
@@ -23,7 +23,7 @@ export class VsbCompiler {
         // 2. Build CSS
         for (const cssFile of cssFiles) {
             const rawName = cssFile.data.name || cssFile.id;
-            const fileName = rawName.replace(/\.css$/i, '').replace(/\s+/g, '_').toLowerCase() + ".css";
+            const fileName = rawName.replace(/\s+/g, '_').toLowerCase() + ".css";
             let content = "";
 
             // Find direct children
@@ -64,7 +64,7 @@ export class VsbCompiler {
         // 3. Build JS
         for (const jsFile of jsFiles) {
             const rawName = jsFile.data.name || jsFile.id;
-            const fileName = rawName.replace(/\.js$/i, '').replace(/\s+/g, '_').toLowerCase() + ".js";
+            const fileName = rawName.replace(/\s+/g, '_').toLowerCase() + ".js";
             let content = `document.addEventListener("DOMContentLoaded", () => {\n`;
             
             const outEdges = graph.outEdges(jsFile.id) || [];
@@ -99,7 +99,7 @@ export class VsbCompiler {
         // 4. Build HTML
         for (const htmlFile of htmlFiles) {
             const rawName = htmlFile.data.name || htmlFile.id;
-            const fileName = rawName.replace(/\.html$/i, '').replace(/\s+/g, '_').toLowerCase() + ".html";
+            const fileName = rawName.replace(/\s+/g, '_').toLowerCase() + ".html";
             let content = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>${htmlFile.data.name || 'Virtual Site'}</title>\n`;
             
             // Includes
@@ -108,14 +108,12 @@ export class VsbCompiler {
             const includedJs  = fileOutEdges.filter(e => graph.getNode(e.dstId)?.data.type === "JS").map(e => graph.getNode(e.dstId));
 
             for (const css of includedCss) {
-                const rawCssName = css.data.name || css.id;
-                const cssName = rawCssName.replace(/\.css$/i, '').replace(/\s+/g, '_').toLowerCase() + ".css";
-                content += `  <link rel="stylesheet" href="${cssName}">\n`;
+                const cName = (css.data.name || css.id).replace(/\s+/g, '_').toLowerCase() + ".css";
+                content += `  <link rel="stylesheet" href="${cName}">\n`;
             }
             for (const js of includedJs) {
-                const rawJsName = js.data.name || js.id;
-                const jsName = rawJsName.replace(/\.js$/i, '').replace(/\s+/g, '_').toLowerCase() + ".js";
-                content += `  <script src="${jsName}" defer></script>\n`;
+                const jName = (js.data.name || js.id).replace(/\s+/g, '_').toLowerCase() + ".js";
+                content += `  <script src="${jName}" defer></script>\n`;
             }
             content += `</head>\n<body>\n`;
 
@@ -129,6 +127,19 @@ export class VsbCompiler {
                 const tag = (elNode.data.tag || "div").toLowerCase();
                 let html = `${indent}<${tag} data-vsb-id="${elNode.id}"`;
                 
+                // Inject Inline Styles
+                const outEdgesAll = graph.outEdges(elNode.id) || [];
+                const inlineStyles = outEdgesAll
+                    .filter(e => graph.getNode(e.dstId)?.data.type === "CSS_RULE")
+                    .map(e => graph.getNode(e.dstId));
+                
+                if (inlineStyles.length > 0) {
+                    const styleStrings = inlineStyles.map(s => s.data.code).filter(c => c).join(" ").replace(/\s+/g, ' ').trim();
+                    if (styleStrings) {
+                        html += ` style="${styleStrings}"`;
+                    }
+                }
+                
                 // Inject Asset Src if applicable
                 if (tag === "img" || tag === "audio" || tag === "video") {
                     const outEdges = graph.outEdges(elNode.id) || [];
@@ -136,8 +147,17 @@ export class VsbCompiler {
                         .map(e => graph.getNode(e.dstId))
                         .find(dst => dst && (dst.data.type === "ASSET_IMAGE" || dst.data.type === "ASSET_AUDIO"));
                     
-                    if (assetNode && assetNode.data.url) {
-                        html += ` src="${assetNode.data.url}"`;
+                    if (assetNode) {
+                        let url = assetNode.data.url;
+                        if (ctx && assetNode.data.assetId) {
+                            const assetData = ctx.getAsset(assetNode.data.assetId);
+                            if (assetData && assetData.url) {
+                                url = assetData.url;
+                            }
+                        }
+                        if (url) {
+                            html += ` src="${url}"`;
+                        }
                     }
                 }
 
