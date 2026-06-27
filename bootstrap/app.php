@@ -8,6 +8,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
     )
-    ->withMiddleware(function (Middleware $middleware) {})
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'require.auth' => \App\Http\Middleware\RequireAuth::class,
+            'ensure.admin' => \App\Http\Middleware\EnsureAdmin::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions) {})
     ->create();

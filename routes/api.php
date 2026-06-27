@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SnapshotController;
 use App\Http\Controllers\CompilerController;
 use App\Http\Controllers\PublishController;
+use App\Http\Controllers\AdminController;
 
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
@@ -37,4 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('publish',    [PublishController::class, 'publish']);
         Route::get('published',   [PublishController::class, 'show']);
     });
+});
+
+Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(function () {
+    Route::get('users',    [AdminController::class, 'users']);
+    Route::get('projects', [AdminController::class, 'projects']);
+    Route::get('stats',    [AdminController::class, 'stats']);
 });
