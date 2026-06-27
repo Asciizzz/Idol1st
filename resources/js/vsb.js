@@ -11,7 +11,6 @@ const graph = raw ? VsbJSON.read(raw) : new Agraph();
 const camera  = new VsCamera();
 const vsgraph = new VsGraph({ mount: document.querySelector("#app"), graph, camera });
 
-// Dot grid binds to the same camera and auto-updates on every vsgraph.render()
 const dotGrid = new VsDotGrid();
 dotGrid.bindVsGraph(vsgraph);
 
@@ -19,7 +18,6 @@ const ctx = new VsbCtx();
 vsgraph.ctx = ctx;
 vsgraph.render();
 
-// Dev helpers
 window.graph   = graph;
 window.vsgraph = vsgraph;
 window.ctx     = ctx;
@@ -27,10 +25,10 @@ window.ui      = new VsbUI(vsgraph);
 
 const token = window.__VSB_TOKEN__;
 
+// Load projects
 fetch('/api/projects', {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
     }
 });
