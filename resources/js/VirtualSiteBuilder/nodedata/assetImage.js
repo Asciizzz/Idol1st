@@ -13,12 +13,12 @@ export class VsbAssetImageData extends VsbElementData {
     static createFn({ node, graph, vsgraph }) {
         const { element, cache } = VsbElementData.createFn({ node, graph, vsgraph });
 
-        // Override header styling for Asset Node (white bg, black text)
+        // Override header styling for Asset Node
         Object.assign(cache.header.style, {
-            background: "#ffffff",
-            color: "#000000"
+            background: "#ec4899",
+            color: "#ffffff"
         });
-        cache.title.style.color = "#000000";
+        cache.title.style.color = "#ffffff";
 
         // Add Image Icon
         const icon = document.createElement("div");

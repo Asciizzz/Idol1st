@@ -909,7 +909,7 @@ export class VsbUI {
         );
 
         const handleEdgeToggle = (type, e) => {
-            const allTypes = ["showElementEdges", "showIncludeEdges", "showCssEdges", "showJsEdges", "showAssetEdges", "showScriptEventEdges"];
+            const allTypes = ["showElementEdges", "showIncludeEdges", "showCssEdges", "showJsEdges", "showAssetEdges", "showScriptEventEdges", "showInlineStyleEdges"];
             if (e.shiftKey) {
                 allTypes.forEach(t => this.ctx[t] = false);
                 this.ctx[type] = true;
@@ -923,18 +923,47 @@ export class VsbUI {
             this.vsgraph.render();
         };
 
-        const mkEdgeIcon = (label, active, type) => {
-            return createIconBtn(`<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16" font-size="11" font-family="monospace" font-weight="bold" text-anchor="middle" fill="currentColor">${label}</text></svg>`, null, active, (e) => handleEdgeToggle(type, e));
+        const mkEdgeToggleBtn = (label, active, type, color) => {
+            const btn = document.createElement("div");
+            Object.assign(btn.style, {
+                boxSizing: "border-box", padding: "0 10px", height: "32px",
+                borderRadius: "6px", cursor: "pointer",
+                background: active ? "#ffffff" : "#1a1a1a",
+                color: active ? "#000000" : "#ffffff",
+                display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "8px",
+                fontSize: "11px", fontWeight: "bold", pointerEvents: "auto",
+                border: active ? "2px solid #ffffff" : "2px solid #333",
+                whiteSpace: "nowrap", width: "100%"
+            });
+            
+            const dot = document.createElement("div");
+            Object.assign(dot.style, {
+                width: "8px", height: "8px", borderRadius: "50%", background: color, border: active ? "1px solid rgba(0,0,0,0.5)" : "none"
+            });
+            
+            const text = document.createElement("div");
+            text.textContent = label;
+            
+            btn.append(dot, text);
+            
+            btn.addEventListener("pointerenter", () => { if (!active) btn.style.background = "#2a2a2a"; });
+            btn.addEventListener("pointerleave", () => { if (!active) btn.style.background = "#1a1a1a"; });
+            btn.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                handleEdgeToggle(type, e);
+            });
+            return btn;
         };
 
         mainCol.append(
             separator.cloneNode(),
-            mkEdgeIcon("EL", this.ctx.showElementEdges, "showElementEdges"),
-            mkEdgeIcon("IN", this.ctx.showIncludeEdges, "showIncludeEdges"),
-            mkEdgeIcon("CS", this.ctx.showCssEdges, "showCssEdges"),
-            mkEdgeIcon("JS", this.ctx.showJsEdges, "showJsEdges"),
-            mkEdgeIcon("AS", this.ctx.showAssetEdges, "showAssetEdges"),
-            mkEdgeIcon("EV", this.ctx.showScriptEventEdges, "showScriptEventEdges")
+            mkEdgeToggleBtn("Element Structure", this.ctx.showElementEdges, "showElementEdges", "#ffffff"),
+            mkEdgeToggleBtn("HTML Includes", this.ctx.showIncludeEdges, "showIncludeEdges", "rgba(255,255,255,0.7)"),
+            mkEdgeToggleBtn("CSS Rules", this.ctx.showCssEdges, "showCssEdges", "#264de4"),
+            mkEdgeToggleBtn("Inline Styles", this.ctx.showInlineStyleEdges, "showInlineStyleEdges", "#3b82f6"),
+            mkEdgeToggleBtn("JS Flow", this.ctx.showJsEdges, "showJsEdges", "#f7df1e"),
+            mkEdgeToggleBtn("JS Events", this.ctx.showScriptEventEdges, "showScriptEventEdges", "#f7df1e"),
+            mkEdgeToggleBtn("Assets", this.ctx.showAssetEdges, "showAssetEdges", "#ec4899")
         );
 
         if (this.activeSubMenu) {

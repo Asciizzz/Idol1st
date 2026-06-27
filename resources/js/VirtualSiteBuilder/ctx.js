@@ -14,6 +14,7 @@ export class VsbCtx {
         this.showElementEdges = true;
         this.showIncludeEdges = true;
         this.showCssEdges = true;
+        this.showInlineStyleEdges = true;
         this.showJsEdges = true;
         this.showAssetEdges = true;
         this.showScriptEventEdges = true;
