@@ -1343,13 +1343,13 @@
             "data": {
                 "vsgdata": {
                     "x": 600,
-                    "y": 600,
+                    "y": 800,
                     "z": 0
                 },
                 "type": "ELEMENT",
                 "name": "Image Example",
                 "tag": "img",
-                "attrsText": "style=\"max-width: 100%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\"",
+                "attrsText": "",
                 "text": ""
             }
         },
@@ -1358,13 +1358,27 @@
             "data": {
                 "vsgdata": {
                     "x": 900,
-                    "y": 600,
+                    "y": 800,
                     "z": 0
                 },
                 "type": "ASSET_IMAGE",
                 "name": "Example Image",
                 "url": "/storage/editor-assets/Example.png",
                 "filename": "Example Image"
+            }
+        },
+        {
+            "id": "c_img_inline",
+            "data": {
+                "vsgdata": {
+                    "x": 300,
+                    "y": 800,
+                    "z": 0
+                },
+                "type": "CSS_RULE",
+                "name": "Image Styles",
+                "selector": "",
+                "code": "max-width: 100%;\nborder-radius: 20px;\nbox-shadow: 0 10px 30px rgba(0,0,0,0.5);"
             }
         }
     ],
@@ -2273,6 +2287,16 @@
             "id": "edge_90",
             "srcId": "n_img_example_79",
             "dstId": "n_asset_80",
+            "data": {
+                "rootId": "n_html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e85",
+            "srcId": "n_img_example_79",
+            "dstId": "c_img_inline",
             "data": {
                 "rootId": "n_html_index",
                 "order": 0,
