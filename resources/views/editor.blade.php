@@ -26,11 +26,16 @@
 <body>
     <div id="app"></div>
 
-    {{-- Raw Agraph blob (label/nodes/edges) for the VSB canvas --}}
+    {{-- Seed VSB canvas with graph state and draft metadata --}}
     <script>
         window.__VSB_GRAPH__ = @json($initialGraph);
         window.__VSB_DRAFT__  = @json($draft);
+
+        {{-- Sanctum token for API calls from vsb.js --}}
+        {{-- Usage in JS: const token = window.__VSB_TOKEN__ --}}
+        window.__VSB_TOKEN__ = @json(session('sanctum_token'));
     </script>
+</form>
 </body>
 
 </html>

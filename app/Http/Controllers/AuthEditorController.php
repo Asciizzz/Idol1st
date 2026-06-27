@@ -12,6 +12,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Http\RedirectResponse;
+
 class AuthEditorController extends Controller
 {
     public function showEditor(Request $request): View
@@ -162,5 +164,79 @@ class AuthEditorController extends Controller
             'success' => true,
             'user'    => new UserResource($request->user()),
         ]);
+    }
+
+    /**
+     * GET /login
+     * Show the login form. Redirect to editor if already authenticated.
+     */
+    public function showLogin(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return redirect()->route('editor');
+        }
+
+        return view('login');
+    }
+
+    /**
+     * POST /login
+     * Authenticate via session (web guard) for blade views.
+     * On success, also mint a Sanctum token and store it in the session
+     * so the editor's JS can pick it up for API calls.
+     */
+    public function handleLogin(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! Auth::attempt($request->only('email', 'password'), remember: true)) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Invalid credentials.']);
+        }
+
+        $request->session()->regenerate();
+
+        // Mint a Sanctum token and store it in the session so vsb.js
+        // can read window.__VSB_TOKEN__ for API calls without a separate login.
+        $user  = Auth::user();
+        $token = $user->createToken('editor-session')->plainTextToken;
+        $request->session()->put('sanctum_token', $token);
+
+        // Admins go to the admin panel, editors go to the editor
+        return $user->role === 'admin'
+            ? redirect()->route('admin')
+            : redirect()->route('editor');
+    }
+
+    /**
+     * POST /logout
+     * Revoke the session Sanctum token and log the user out.
+     */
+    public function webLogout(Request $request): RedirectResponse
+    {
+        // Revoke the session-stored Sanctum token if it exists
+        $user = Auth::user();
+        if ($user) {
+            $user->tokens()->where('name', 'editor-session')->delete();
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+
+    /**
+     * GET /admin
+     * Show the admin panel. Role check is handled by middleware.
+     */
+    public function showAdmin(): View
+    {
+        return view('admin');
     }
 }

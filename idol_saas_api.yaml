@@ -1,0 +1,2099 @@
+openapi: 3.0.3
+info:
+  title: Idol SaaS Platform API
+  description: |
+    Multi-tenant SaaS platform API for idol fansites.
+    
+    ## Authentication
+    - **Platform Admin** — Bearer token via `/api/admin/auth/login`
+    - **Tenant Admin** — Bearer token via `/api/manage/auth/login`
+    - **Fan** — Bearer token via `/api/auth/login` (tenant-scoped)
+    
+    ## Tenant Identification
+    All fan and tenant admin requests are scoped to a tenant via the
+    `X-Tenant-ID` header or subdomain resolution.
+    
+    ## Base URLs
+    - Platform Admin: `https://api.idolsaas.com/api/admin`
+    - Tenant Admin:   `https://api.idolsaas.com/api/manage`
+    - Fan:            `https://{tenant}.idolsaas.com/api`
+  version: 1.0.0
+  contact:
+    name: Idol SaaS API
+
+servers:
+  - url: https://api.idolsaas.com
+    description: Production
+  - url: https://staging-api.idolsaas.com
+    description: Staging
+
+# ─────────────────────────────────────────────────────────────
+# SECURITY SCHEMES
+# ─────────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    AdminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Service Admin token
+    TenantAdminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tenant Admin token
+    FanBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Fan token (tenant-scoped)
+
+  parameters:
+    TenantHeader:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Tenant UUID for scoping the request
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    PerPageParam:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 20
+        maximum: 100
+
+  # ── SHARED SCHEMAS ─────────────────────────────────────────
+  schemas:
+
+    # Common
+    UUID:
+      type: string
+      format: uuid
+      example: "550e8400-e29b-41d4-a716-446655440000"
+
+    Timestamp:
+      type: string
+      format: date-time
+      example: "2026-06-10T12:00:00Z"
+
+    PaginationMeta:
+      type: object
+      properties:
+        current_page: { type: integer }
+        per_page:     { type: integer }
+        total:        { type: integer }
+        last_page:    { type: integer }
+
+    SuccessResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    # ── PLATFORM SCHEMAS ─────────────────────────────────────
+
+    ServiceAdmin:
+      type: object
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        email:          { type: string, format: email }
+        role:           { type: string, enum: [SUPER_ADMIN, SUPPORT, BILLING_ADMIN, OPS] }
+        mfa_enabled:    { type: boolean }
+        is_active:      { type: boolean }
+        last_login_at:  { $ref: '#/components/schemas/Timestamp' }
+        created_at:     { $ref: '#/components/schemas/Timestamp' }
+
+    Tenant:
+      type: object
+      properties:
+        id:           { $ref: '#/components/schemas/UUID' }
+        name:         { type: string }
+        status:       { type: string, enum: [ACTIVE, SUSPENDED, DELETED, PENDING] }
+        created_by:   { $ref: '#/components/schemas/UUID' }
+        created_at:   { $ref: '#/components/schemas/Timestamp' }
+        suspended_at: { $ref: '#/components/schemas/Timestamp', nullable: true }
+        config:       { $ref: '#/components/schemas/TenantConfig' }
+        subscription: { $ref: '#/components/schemas/TenantSubscription' }
+
+    TenantConfig:
+      type: object
+      properties:
+        branding_logo:   { type: string, format: uri, nullable: true }
+        branding_colors: { type: object, nullable: true }
+        custom_domain:   { type: string, nullable: true }
+        settings:        { type: object }
+
+    Plan:
+      type: object
+      properties:
+        id:            { $ref: '#/components/schemas/UUID' }
+        name:          { type: string }
+        price:         { type: number, format: float }
+        billing_cycle: { type: string, enum: [MONTHLY, YEARLY, LIFETIME] }
+        is_active:     { type: boolean }
+        features:
+          type: array
+          items: { $ref: '#/components/schemas/Feature' }
+
+    Feature:
+      type: object
+      properties:
+        id:          { $ref: '#/components/schemas/UUID' }
+        name:        { type: string }
+        description: { type: string }
+        is_enabled:  { type: boolean }
+
+    TenantSubscription:
+      type: object
+      properties:
+        id:         { $ref: '#/components/schemas/UUID' }
+        plan:       { $ref: '#/components/schemas/Plan' }
+        start_date: { $ref: '#/components/schemas/Timestamp' }
+        end_date:   { $ref: '#/components/schemas/Timestamp', nullable: true }
+        status:     { type: string, enum: [ACTIVE, EXPIRED, CANCELLED, PENDING] }
+
+    FeatureFlag:
+      type: object
+      properties:
+        id:                   { $ref: '#/components/schemas/UUID' }
+        name:                 { type: string }
+        is_globally_enabled:  { type: boolean }
+        created_at:           { $ref: '#/components/schemas/Timestamp' }
+
+    # ── IDOL SCHEMAS ──────────────────────────────────────────
+
+    IdolProfile:
+      type: object
+      properties:
+        id:                 { $ref: '#/components/schemas/UUID' }
+        tenant_id:          { $ref: '#/components/schemas/UUID' }
+        stage_name:         { type: string }
+        debut_date:         { type: string, format: date, nullable: true }
+        agency:             { type: string, nullable: true }
+        nationality:        { type: string, nullable: true }
+        profile_image_url:  { type: string, format: uri, nullable: true }
+        banner_image_url:   { type: string, format: uri, nullable: true }
+        bio:                { type: string, nullable: true }
+        status:             { type: string, enum: [ACTIVE, HIATUS, RETIRED] }
+        social_links:
+          type: array
+          items: { $ref: '#/components/schemas/SocialLink' }
+
+    IdolGroup:
+      type: object
+      properties:
+        id:                 { $ref: '#/components/schemas/UUID' }
+        group_name:         { type: string }
+        debut_date:         { type: string, format: date, nullable: true }
+        agency:             { type: string, nullable: true }
+        profile_image_url:  { type: string, format: uri, nullable: true }
+        bio:                { type: string, nullable: true }
+        members:
+          type: array
+          items: { $ref: '#/components/schemas/IdolProfile' }
+
+    SocialLink:
+      type: object
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        platform:       { type: string, enum: [TWITTER, INSTAGRAM, YOUTUBE, TIKTOK, WEIBO] }
+        url:            { type: string, format: uri }
+        follower_count: { type: integer }
+        last_synced_at: { $ref: '#/components/schemas/Timestamp', nullable: true }
+
+    Discography:
+      type: object
+      properties:
+        id:               { $ref: '#/components/schemas/UUID' }
+        title:            { type: string }
+        release_type:     { type: string, enum: [SINGLE, EP, ALBUM, COLLABORATION] }
+        release_date:     { type: string, format: date, nullable: true }
+        cover_image_url:  { type: string, format: uri, nullable: true }
+        streaming_links:
+          type: array
+          items: { $ref: '#/components/schemas/ExternalSite' }
+
+    # ── CONTENT SCHEMAS ───────────────────────────────────────
+
+    BlogPost:
+      type: object
+      properties:
+        id:               { $ref: '#/components/schemas/UUID' }
+        title:            { type: string }
+        content:          { type: string }
+        cover_image_url:  { type: string, format: uri, nullable: true }
+        tags:             { type: array, items: { type: string } }
+        status:           { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
+        visibility:       { type: string, enum: [PUBLIC, SUBSCRIBERS_ONLY, PAID_ONLY] }
+        category:         { $ref: '#/components/schemas/BlogCategory', nullable: true }
+        published_at:     { $ref: '#/components/schemas/Timestamp', nullable: true }
+        created_at:       { $ref: '#/components/schemas/Timestamp' }
+        updated_at:       { $ref: '#/components/schemas/Timestamp' }
+        like_count:       { type: integer }
+        comment_count:    { type: integer }
+
+    BlogCategory:
+      type: object
+      properties:
+        id:   { $ref: '#/components/schemas/UUID' }
+        name: { type: string }
+
+    BlogComment:
+      type: object
+      properties:
+        id:         { $ref: '#/components/schemas/UUID' }
+        fan_id:     { $ref: '#/components/schemas/UUID' }
+        content:    { type: string }
+        is_hidden:  { type: boolean }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+
+    MediaGallery:
+      type: object
+      properties:
+        id:          { $ref: '#/components/schemas/UUID' }
+        title:       { type: string }
+        description: { type: string, nullable: true }
+        visibility:  { type: string, enum: [PUBLIC, SUBSCRIBERS_ONLY, PAID_ONLY] }
+        item_count:  { type: integer }
+        created_at:  { $ref: '#/components/schemas/Timestamp' }
+
+    MediaItem:
+      type: object
+      properties:
+        id:            { $ref: '#/components/schemas/UUID' }
+        media_type:    { type: string, enum: [IMAGE, VIDEO_LINK, AUDIO] }
+        url:           { type: string, format: uri }
+        thumbnail_url: { type: string, format: uri, nullable: true }
+        caption:       { type: string, nullable: true }
+        display_order: { type: integer }
+
+    ExternalSite:
+      type: object
+      properties:
+        id:            { $ref: '#/components/schemas/UUID' }
+        label:         { type: string }
+        url:           { type: string, format: uri }
+        site_type:     { type: string, enum: [STREAMING, TICKETING, OFFICIAL_SITE, FANCLUB, MERCHANDISE, SOCIAL_MEDIA, YOUTUBE_CHANNEL, PODCAST] }
+        icon_url:      { type: string, format: uri, nullable: true }
+        display_order: { type: integer }
+        is_active:     { type: boolean }
+
+    IdolEvent:
+      type: object
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        title:          { type: string }
+        description:    { type: string, nullable: true }
+        event_type:     { type: string, enum: [CONCERT, FANSIGN, LIVESTREAM, ANNIVERSARY, COMEBACK] }
+        start_datetime: { $ref: '#/components/schemas/Timestamp' }
+        end_datetime:   { $ref: '#/components/schemas/Timestamp', nullable: true }
+        location:       { type: string, nullable: true }
+        ticket_url:     { type: string, format: uri, nullable: true }
+        visibility:     { type: string, enum: [PUBLIC, SUBSCRIBERS_ONLY, PAID_ONLY] }
+        status:         { type: string, enum: [UPCOMING, ONGOING, COMPLETED, CANCELLED] }
+        rsvp_counts:
+          type: object
+          properties:
+            going:       { type: integer }
+            interested:  { type: integer }
+            not_going:   { type: integer }
+
+    # ── FAN SCHEMAS ───────────────────────────────────────────
+
+    Fan:
+      type: object
+      properties:
+        id:           { $ref: '#/components/schemas/UUID' }
+        email:        { type: string, format: email }
+        username:     { type: string }
+        display_name: { type: string, nullable: true }
+        avatar_url:   { type: string, format: uri, nullable: true }
+        created_at:   { $ref: '#/components/schemas/Timestamp' }
+        subscription: { $ref: '#/components/schemas/FanSubscription', nullable: true }
+
+    MembershipTier:
+      type: object
+      properties:
+        id:            { $ref: '#/components/schemas/UUID' }
+        name:          { type: string }
+        price:         { type: number, format: float }
+        billing_cycle: { type: string, enum: [MONTHLY, YEARLY, LIFETIME] }
+        max_members:   { type: integer, nullable: true }
+        is_active:     { type: boolean }
+        perks:
+          type: array
+          items: { $ref: '#/components/schemas/TierPerk' }
+
+    TierPerk:
+      type: object
+      properties:
+        id:          { $ref: '#/components/schemas/UUID' }
+        description: { type: string }
+        perk_type:   { type: string, enum: [EXCLUSIVE_CONTENT, EARLY_ACCESS, MERCH_DISCOUNT, LIVE_ACCESS, BADGE] }
+
+    FanSubscription:
+      type: object
+      properties:
+        id:         { $ref: '#/components/schemas/UUID' }
+        tier:       { $ref: '#/components/schemas/MembershipTier' }
+        start_date: { $ref: '#/components/schemas/Timestamp' }
+        end_date:   { $ref: '#/components/schemas/Timestamp', nullable: true }
+        status:     { type: string, enum: [ACTIVE, EXPIRING, EXPIRED, CANCELLED] }
+        auto_renew: { type: boolean }
+
+    # ── COMMERCE SCHEMAS ──────────────────────────────────────
+
+    MerchProduct:
+      type: object
+      properties:
+        id:                   { $ref: '#/components/schemas/UUID' }
+        name:                 { type: string }
+        description:          { type: string, nullable: true }
+        base_price:           { type: number, format: float }
+        currency:             { type: string, example: USD }
+        cover_image_url:      { type: string, format: uri, nullable: true }
+        images:               { type: array, items: { type: string, format: uri } }
+        status:               { type: string, enum: [ACTIVE, DRAFT, SOLD_OUT, ARCHIVED] }
+        is_limited_edition:   { type: boolean }
+        available_from:       { $ref: '#/components/schemas/Timestamp', nullable: true }
+        available_until:      { $ref: '#/components/schemas/Timestamp', nullable: true }
+        category:             { $ref: '#/components/schemas/MerchCategory', nullable: true }
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/MerchVariant' }
+
+    MerchCategory:
+      type: object
+      properties:
+        id:   { $ref: '#/components/schemas/UUID' }
+        name: { type: string }
+
+    MerchVariant:
+      type: object
+      properties:
+        id:            { $ref: '#/components/schemas/UUID' }
+        sku:           { type: string }
+        attributes:    { type: object, example: { size: M, color: black } }
+        price:         { type: number, format: float }
+        stock_qty:     { type: integer }
+        available_qty: { type: integer }
+
+    MerchCart:
+      type: object
+      properties:
+        id:       { $ref: '#/components/schemas/UUID' }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MerchCartItem' }
+        subtotal: { type: number, format: float }
+        total:    { type: number, format: float }
+        currency: { type: string }
+
+    MerchCartItem:
+      type: object
+      properties:
+        id:         { $ref: '#/components/schemas/UUID' }
+        product:    { $ref: '#/components/schemas/MerchProduct' }
+        variant:    { $ref: '#/components/schemas/MerchVariant' }
+        quantity:   { type: integer }
+        unit_price: { type: number, format: float }
+        subtotal:   { type: number, format: float }
+
+    MerchOrder:
+      type: object
+      properties:
+        id:               { $ref: '#/components/schemas/UUID' }
+        fan_id:           { $ref: '#/components/schemas/UUID' }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MerchOrderItem' }
+        shipping_address: { $ref: '#/components/schemas/Address' }
+        total_amount:     { type: number, format: float }
+        currency:         { type: string }
+        status:           { type: string, enum: [PENDING, PAID, SHIPPED, DELIVERED, CANCELLED] }
+        payment:          { $ref: '#/components/schemas/Payment', nullable: true }
+        shipment:         { $ref: '#/components/schemas/Shipment', nullable: true }
+        placed_at:        { $ref: '#/components/schemas/Timestamp' }
+
+    MerchOrderItem:
+      type: object
+      properties:
+        id:           { $ref: '#/components/schemas/UUID' }
+        product_name: { type: string }
+        sku:          { type: string }
+        quantity:     { type: integer }
+        unit_price:   { type: number, format: float }
+        subtotal:     { type: number, format: float }
+
+    Address:
+      type: object
+      properties:
+        id:          { $ref: '#/components/schemas/UUID' }
+        street:      { type: string }
+        city:        { type: string }
+        state:       { type: string, nullable: true }
+        country:     { type: string }
+        postal_code: { type: string, nullable: true }
+        is_default:  { type: boolean }
+
+    Payment:
+      type: object
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        amount:         { type: number, format: float }
+        currency:       { type: string }
+        status:         { type: string, enum: [PENDING, COMPLETED, FAILED, REFUNDED] }
+        method:         { type: string, enum: [CREDIT_CARD, PAYPAL, STRIPE, BANK_TRANSFER] }
+        transaction_id: { type: string, nullable: true }
+        paid_at:        { $ref: '#/components/schemas/Timestamp', nullable: true }
+
+    BankTransferDetail:
+      type: object
+      properties:
+        qr_code_url:        { type: string, format: uri }
+        qr_code_payload:    { type: string }
+        qr_code_expires_at: { $ref: '#/components/schemas/Timestamp' }
+        transfer_network:   { type: string, enum: [PROMPTPAY, DUITNOW, QRIS, PAYNOW, INSTAPAY, WECHATPAY, ALIPAY] }
+        bank_account_name:  { type: string }
+        timeout_seconds:    { type: integer }
+
+    Shipment:
+      type: object
+      properties:
+        id:                 { $ref: '#/components/schemas/UUID' }
+        tracking_number:    { type: string, nullable: true }
+        carrier:            { type: string, nullable: true }
+        status:             { type: string, enum: [PREPARING, SHIPPED, IN_TRANSIT, DELIVERED, RETURNED] }
+        shipped_at:         { $ref: '#/components/schemas/Timestamp', nullable: true }
+        estimated_delivery: { $ref: '#/components/schemas/Timestamp', nullable: true }
+
+    FanNotification:
+      type: object
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        type:           { type: string, enum: [NEW_POST, NEW_MERCH, EVENT_REMINDER, SUBSCRIPTION_EXPIRY, NEW_MEDIA, COMEBACK_ALERT] }
+        message:        { type: string }
+        is_read:        { type: boolean }
+        reference_id:   { $ref: '#/components/schemas/UUID', nullable: true }
+        reference_type: { type: string, nullable: true }
+        created_at:     { $ref: '#/components/schemas/Timestamp' }
+
+# ═══════════════════════════════════════════════════════════════
+# PATHS
+# ═══════════════════════════════════════════════════════════════
+paths:
+
+  # ─────────────────────────────────────────────────────────────
+  # PLATFORM ADMIN — AUTH
+  # ─────────────────────────────────────────────────────────────
+
+  /api/admin/auth/login:
+    post:
+      tags: [Platform - Auth]
+      summary: Service Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:    { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:  { type: string }
+                  admin:  { $ref: '#/components/schemas/ServiceAdmin' }
+                  mfa_required: { type: boolean }
+        '401': { description: Invalid credentials }
+
+  /api/admin/auth/mfa/verify:
+    post:
+      tags: [Platform - Auth]
+      summary: Verify MFA token
+      security: [{ AdminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string, example: "123456" }
+      responses:
+        '200': { description: MFA verified }
+        '422': { description: Invalid token }
+
+  /api/admin/auth/logout:
+    post:
+      tags: [Platform - Auth]
+      summary: Service Admin logout
+      security: [{ AdminBearerAuth: [] }]
+      responses:
+        '200': { description: Logged out }
+
+  # ─────────────────────────────────────────────────────────────
+  # PLATFORM ADMIN — TENANTS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/admin/tenants:
+    get:
+      tags: [Platform - Tenants]
+      summary: List all tenants
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, SUSPENDED, DELETED, PENDING] }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Tenant list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Tenant' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+    post:
+      tags: [Platform - Tenants]
+      summary: Create a new tenant
+      security: [{ AdminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, plan_id]
+              properties:
+                name:    { type: string }
+                plan_id: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '201':
+          description: Tenant created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+
+  /api/admin/tenants/{tenantId}:
+    get:
+      tags: [Platform - Tenants]
+      summary: Get tenant details
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '404': { description: Tenant not found }
+
+    patch:
+      tags: [Platform - Tenants]
+      summary: Update tenant
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+
+  /api/admin/tenants/{tenantId}/suspend:
+    post:
+      tags: [Platform - Tenants]
+      summary: Suspend a tenant
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { description: Tenant suspended }
+
+  /api/admin/tenants/{tenantId}/reactivate:
+    post:
+      tags: [Platform - Tenants]
+      summary: Reactivate a suspended tenant
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Tenant reactivated }
+
+  /api/admin/tenants/{tenantId}/impersonate:
+    post:
+      tags: [Platform - Tenants]
+      summary: Start impersonation session
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target_user_id: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          description: Impersonation session started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:  { $ref: '#/components/schemas/UUID' }
+                  token:       { type: string }
+                  expires_at:  { $ref: '#/components/schemas/Timestamp' }
+
+  # ─────────────────────────────────────────────────────────────
+  # PLATFORM ADMIN — PLANS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/admin/plans:
+    get:
+      tags: [Platform - Plans]
+      summary: List all plans
+      security: [{ AdminBearerAuth: [] }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Plan' }
+
+    post:
+      tags: [Platform - Plans]
+      summary: Create a plan
+      security: [{ AdminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, price, billing_cycle]
+              properties:
+                name:          { type: string }
+                price:         { type: number }
+                billing_cycle: { type: string, enum: [MONTHLY, YEARLY, LIFETIME] }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+
+  /api/admin/tenants/{tenantId}/plan:
+    put:
+      tags: [Platform - Plans]
+      summary: Assign or change plan for a tenant
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan_id]
+              properties:
+                plan_id: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Plan assigned }
+
+  # ─────────────────────────────────────────────────────────────
+  # PLATFORM ADMIN — FEATURE FLAGS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/admin/feature-flags:
+    get:
+      tags: [Platform - Feature Flags]
+      summary: List all feature flags
+      security: [{ AdminBearerAuth: [] }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeatureFlag' }
+
+    post:
+      tags: [Platform - Feature Flags]
+      summary: Create a feature flag
+      security: [{ AdminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeatureFlag' }
+
+  /api/admin/feature-flags/{flagId}/tenants/{tenantId}:
+    put:
+      tags: [Platform - Feature Flags]
+      summary: Enable or disable a flag for a tenant
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: flagId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: tenantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [is_enabled]
+              properties:
+                is_enabled: { type: boolean }
+      responses:
+        '200': { description: Override applied }
+
+  /api/admin/feature-flags/{flagId}/rollout:
+    post:
+      tags: [Platform - Feature Flags]
+      summary: Roll out flag globally
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - name: flagId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Rolled out globally }
+
+  # ─────────────────────────────────────────────────────────────
+  # PLATFORM ADMIN — AUDIT LOGS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/admin/audit-logs:
+    get:
+      tags: [Platform - Audit]
+      summary: Query audit logs across all tenants
+      security: [{ AdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+        - name: tenant_id
+          in: query
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: action
+          in: query
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: until
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Audit log list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:            { $ref: '#/components/schemas/UUID' }
+                        tenant_id:     { $ref: '#/components/schemas/UUID' }
+                        admin_id:      { $ref: '#/components/schemas/UUID' }
+                        action:        { type: string }
+                        target_entity: { type: string }
+                        target_id:     { $ref: '#/components/schemas/UUID' }
+                        performed_at:  { $ref: '#/components/schemas/Timestamp' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — AUTH
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/auth/login:
+    post:
+      tags: [Tenant - Auth]
+      summary: Tenant Admin login
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:    { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  admin: { type: object }
+
+  /api/manage/auth/logout:
+    post:
+      tags: [Tenant - Auth]
+      summary: Tenant Admin logout
+      security: [{ TenantAdminBearerAuth: [] }]
+      responses:
+        '200': { description: Logged out }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — IDOL PROFILE
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/idol/profile:
+    get:
+      tags: [Tenant - Idol]
+      summary: Get idol profile
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdolProfile' }
+
+    put:
+      tags: [Tenant - Idol]
+      summary: Update idol profile
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                stage_name:       { type: string }
+                bio:              { type: string }
+                debut_date:       { type: string, format: date }
+                agency:           { type: string }
+                nationality:      { type: string }
+                status:           { type: string, enum: [ACTIVE, HIATUS, RETIRED] }
+                profile_image:    { type: string, format: binary }
+                banner_image:     { type: string, format: binary }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdolProfile' }
+
+  /api/manage/idol/social-links:
+    post:
+      tags: [Tenant - Idol]
+      summary: Add or update a social link
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, url]
+              properties:
+                platform: { type: string, enum: [TWITTER, INSTAGRAM, YOUTUBE, TIKTOK, WEIBO] }
+                url:      { type: string, format: uri }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SocialLink' }
+
+  /api/manage/idol/groups:
+    get:
+      tags: [Tenant - Idol]
+      summary: List idol groups
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IdolGroup' }
+
+    post:
+      tags: [Tenant - Idol]
+      summary: Create idol group
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [group_name]
+              properties:
+                group_name: { type: string }
+                debut_date: { type: string, format: date }
+                agency:     { type: string }
+                bio:        { type: string }
+                member_ids:
+                  type: array
+                  items: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdolGroup' }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — BLOG
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/blog/posts:
+    get:
+      tags: [Tenant - Blog]
+      summary: List blog posts (all statuses)
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: status
+          in: query
+          schema: { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/BlogPost' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+    post:
+      tags: [Tenant - Blog]
+      summary: Create a blog post
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, content]
+              properties:
+                title:       { type: string }
+                content:     { type: string }
+                category_id: { $ref: '#/components/schemas/UUID' }
+                tags:        { type: array, items: { type: string } }
+                visibility:  { type: string, enum: [PUBLIC, SUBSCRIBERS_ONLY, PAID_ONLY] }
+                status:      { type: string, enum: [DRAFT, PUBLISHED] }
+                publish_at:  { $ref: '#/components/schemas/Timestamp' }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BlogPost' }
+
+  /api/manage/blog/posts/{postId}/publish:
+    post:
+      tags: [Tenant - Blog]
+      summary: Publish a draft post
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: postId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Post published }
+
+  /api/manage/blog/comments/{commentId}/hide:
+    post:
+      tags: [Tenant - Blog]
+      summary: Hide a fan comment
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: commentId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Comment hidden }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — MERCH
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/merch/products:
+    get:
+      tags: [Tenant - Merch]
+      summary: List merch products
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, DRAFT, SOLD_OUT, ARCHIVED] }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/MerchProduct' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+    post:
+      tags: [Tenant - Merch]
+      summary: Create a merch product
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, base_price, currency]
+              properties:
+                name:                { type: string }
+                description:         { type: string }
+                base_price:          { type: number }
+                currency:            { type: string }
+                category_id:         { $ref: '#/components/schemas/UUID' }
+                is_limited_edition:  { type: boolean }
+                available_from:      { $ref: '#/components/schemas/Timestamp' }
+                available_until:     { $ref: '#/components/schemas/Timestamp' }
+                variants:
+                  type: array
+                  items:
+                    type: object
+                    required: [sku, price, stock_qty, attributes]
+                    properties:
+                      sku:        { type: string }
+                      price:      { type: number }
+                      stock_qty:  { type: integer }
+                      attributes: { type: object }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchProduct' }
+
+  /api/manage/merch/variants/{variantId}/stock:
+    patch:
+      tags: [Tenant - Merch]
+      summary: Update variant stock
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: variantId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stock_qty]
+              properties:
+                stock_qty: { type: integer }
+      responses:
+        '200': { description: Stock updated }
+
+  /api/manage/merch/orders:
+    get:
+      tags: [Tenant - Merch]
+      summary: List all orders for this tenant
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: status
+          in: query
+          schema: { type: string, enum: [PENDING, PAID, SHIPPED, DELIVERED, CANCELLED] }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/MerchOrder' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/manage/merch/orders/{orderId}/ship:
+    post:
+      tags: [Tenant - Merch]
+      summary: Mark order as shipped
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: orderId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tracking_number, carrier]
+              properties:
+                tracking_number:    { type: string }
+                carrier:            { type: string }
+                estimated_delivery: { $ref: '#/components/schemas/Timestamp' }
+      responses:
+        '200': { description: Order marked as shipped }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — EVENTS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/events:
+    get:
+      tags: [Tenant - Events]
+      summary: List events
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: status
+          in: query
+          schema: { type: string, enum: [UPCOMING, ONGOING, COMPLETED, CANCELLED] }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/IdolEvent' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+    post:
+      tags: [Tenant - Events]
+      summary: Create event
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, event_type, start_datetime]
+              properties:
+                title:          { type: string }
+                description:    { type: string }
+                event_type:     { type: string, enum: [CONCERT, FANSIGN, LIVESTREAM, ANNIVERSARY, COMEBACK] }
+                start_datetime: { $ref: '#/components/schemas/Timestamp' }
+                end_datetime:   { $ref: '#/components/schemas/Timestamp' }
+                location:       { type: string }
+                ticket_url:     { type: string, format: uri }
+                visibility:     { type: string, enum: [PUBLIC, SUBSCRIBERS_ONLY, PAID_ONLY] }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdolEvent' }
+
+  # ─────────────────────────────────────────────────────────────
+  # TENANT ADMIN — MEMBERSHIP TIERS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/manage/membership/tiers:
+    get:
+      tags: [Tenant - Membership]
+      summary: List membership tiers
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/MembershipTier' }
+
+    post:
+      tags: [Tenant - Membership]
+      summary: Create membership tier
+      security: [{ TenantAdminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, price, billing_cycle]
+              properties:
+                name:          { type: string }
+                price:         { type: number }
+                billing_cycle: { type: string, enum: [MONTHLY, YEARLY, LIFETIME] }
+                max_members:   { type: integer, nullable: true }
+                perks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      description: { type: string }
+                      perk_type:   { type: string, enum: [EXCLUSIVE_CONTENT, EARLY_ACCESS, MERCH_DISCOUNT, LIVE_ACCESS, BADGE] }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MembershipTier' }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — AUTH
+  # ─────────────────────────────────────────────────────────────
+
+  /api/auth/register:
+    post:
+      tags: [Fan - Auth]
+      summary: Fan registration
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, username, password, password_confirmation]
+              properties:
+                email:                 { type: string, format: email }
+                username:              { type: string }
+                password:              { type: string, minLength: 8 }
+                password_confirmation: { type: string }
+                display_name:          { type: string }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  fan:   { $ref: '#/components/schemas/Fan' }
+        '422': { description: Validation errors }
+
+  /api/auth/login:
+    post:
+      tags: [Fan - Auth]
+      summary: Fan login
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:    { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  fan:   { $ref: '#/components/schemas/Fan' }
+
+  /api/auth/logout:
+    post:
+      tags: [Fan - Auth]
+      summary: Fan logout
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200': { description: Logged out }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — IDOL & CONTENT
+  # ─────────────────────────────────────────────────────────────
+
+  /api/idol:
+    get:
+      tags: [Fan - Idol]
+      summary: Get idol/group profile
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdolProfile' }
+
+  /api/blog/posts:
+    get:
+      tags: [Fan - Content]
+      summary: List published blog posts (visibility-gated)
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: category_id
+          in: query
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: tag
+          in: query
+          schema: { type: string }
+      security: [{ FanBearerAuth: [] }, {}]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/BlogPost' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/blog/posts/{postId}:
+    get:
+      tags: [Fan - Content]
+      summary: Get a single blog post (visibility-gated)
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: postId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      security: [{ FanBearerAuth: [] }, {}]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BlogPost' }
+        '403': { description: Content requires subscription upgrade }
+        '404': { description: Post not found }
+
+  /api/blog/posts/{postId}/like:
+    post:
+      tags: [Fan - Content]
+      summary: Like or unlike a post
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: postId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  liked:      { type: boolean }
+                  like_count: { type: integer }
+
+  /api/blog/posts/{postId}/comments:
+    get:
+      tags: [Fan - Content]
+      summary: Get comments on a post
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: postId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - $ref: '#/components/parameters/PageParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/BlogComment' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+    post:
+      tags: [Fan - Content]
+      summary: Post a comment
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: postId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BlogComment' }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — SUBSCRIPTION
+  # ─────────────────────────────────────────────────────────────
+
+  /api/membership/tiers:
+    get:
+      tags: [Fan - Subscription]
+      summary: List available membership tiers
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/MembershipTier' }
+
+  /api/membership/subscribe:
+    post:
+      tags: [Fan - Subscription]
+      summary: Subscribe to a tier
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tier_id, payment_method]
+              properties:
+                tier_id:        { $ref: '#/components/schemas/UUID' }
+                payment_method: { type: string, enum: [CREDIT_CARD, PAYPAL, STRIPE, BANK_TRANSFER] }
+                auto_renew:     { type: boolean, default: true }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FanSubscription' }
+
+  /api/membership/subscription:
+    get:
+      tags: [Fan - Subscription]
+      summary: Get current subscription
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FanSubscription' }
+
+  /api/membership/subscription/cancel:
+    post:
+      tags: [Fan - Subscription]
+      summary: Cancel current subscription
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200': { description: Subscription cancelled }
+
+  /api/membership/subscription/upgrade:
+    post:
+      tags: [Fan - Subscription]
+      summary: Upgrade subscription tier
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tier_id]
+              properties:
+                tier_id: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FanSubscription' }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — MERCH & CART
+  # ─────────────────────────────────────────────────────────────
+
+  /api/merch/products:
+    get:
+      tags: [Fan - Merch]
+      summary: Browse merch products
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: category_id
+          in: query
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: is_limited_edition
+          in: query
+          schema: { type: boolean }
+      security: [{ FanBearerAuth: [] }, {}]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/MerchProduct' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/merch/cart:
+    get:
+      tags: [Fan - Merch]
+      summary: Get current cart
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchCart' }
+
+  /api/merch/cart/items:
+    post:
+      tags: [Fan - Merch]
+      summary: Add item to cart
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product_id, variant_id, quantity]
+              properties:
+                product_id: { $ref: '#/components/schemas/UUID' }
+                variant_id: { $ref: '#/components/schemas/UUID' }
+                quantity:   { type: integer, minimum: 1 }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchCart' }
+        '422': { description: Insufficient stock }
+
+  /api/merch/cart/items/{itemId}:
+    patch:
+      tags: [Fan - Merch]
+      summary: Update cart item quantity
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: itemId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchCart' }
+
+    delete:
+      tags: [Fan - Merch]
+      summary: Remove item from cart
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: itemId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchCart' }
+
+  /api/merch/checkout:
+    post:
+      tags: [Fan - Merch]
+      summary: Initiate checkout from cart
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [address_id, payment_method]
+              properties:
+                address_id:      { $ref: '#/components/schemas/UUID' }
+                payment_method:  { type: string, enum: [CREDIT_CARD, PAYPAL, STRIPE, BANK_TRANSFER] }
+                transfer_network:
+                  type: string
+                  enum: [PROMPTPAY, DUITNOW, QRIS, PAYNOW, INSTAPAY, WECHATPAY, ALIPAY]
+                  description: Required if payment_method is BANK_TRANSFER
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:              { $ref: '#/components/schemas/MerchOrder' }
+                  bank_transfer:      { $ref: '#/components/schemas/BankTransferDetail', nullable: true }
+                  payment_client_key: { type: string, nullable: true, description: Stripe/PayPal client key }
+
+  /api/merch/orders:
+    get:
+      tags: [Fan - Merch]
+      summary: Get fan order history
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/MerchOrder' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/merch/orders/{orderId}:
+    get:
+      tags: [Fan - Merch]
+      summary: Get order details
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: orderId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MerchOrder' }
+
+  /api/merch/orders/{orderId}/cancel:
+    post:
+      tags: [Fan - Merch]
+      summary: Cancel an order
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: orderId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200': { description: Order cancelled }
+        '422': { description: Order cannot be cancelled at current status }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — PAYMENT WEBHOOK
+  # ─────────────────────────────────────────────────────────────
+
+  /api/webhooks/payment/{provider}:
+    post:
+      tags: [Fan - Payment]
+      summary: Payment provider webhook callback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: { type: string, enum: [stripe, paypal, promptpay, duitnow, qris, paynow, wechatpay, alipay] }
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200': { description: Webhook received }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — EVENTS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/events:
+    get:
+      tags: [Fan - Events]
+      summary: List upcoming events
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: type
+          in: query
+          schema: { type: string, enum: [CONCERT, FANSIGN, LIVESTREAM, ANNIVERSARY, COMEBACK] }
+      security: [{ FanBearerAuth: [] }, {}]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/IdolEvent' }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/events/{eventId}/rsvp:
+    post:
+      tags: [Fan - Events]
+      summary: RSVP to an event
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - name: eventId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [GOING, INTERESTED, NOT_GOING] }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:      { type: string }
+                  rsvp_counts: { type: object }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — NOTIFICATIONS
+  # ─────────────────────────────────────────────────────────────
+
+  /api/notifications:
+    get:
+      tags: [Fan - Notifications]
+      summary: Get fan notifications
+      security: [{ FanBearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - $ref: '#/components/parameters/PageParam'
+        - name: unread_only
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/FanNotification' }
+                  unread_count: { type: integer }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+
+  /api/notifications/read-all:
+    post:
+      tags: [Fan - Notifications]
+      summary: Mark all notifications as read
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200': { description: All marked as read }
+
+  /api/notifications/preferences:
+    get:
+      tags: [Fan - Notifications]
+      summary: Get notification preferences
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:       { type: string }
+                    is_enabled: { type: boolean }
+                    channel:    { type: string }
+
+    put:
+      tags: [Fan - Notifications]
+      summary: Update notification preferences
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required: [type, is_enabled, channel]
+                properties:
+                  type:       { type: string }
+                  is_enabled: { type: boolean }
+                  channel:    { type: string, enum: [EMAIL, PUSH, IN_APP] }
+      responses:
+        '200': { description: Preferences updated }
+
+  # ─────────────────────────────────────────────────────────────
+  # FAN — PROFILE & ADDRESSES
+  # ─────────────────────────────────────────────────────────────
+
+  /api/profile:
+    get:
+      tags: [Fan - Profile]
+      summary: Get fan profile
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Fan' }
+
+    patch:
+      tags: [Fan - Profile]
+      summary: Update fan profile
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                display_name: { type: string }
+                avatar:       { type: string, format: binary }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Fan' }
+
+  /api/profile/addresses:
+    get:
+      tags: [Fan - Profile]
+      summary: List saved addresses
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Address' }
+
+    post:
+      tags: [Fan - Profile]
+      summary: Add a delivery address
+      security: [{ FanBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [street, city, country]
+              properties:
+                street:      { type: string }
+                city:        { type: string }
+                state:       { type: string }
+                country:     { type: string }
+                postal_code: { type: string }
+                is_default:  { type: boolean }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Address' }
+
+# ─────────────────────────────────────────────────────────────
+# GLOBAL TAG GROUPS
+# ─────────────────────────────────────────────────────────────
+tags:
+  - name: Platform - Auth
+    description: Service Admin authentication
+  - name: Platform - Tenants
+    description: Tenant lifecycle management
+  - name: Platform - Plans
+    description: Subscription plan management
+  - name: Platform - Feature Flags
+    description: Feature flag management
+  - name: Platform - Audit
+    description: Audit log queries
+  - name: Tenant - Auth
+    description: Tenant Admin authentication
+  - name: Tenant - Idol
+    description: Idol profile and group management
+  - name: Tenant - Blog
+    description: Blog post and comment management
+  - name: Tenant - Merch
+    description: Merch product and order management
+  - name: Tenant - Events
+    description: Event management
+  - name: Tenant - Membership
+    description: Membership tier management
+  - name: Fan - Auth
+    description: Fan registration and authentication
+  - name: Fan - Idol
+    description: Fan-facing idol profiles
+  - name: Fan - Content
+    description: Blog posts and media (visibility-gated)
+  - name: Fan - Subscription
+    description: Fan membership subscription
+  - name: Fan - Merch
+    description: Merch browsing, cart, and orders
+  - name: Fan - Payment
+    description: Payment webhooks
+  - name: Fan - Events
+    description: Events and RSVP
+  - name: Fan - Notifications
+    description: In-app notifications and preferences
+  - name: Fan - Profile
+    description: Fan profile and addresses

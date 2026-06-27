@@ -24,3 +24,13 @@ window.graph   = graph;
 window.vsgraph = vsgraph;
 window.ctx     = ctx;
 window.ui      = new VsbUI(vsgraph);
+
+const token = window.__VSB_TOKEN__;
+
+fetch('/api/projects', {
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+    }
+});

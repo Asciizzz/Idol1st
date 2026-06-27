@@ -1,0 +1,61 @@
+@base = http://127.0.0.1:8000/api
+@token = PASTE_TOKEN_HERE_AFTER_LOGIN
+
+### Login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "password"
+}
+
+### Me
+GET {{base}}/auth/me
+Authorization: Bearer {{token}}
+
+### Create Project
+POST {{base}}/projects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "My First Site"
+}
+
+### List Projects
+GET {{base}}/projects
+Authorization: Bearer {{token}}
+
+### Get Project
+GET {{base}}/projects/1
+Authorization: Bearer {{token}}
+
+### Save Snapshot
+POST {{base}}/projects/1/snapshots
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "graph_data": { "nodes": [], "edges": [], "camera": {}, "grid": {} }
+}
+
+### List Snapshots
+GET {{base}}/projects/1/snapshots
+Authorization: Bearer {{token}}
+
+### Compile
+POST {{base}}/projects/1/compile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "graph_data": { "nodes": [], "edges": [], "camera": {}, "grid": {} },
+    "compiled_html": "<html><body>Hello</body></html>",
+    "compiled_css": "body { margin: 0; }",
+    "compiled_js": "console.log('vsb');"
+}
+
+### Logout
+POST {{base}}/auth/logout
+Authorization: Bearer {{token}}

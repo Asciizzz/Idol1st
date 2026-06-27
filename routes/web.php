@@ -3,12 +3,20 @@
 use App\Http\Controllers\AuthEditorController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/editor');
+// ── Public ────────────────────────────────────────────────────
+Route::redirect('/', '/login');
 
-Route::get('/editor', [AuthEditorController::class, 'showEditor'])->name('editor');
-Route::post('/editor/save', [AuthEditorController::class, 'saveEditor'])->name('editor.save');
-Route::post('/editor/upload-asset', [AuthEditorController::class, 'uploadAsset'])->name('editor.upload');
+Route::get('/login',  [AuthEditorController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthEditorController::class, 'handleLogin'])->name('login.submit');
 
-Route::get('/admin', function () {
-    return view('admin');
-})->name('admin');
+// ── Authenticated ─────────────────────────────────────────────
+Route::middleware('require.auth')->group(function () {
+    Route::get('/editor',       [AuthEditorController::class, 'showEditor'])->name('editor');
+    Route::post('/editor/save', [AuthEditorController::class, 'saveEditor'])->name('editor.save');
+    Route::post('/logout',      [AuthEditorController::class, 'webLogout'])->name('logout');
+});
+
+// ── Admin only ────────────────────────────────────────────────
+Route::middleware('require.auth:admin')->group(function () {
+    Route::get('/admin', [AuthEditorController::class, 'showAdmin'])->name('admin');
+});
