@@ -58,6 +58,13 @@ export class VsbHtmlElementData extends VsbElementData {
             if (vsgraph) vsgraph.render();
         });
 
+        const styleLabel = createLabel("Inline Styles");
+        const styleList = document.createElement("div");
+        Object.assign(styleList.style, {
+            marginTop: "6px", fontSize: "11px", color: "#b9c0ce",
+            display: "flex", flexDirection: "column", gap: "2px"
+        });
+
         const assetLabel = createLabel("Asset Src");
         const assetList = document.createElement("div");
         Object.assign(assetList.style, {
@@ -72,11 +79,12 @@ export class VsbHtmlElementData extends VsbElementData {
             display: "flex", flexDirection: "column", gap: "2px"
         });
 
-        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, textLabel, textInput, assetLabel, assetList, eventsLabel, boundEventsList);
+        cache.body.append(tagLabel, tagInput, attrsLabel, attrsInput, styleLabel, styleList, textLabel, textInput, assetLabel, assetList, eventsLabel, boundEventsList);
 
         cache.tagInput   = tagInput;
         cache.attrsInput = attrsInput;
         cache.textInput  = textInput;
+        cache.styleList  = styleList;
         cache.assetList  = assetList;
         cache.boundEventsList = boundEventsList;
 
@@ -106,10 +114,16 @@ export class VsbHtmlElementData extends VsbElementData {
 
             const boundEvents = [];
             const connectedAssets = [];
+            const connectedStyles = [];
             const outEdges = graph.outEdges(node.id) || [];
             for (const e of outEdges) {
                 const dst = graph.getNode(e.dstId);
-                if (dst && dst.data.type === "JS_EVENT") {
+                if (dst && dst.data.type === "CSS_RULE") {
+                    connectedStyles.push({
+                        name: dst.data.name ?? dst.id,
+                        code: dst.data.code ?? ""
+                    });
+                } else if (dst && dst.data.type === "JS_EVENT") {
                     boundEvents.push({ 
                         eventName: dst.data.name ?? dst.id,
                         eventType: dst.data.event ?? "click"
@@ -131,6 +145,26 @@ export class VsbHtmlElementData extends VsbElementData {
                 });
                 row.textContent = `[${be.eventType}] ${be.eventName}`;
                 cache.boundEventsList.append(row);
+            }
+
+            cache.styleList.innerHTML = "";
+            if (connectedStyles.length > 0) {
+                for (const style of connectedStyles) {
+                    const row = document.createElement("div");
+                    Object.assign(row.style, {
+                        padding: "4px 8px", background: "#18191c", color: "#d8dde8",
+                        borderLeft: "3px solid #3b82f6", fontWeight: "bold"
+                    });
+                    
+                    const codeSnippet = style.code.replace(/\n/g, ' ').substring(0, 30);
+                    row.innerHTML = `<span style="color: #8b93a7">style="</span>${codeSnippet}${style.code.length > 30 ? '...' : ''}<span style="color: #8b93a7">"</span>`;
+                    cache.styleList.append(row);
+                }
+            } else {
+                const empty = document.createElement("div");
+                empty.textContent = "No inline style";
+                empty.style.color = "#72798a";
+                cache.styleList.append(empty);
             }
 
             cache.assetList.innerHTML = "";

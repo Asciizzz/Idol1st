@@ -314,7 +314,11 @@ export class VsbEdgeData extends VsData {
         const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
         let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
-        if (edgeCategory === "showAssetEdges") {
+        if (stype === "ELEMENT" && dtype === "CSS_RULE") {
+            if (!hasError) color = "#3b82f6";
+            cache.visiblePath.setAttribute("stroke-dasharray", "6 6");
+            cache.visiblePath.setAttribute("stroke-linecap", "round");
+        } else if (edgeCategory === "showAssetEdges") {
             if (!hasError) color = "#ffffff";
             cache.visiblePath.setAttribute("stroke-dasharray", "2 4");
             cache.visiblePath.setAttribute("stroke-linecap", "round");

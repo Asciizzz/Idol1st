@@ -127,6 +127,19 @@ export class VsbCompiler {
                 const tag = (elNode.data.tag || "div").toLowerCase();
                 let html = `${indent}<${tag} data-vsb-id="${elNode.id}"`;
                 
+                // Inject Inline Styles
+                const outEdgesAll = graph.outEdges(elNode.id) || [];
+                const inlineStyles = outEdgesAll
+                    .filter(e => graph.getNode(e.dstId)?.data.type === "CSS_RULE")
+                    .map(e => graph.getNode(e.dstId));
+                
+                if (inlineStyles.length > 0) {
+                    const styleStrings = inlineStyles.map(s => s.data.code).filter(c => c).join(" ").replace(/\s+/g, ' ').trim();
+                    if (styleStrings) {
+                        html += ` style="${styleStrings}"`;
+                    }
+                }
+                
                 // Inject Asset Src if applicable
                 if (tag === "img" || tag === "audio" || tag === "video") {
                     const outEdges = graph.outEdges(elNode.id) || [];
