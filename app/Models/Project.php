@@ -66,4 +66,9 @@ class Project extends Model
 
         return $slug;
     }
+
+    public function publishedSites(): HasMany
+    {
+        return $this->hasMany(PublishedSite::class);
+    }
 }
