@@ -330,6 +330,9 @@ export class VsbEdgeData extends VsData {
         } else if (edgeCategory === "showJsEdges") {
             if (!hasError) color = "#f7df1e";
             cache.visiblePath.removeAttribute("stroke-dasharray");
+        } else if (edgeCategory === "showElementEdges") {
+            if (!hasError) color = "#e34c26";
+            cache.visiblePath.removeAttribute("stroke-dasharray");
         } else {
             cache.visiblePath.removeAttribute("stroke-dasharray");
         }

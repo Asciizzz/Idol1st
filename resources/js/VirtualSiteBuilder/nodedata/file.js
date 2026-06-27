@@ -129,8 +129,26 @@ export class VsbFileData extends VsbNodeData {
             background:   "#232428",
             overflowWrap: "anywhere",
         });
+        const collapseBtn = document.createElement("div");
+        collapseBtn.innerHTML = "▼";
+        Object.assign(collapseBtn.style, {
+            cursor: "pointer",
+            marginRight: "4px",
+            fontSize: "10px",
+            color: "inherit",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            userSelect: "none"
+        });
+        collapseBtn.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+            if (!node.data.vsgdata) node.data.vsgdata = {};
+            node.data.vsgdata.collapsed = !(node.data.vsgdata?.collapsed ?? false);
+            if (vsgraph) vsgraph.render();
+        });
 
-        header.append(title, colorInput, meta);
+        header.append(collapseBtn, title, colorInput, meta);
         element.append(header, body);
 
         cache.header = header;
@@ -138,6 +156,7 @@ export class VsbFileData extends VsbNodeData {
         cache.colorInput = colorInput;
         cache.meta   = meta;
         cache.body   = body;
+        cache.collapseBtn = collapseBtn;
 
         return { element, cache };
     }
@@ -159,9 +178,22 @@ export class VsbFileData extends VsbNodeData {
 
         // Trapezoid-like background: fully fileColor, ending with typeColor at the right edge
         cache.header.style.background = `linear-gradient(105deg, ${fileColor} 0%, ${fileColor} 75%, ${typeColor} 75%, ${typeColor} 100%)`;
+        
         cache.title.style.color = textColor;
+        if (cache.collapseBtn) cache.collapseBtn.style.color = textColor;
         cache.meta.style.color = metaColor;
         cache.colorInput.style.setProperty("--vsb-cp-border", textColor);
+
+        const vsg = node.data.vsgdata;
+        if (cache.collapseBtn) {
+            cache.collapseBtn.innerHTML = vsg?.collapsed ? "▶" : "▼";
+        }
+
+        if (vsg?.collapsed) {
+            cache.body.style.display = "none";
+        } else {
+            cache.body.style.display = "block";
+        }
 
         if (document.activeElement !== cache.title) {
             cache.title.value = node.data.name ?? node.id;

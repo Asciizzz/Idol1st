@@ -957,8 +957,8 @@ export class VsbUI {
 
         mainCol.append(
             separator.cloneNode(),
-            mkEdgeToggleBtn("Element Structure", this.ctx.showElementEdges, "showElementEdges", "#ffffff"),
             mkEdgeToggleBtn("HTML Includes", this.ctx.showIncludeEdges, "showIncludeEdges", "rgba(255,255,255,0.7)"),
+            mkEdgeToggleBtn("Element Structure", this.ctx.showElementEdges, "showElementEdges", "#e34c26"),
             mkEdgeToggleBtn("CSS Rules", this.ctx.showCssEdges, "showCssEdges", "#264de4"),
             mkEdgeToggleBtn("Inline Styles", this.ctx.showInlineStyleEdges, "showInlineStyleEdges", "#3b82f6"),
             mkEdgeToggleBtn("JS Flow", this.ctx.showJsEdges, "showJsEdges", "#f7df1e"),
