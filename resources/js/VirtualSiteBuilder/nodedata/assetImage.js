@@ -26,21 +26,14 @@ export class VsbAssetImageData extends VsbElementData {
         icon.style.marginRight = "6px";
         cache.header.insertBefore(icon, cache.title);
 
-        const fileLabel = createLabel("File Upload");
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
+        const fileLabel = createLabel("Select Asset");
+        const fileInput = document.createElement("select");
         Object.assign(fileInput.style, inputStyle);
-        fileInput.style.padding = "2px";
+        fileInput.style.padding = "4px";
         fileInput.addEventListener("pointerdown", e => e.stopPropagation());
         
-        fileInput.addEventListener("change", async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            node.data.filename = file.name;
-            
-            // For MVP: use object URL. In production, this posts to /api/assets/upload
-            node.data.url = URL.createObjectURL(file);
+        fileInput.addEventListener("change", (e) => {
+            node.data.assetId = e.target.value;
             if (vsgraph) vsgraph.render();
         });
 
@@ -66,10 +59,11 @@ export class VsbAssetImageData extends VsbElementData {
         });
         const imgPreview = document.createElement("img");
         Object.assign(imgPreview.style, {
-            maxWidth: "100%",
-            maxHeight: "150px",
+            width: "100%",
+            height: "auto",
             objectFit: "contain",
-            borderRadius: "2px"
+            borderRadius: "2px",
+            display: "block"
         });
         previewContainer.appendChild(imgPreview);
 
@@ -90,10 +84,32 @@ export class VsbAssetImageData extends VsbElementData {
         const collapsed = data.vsgdata?.collapsed ?? false;
 
         if (!collapsed) {
-            cache.urlDisplay.textContent = data.url || "No URL generated yet";
+            // Re-populate select options
+            cache.fileInput.innerHTML = `<option value="">-- Choose Image --</option>`;
+            if (vsgraph && vsgraph.ctx) {
+                for (const [id, asset] of vsgraph.ctx.assets.entries()) {
+                    if (asset.type === "image") {
+                        const opt = document.createElement("option");
+                        opt.value = id;
+                        opt.textContent = asset.filename;
+                        if (data.assetId === id) opt.selected = true;
+                        cache.fileInput.appendChild(opt);
+                    }
+                }
+            }
+
+            let assetData = null;
+            if (data.assetId && vsgraph && vsgraph.ctx) {
+                assetData = vsgraph.ctx.getAsset(data.assetId);
+            }
             
-            if (data.url) {
-                cache.imgPreview.src = data.url;
+            // Fallback for pre-existing json without assetId but with url
+            const url = assetData ? assetData.url : data.url;
+            
+            cache.urlDisplay.textContent = url || "No Asset Selected";
+            
+            if (url) {
+                cache.imgPreview.src = url;
                 cache.imgPreview.style.display = "block";
                 cache.previewContainer.style.display = "flex";
             } else {

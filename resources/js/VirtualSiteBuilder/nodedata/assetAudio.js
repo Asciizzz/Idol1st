@@ -26,21 +26,14 @@ export class VsbAssetAudioData extends VsbElementData {
         icon.style.marginRight = "6px";
         cache.header.insertBefore(icon, cache.title);
 
-        const fileLabel = createLabel("File Upload");
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "audio/*";
+        const fileLabel = createLabel("Select Asset");
+        const fileInput = document.createElement("select");
         Object.assign(fileInput.style, inputStyle);
-        fileInput.style.padding = "2px";
+        fileInput.style.padding = "4px";
         fileInput.addEventListener("pointerdown", e => e.stopPropagation());
         
-        fileInput.addEventListener("change", async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            node.data.filename = file.name;
-            
-            // For MVP: use object URL
-            node.data.url = URL.createObjectURL(file);
+        fileInput.addEventListener("change", (e) => {
+            node.data.assetId = e.target.value;
             if (vsgraph) vsgraph.render();
         });
 
@@ -88,13 +81,35 @@ export class VsbAssetAudioData extends VsbElementData {
         const collapsed = data.vsgdata?.collapsed ?? false;
 
         if (!collapsed) {
-            cache.urlDisplay.textContent = data.url || "No URL generated yet";
-            
-            if (data.url && cache.audioPreview.src !== data.url) {
-                cache.audioPreview.src = data.url;
+            // Re-populate select options
+            cache.fileInput.innerHTML = `<option value="">-- Choose Audio --</option>`;
+            if (vsgraph && vsgraph.ctx) {
+                for (const [id, asset] of vsgraph.ctx.assets.entries()) {
+                    if (asset.type === "audio") {
+                        const opt = document.createElement("option");
+                        opt.value = id;
+                        opt.textContent = asset.filename;
+                        if (data.assetId === id) opt.selected = true;
+                        cache.fileInput.appendChild(opt);
+                    }
+                }
+            }
+
+            let assetData = null;
+            if (data.assetId && vsgraph && vsgraph.ctx) {
+                assetData = vsgraph.ctx.getAsset(data.assetId);
             }
             
-            if (data.url) {
+            // Fallback for pre-existing json without assetId but with url
+            const url = assetData ? assetData.url : data.url;
+
+            cache.urlDisplay.textContent = url || "No Asset Selected";
+            
+            if (url && cache.audioPreview.src !== url) {
+                cache.audioPreview.src = url;
+            }
+            
+            if (url) {
                 cache.previewContainer.style.display = "flex";
             } else {
                 cache.previewContainer.style.display = "none";
