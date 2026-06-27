@@ -13,7 +13,7 @@
                     "collapsed": true
                 },
                 "type": "CSS",
-                "name": "main.css",
+                "name": "main",
                 "collapsed": true
             }
         },
@@ -27,7 +27,7 @@
                     "collapsed": true
                 },
                 "type": "JS",
-                "name": "app.js",
+                "name": "app",
                 "collapsed": true
             }
         },
@@ -1221,8 +1221,8 @@
     "edges": [
         {
             "id": "e1",
-            "srcId": "css_main",
-            "dstId": "c_body",
+            "dstId": "css_main",
+            "srcId": "c_body",
             "data": {
                 "rootId": "css_main",
                 "order": 0,

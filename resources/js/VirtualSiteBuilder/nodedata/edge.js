@@ -64,48 +64,100 @@ function _arrowPoints(tip, control) {
 
 const isFileNode = (type) => type === VsbNodeType.HTML || type === VsbNodeType.CSS || type === VsbNodeType.JS;
 
-function _getEdgeError(edge, srcNode, dstNode, graph) {
-    const stype = srcNode.data?.type;
-    const dtype = dstNode.data?.type;
-
-    const validSrcDst = {
-        "HTML": ["ELEMENT", "CSS", "JS"],
-        "CSS": ["CSS_RULE"],
-        "JS": ["JS_EVENT"],
-        "ELEMENT": ["ELEMENT", "CSS_RULE", "JS_EVENT", "ASSET_IMAGE", "ASSET_AUDIO"],
-        "CSS_RULE": ["CSS_RULE"],
-        "JS_EVENT": [],
-        "ASSET_IMAGE": [],
-        "ASSET_AUDIO": []
-    };
-
-    if (validSrcDst[stype] && !validSrcDst[stype].includes(dtype)) {
-        if (stype === "JS_EVENT" && dtype === "JS_EVENT") {
-            return "JS Event to JS Event connection is forbidden.";
-        }
-        return `Invalid direction: ${stype} cannot connect to ${dtype}.`;
+function getRootColor(edge, graph) {
+    const rootId = edge.data?.rootId;
+    const rootNode = rootId ? graph.getNode(rootId) : null;
+    if (rootNode && isFileNode(rootNode.data?.type)) {
+        return rootNode.data.vsgdata?.fileColor 
+            ?? rootNode.data.constructor._fileTypeColor?.() 
+            ?? "rgba(235, 238, 246, 0.46)";
     }
+    return "rgba(235, 238, 246, 0.46)";
+}
 
-    if (dtype === "ELEMENT") {
-        const inEdges = graph.inEdges(dstNode.id) || [];
+const EDGE_CONFIG_MAP = {
+    "HTML->ELEMENT": (edge, graph) => ({
+        dashcolor: getRootColor(edge, graph),
+        edgeCategory: "showElementEdges"
+    }),
+    "HTML->CSS": (edge, graph) => ({
+        dashcolor: "rgba(255, 255, 255, 0.7)",
+        edgeCategory: "showIncludeEdges"
+    }),
+    "HTML->JS": (edge, graph) => ({
+        dashcolor: "rgba(255, 255, 255, 0.7)",
+        edgeCategory: "showIncludeEdges"
+    }),
+    "ELEMENT->ELEMENT": (edge, graph) => {
+        const inEdges = graph.inEdges(edge.dstId) || [];
         const parentEdges = inEdges.filter(e => {
             const p = graph.getNode(e.srcId);
             return p && (p.data.type === "ELEMENT" || p.data.type === "HTML");
         });
-        if (parentEdges.length > 1) {
-            return "Element node cannot have multiple parents.";
+        if (parentEdges.length > 1) return { error: "Element node cannot have multiple parents." };
+        return { dashcolor: getRootColor(edge, graph), edgeCategory: "showElementEdges" };
+    },
+    "ELEMENT->CSS_RULE": (edge, graph) => ({
+        dashcolor: "#3b82f6",
+        trackcolor: getRootColor(edge, graph),
+        dasharray: "6 6",
+        linecap: "round",
+        edgeCategory: "showInlineStyleEdges"
+    }),
+    "ELEMENT->JS_EVENT": (edge, graph) => ({
+        dashcolor: "#f7df1e",
+        trackcolor: getRootColor(edge, graph),
+        dasharray: "4 4",
+        edgeCategory: "showScriptEventEdges"
+    }),
+    "ELEMENT->ASSET_IMAGE": (edge, graph) => ({
+        dashcolor: "#ec4899",
+        trackcolor: getRootColor(edge, graph),
+        dasharray: "2 4",
+        linecap: "round",
+        edgeCategory: "showAssetEdges"
+    }),
+    "ELEMENT->ASSET_AUDIO": (edge, graph) => ({
+        dashcolor: "#ec4899",
+        trackcolor: getRootColor(edge, graph),
+        dasharray: "2 4",
+        linecap: "round",
+        edgeCategory: "showAssetEdges"
+    }),
+    "CSS->CSS_RULE": (edge, graph) => ({
+        dashcolor: getRootColor(edge, graph),
+        edgeCategory: "showCssEdges"
+    }),
+    "CSS_RULE->CSS_RULE": (edge, graph) => ({
+        dashcolor: getRootColor(edge, graph),
+        edgeCategory: "showCssEdges"
+    }),
+    "JS->JS_EVENT": (edge, graph) => {
+        const inEdges = graph.inEdges(edge.dstId) || [];
+        const jsParents = inEdges.filter(e => graph.getNode(e.srcId)?.data.type === "JS");
+        if (jsParents.length > 1) return { error: "JS Event cannot belong to multiple JS files." };
+        return { dashcolor: getRootColor(edge, graph), edgeCategory: "showJsEdges" };
+    }
+};
+
+function resolveEdgeConfig(edge, srcNode, dstNode, graph) {
+    const stype = srcNode.data?.type;
+    const dtype = dstNode.data?.type;
+    const key = `${stype}->${dtype}`;
+    
+    const handler = EDGE_CONFIG_MAP[key];
+    if (!handler) {
+        if (stype === "JS_EVENT" && dtype === "JS_EVENT") {
+            return { dashcolor: "#ff3333", error: "JS Event to JS Event connection is forbidden." };
         }
+        return { dashcolor: "#ff3333", error: `Invalid direction: ${stype} cannot connect to ${dtype}.` };
     }
     
-    if (dtype === "JS_EVENT") {
-        const inEdges = graph.inEdges(dstNode.id) || [];
-        const jsParents = inEdges.filter(e => graph.getNode(e.srcId)?.data.type === "JS");
-        if (jsParents.length > 1) {
-            return "JS Event cannot belong to multiple JS files.";
-        }
+    const config = handler(edge, graph);
+    if (config.error) {
+        return { dashcolor: "#ff3333", error: config.error };
     }
-
-    return null;
+    return config;
 }
 
 export class VsbEdgeData extends VsData {
@@ -131,6 +183,13 @@ export class VsbEdgeData extends VsData {
             zIndex:        "-1",
         });
 
+        const trackPath = document.createElementNS(SVG_NS, "path");
+        trackPath.setAttribute("fill", "none");
+        trackPath.setAttribute("stroke-width", "2");
+        trackPath.setAttribute("stroke-linecap", "round");
+        trackPath.setAttribute("pointer-events", "none");
+        trackPath.style.display = "none"; // Hidden by default
+
         const visiblePath = document.createElementNS(SVG_NS, "path");
         visiblePath.setAttribute("fill", "none");
         visiblePath.setAttribute("stroke-width", "2");
@@ -151,7 +210,7 @@ export class VsbEdgeData extends VsData {
         hitPath.setAttribute("stroke-linecap", "round");
         hitPath.setAttribute("pointer-events", "stroke");
 
-        element.append(visiblePath, socket, arrow, hitPath);
+        element.append(trackPath, visiblePath, socket, arrow, hitPath);
 
         const foreignObject = document.createElementNS(SVG_NS, "foreignObject");
         foreignObject.setAttribute("width", "36");
@@ -176,30 +235,29 @@ export class VsbEdgeData extends VsData {
         });
 
         const errorIcon = document.createElement("div");
+        errorIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2 L1 21 H23 Z" fill="#ff3333"/><rect x="11" y="9" width="2" height="5" fill="#ffffff"/><rect x="11" y="16" width="2" height="2" fill="#ffffff"/></svg>`;
         Object.assign(errorIcon.style, {
             width: "100%", height: "100%", margin: "0", padding: "0",
-            background: "#ff3333", color: "#ffffff",
-            borderRadius: "50%", display: "none",
-            alignItems: "center", justifyContent: "center",
-            fontWeight: "bold", fontSize: "16px", cursor: "help",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.5)"
+            display: "none", alignItems: "center", justifyContent: "center",
+            cursor: "help", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
         });
-        errorIcon.textContent = "×";
         errorIcon.addEventListener("pointerdown", e => e.stopPropagation());
 
         foreignObject.append(input, errorIcon);
         element.append(foreignObject);
 
-        const cache = { visiblePath, socket, arrow, hitPath, foreignObject, input, errorIcon, hover: false };
+        const cache = { trackPath, visiblePath, socket, arrow, hitPath, foreignObject, input, errorIcon, hover: false };
 
         hitPath.addEventListener("pointerenter", () => {
             cache.hover = true;
             visiblePath.setAttribute("stroke-width", "3");
+            trackPath.setAttribute("stroke-width", "3");
             if (vsgraph) vsgraph.render();
         });
         hitPath.addEventListener("pointerleave", () => {
             cache.hover = false;
             visiblePath.setAttribute("stroke-width", "2");
+            trackPath.setAttribute("stroke-width", "2");
             if (vsgraph) vsgraph.render();
         });
 
@@ -252,8 +310,11 @@ export class VsbEdgeData extends VsData {
             midY = 0.125 * src.y + 0.375 * controls.c1.y + 0.375 * controls.c2.y + 0.125 * dst.y;
         }
 
-        const errorMsg = _getEdgeError(edge, srcNode, dstNode, graph);
-        const hasError = !!errorMsg && (ctx?.showEdgeErrors ?? true);
+        const config = resolveEdgeConfig(edge, srcNode, dstNode, graph);
+        const hasError = !!config.error && (ctx?.showEdgeErrors ?? true);
+        const isVisible = config.edgeCategory ? (ctx?.[config.edgeCategory] ?? true) : true;
+        const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
+        let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
 
         cache.foreignObject.setAttribute("x", String(midX - 18));
         cache.foreignObject.setAttribute("y", String(midY - 11));
@@ -268,94 +329,58 @@ export class VsbEdgeData extends VsData {
             cache.foreignObject.style.display = "block";
             cache.input.style.display = "none";
             cache.errorIcon.style.display = "flex";
-            cache.errorIcon.title = errorMsg;
+            cache.errorIcon.title = config.error;
+            
+            // Force DOM update for hot-reload to ensure it's a triangle, not an oval
+            cache.errorIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2 L1 21 H23 Z" fill="#ff3333"/><rect x="11" y="9" width="2" height="5" fill="#ffffff"/><rect x="11" y="16" width="2" height="2" fill="#ffffff"/></svg>`;
+            cache.errorIcon.style.background = "transparent";
+            cache.errorIcon.style.borderRadius = "0";
+            cache.errorIcon.style.boxShadow = "none";
+            cache.errorIcon.style.filter = "drop-shadow(0 2px 4px rgba(0,0,0,0.5))";
+            
+            cache.visiblePath.removeAttribute("stroke-dasharray");
+            cache.visiblePath.removeAttribute("stroke-linecap");
+            cache.visiblePath.setAttribute("stroke-width", cache.hover ? "5" : "4");
+            cache.visiblePath.setAttribute("stroke", "#ff3333");
+            cache.trackPath.style.display = "none";
         } else {
             cache.foreignObject.style.display = showInput ? "block" : "none";
             cache.input.style.display = "block";
             cache.errorIcon.style.display = "none";
-        }
-
-        // Determine category for filtering
-        const stype = srcNode.data?.type;
-        const dtype = dstNode.data?.type;
-        let edgeCategory = "showElementEdges";
-        if ((stype === "HTML" && dtype === "ELEMENT") || (stype === "ELEMENT" && dtype === "ELEMENT")) {
-            edgeCategory = "showElementEdges";
-        } else if ((stype === "HTML" && (dtype === "CSS" || dtype === "JS")) || (dtype === "HTML" && (stype === "CSS" || stype === "JS"))) {
-            edgeCategory = "showIncludeEdges";
-        } else if (stype === "CSS" || stype === "CSS_RULE") {
-            edgeCategory = "showCssEdges";
-        } else if (stype === "ELEMENT" && dtype === "CSS_RULE") {
-            edgeCategory = "showInlineStyleEdges";
-        } else if (stype === "JS" && dtype === "JS_EVENT") {
-            edgeCategory = "showJsEdges";
-        } else if (stype === "ELEMENT" && dtype === "JS_EVENT") {
-            edgeCategory = "showScriptEventEdges";
-        } else if (stype === "ELEMENT" && (dtype === "ASSET_IMAGE" || dtype === "ASSET_AUDIO")) {
-            edgeCategory = "showAssetEdges";
-        }
-
-        const isVisible = ctx?.[edgeCategory] ?? true;
-
-        // Determine color
-        let color = "rgba(235, 238, 246, 0.46)";
-        if (hasError) {
-            color = "#ff3333";
-        } else if (bothFiles) {
-            color = "rgba(255, 255, 255, 0.7)";
-        } else {
-            const rootId = edge.data?.rootId;
-            const rootNode = rootId ? graph.getNode(rootId) : null;
-            if (rootNode && isFileNode(rootNode.data?.type)) {
-                color = rootNode.data.vsgdata?.fileColor 
-                     ?? rootNode.data.constructor._fileTypeColor?.() 
-                     ?? "rgba(235, 238, 246, 0.46)";
-            }
-        }
-
-        const highlighted = ctx?.highlightedEdgeIds?.has(edge.id) ?? false;
-        let opacity = cache.hover ? "1" : (highlighted ? "0.9" : "0.46");
-
-        if (stype === "ELEMENT" && dtype === "CSS_RULE") {
-            if (!hasError) color = "#3b82f6";
-            cache.visiblePath.setAttribute("stroke-dasharray", "6 6");
-            cache.visiblePath.setAttribute("stroke-linecap", "round");
-        } else if (edgeCategory === "showAssetEdges") {
-            if (!hasError) color = "#ec4899";
-            cache.visiblePath.setAttribute("stroke-dasharray", "2 4");
-            cache.visiblePath.setAttribute("stroke-linecap", "round");
-        } else if (edgeCategory === "showScriptEventEdges") {
-            if (!hasError) color = "#f7df1e";
-            cache.visiblePath.setAttribute("stroke-dasharray", "4 4");
-        } else if (edgeCategory === "showJsEdges") {
-            if (!hasError) color = "#f7df1e";
-            cache.visiblePath.removeAttribute("stroke-dasharray");
-        } else if (edgeCategory === "showElementEdges") {
-            if (!hasError) color = "#e34c26";
-            cache.visiblePath.removeAttribute("stroke-dasharray");
-        } else {
-            cache.visiblePath.removeAttribute("stroke-dasharray");
-        }
-
-        if (hasError) {
-            cache.visiblePath.removeAttribute("stroke-dasharray");
-            cache.visiblePath.setAttribute("stroke-width", cache.hover ? "5" : "4");
-        } else {
+            
+            if (config.dasharray) cache.visiblePath.setAttribute("stroke-dasharray", config.dasharray);
+            else cache.visiblePath.removeAttribute("stroke-dasharray");
+            
+            if (config.linecap) cache.visiblePath.setAttribute("stroke-linecap", config.linecap);
+            else cache.visiblePath.removeAttribute("stroke-linecap");
+            
             cache.visiblePath.setAttribute("stroke-width", cache.hover ? "3" : "2");
         }
 
         cache.visiblePath.setAttribute("d", pathD);
-        cache.visiblePath.setAttribute("stroke", color);
+        cache.visiblePath.setAttribute("stroke", config.dashcolor);
         
         if (!isVisible) opacity = "0";
         cache.visiblePath.style.opacity = opacity;
 
+        const terminalColor = (config.trackcolor && !hasError) ? config.trackcolor : config.dashcolor;
+
+        if (config.trackcolor && !hasError) {
+            cache.trackPath.style.display = "block";
+            cache.trackPath.setAttribute("d", pathD);
+            cache.trackPath.setAttribute("stroke", config.trackcolor);
+            cache.trackPath.setAttribute("stroke-width", cache.hover ? "3" : "2");
+            cache.trackPath.style.opacity = String(parseFloat(opacity) * 0.4);
+        } else {
+            cache.trackPath.style.display = "none";
+        }
+
         cache.socket.setAttribute("cx", String(src.x));
         cache.socket.setAttribute("cy", String(src.y));
-        cache.socket.setAttribute("fill", color);
+        cache.socket.setAttribute("fill", terminalColor);
         cache.socket.style.opacity = opacity;
 
-        cache.arrow.setAttribute("fill", color);
+        cache.arrow.setAttribute("fill", terminalColor);
         cache.arrow.style.opacity = opacity;
 
         cache.hitPath.setAttribute("d", pathD);
