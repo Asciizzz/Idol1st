@@ -118,7 +118,8 @@ export class VsbNodeData extends VsData {
         const z = vsg?.z ?? 0;
 
         element.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
-        element.style.zIndex    = String(z);
+        const baseZ = vsg?.collapsed ? 1 : 2;
+        element.style.zIndex    = String((vsg?.z ?? 0) + baseZ);
 
         const allowInput = vsgraph?.ctx?.showNodeInputs ?? false;
         if (cache.lastAllowInput !== allowInput) {
