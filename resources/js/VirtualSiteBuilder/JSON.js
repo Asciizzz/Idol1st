@@ -3,6 +3,7 @@ import {
     VsbNodeType, VsbEdgeData,
     VsbHtmlFileData, VsbCssFileData, VsbJsFileData,
     VsbHtmlElementData, VsbCssRuleData, VsbJsEventData,
+    VsbAssetImageData, VsbAssetAudioData
 } from "./nodedata/index.js";
 
 const _NODE_CLASS = {
@@ -12,6 +13,8 @@ const _NODE_CLASS = {
     [VsbNodeType.ELEMENT]:   VsbHtmlElementData,
     [VsbNodeType.CSS_RULE]:  VsbCssRuleData,
     [VsbNodeType.JS_EVENT]:  VsbJsEventData,
+    [VsbNodeType.ASSET_IMAGE]: VsbAssetImageData,
+    [VsbNodeType.ASSET_AUDIO]: VsbAssetAudioData,
 };
 
 export class VsbJSON {

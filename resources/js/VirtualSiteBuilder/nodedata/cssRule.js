@@ -62,8 +62,25 @@ export class VsbCssRuleData extends VsbElementData {
         const collapsed = data.vsgdata?.collapsed ?? false;
 
         if (!collapsed) {
-            if (document.activeElement !== cache.selectorInput) {
-                cache.selectorInput.value = data.selector ?? "";
+            let isInlineStyle = false;
+            if (graph) {
+                const inEdges = graph.inEdges(node.id) || [];
+                isInlineStyle = inEdges.some(e => {
+                    const srcNode = graph.getNode(e.srcId);
+                    return srcNode && srcNode.data.type === "ELEMENT";
+                });
+            }
+
+            if (isInlineStyle) {
+                cache.selectorInput.disabled = true;
+                cache.selectorInput.style.opacity = "0.5";
+                cache.selectorInput.value = "(Inline Style)";
+            } else {
+                cache.selectorInput.disabled = false;
+                cache.selectorInput.style.opacity = "1";
+                if (document.activeElement !== cache.selectorInput) {
+                    cache.selectorInput.value = data.selector ?? "";
+                }
             }
 
             if (document.activeElement !== cache.codeInput) {

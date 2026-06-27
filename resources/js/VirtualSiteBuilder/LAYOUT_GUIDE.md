@@ -18,12 +18,12 @@ To keep the infinite canvas from turning into unreadable "spaghetti", follow thi
 
 ## 3. Left-Branching CSS Vines
 - Place your primary **CSS File** nodes (e.g., `main.css`) on the **left** side of the root HTML column (e.g., `x = -400`).
-- From the CSS file, branch your **CSS Rule** nodes horizontally further to the **far left**.
-- The `x` coordinate should strictly decrease (e.g., `x = -700`, `x = -1000`, `x = -1300`), creating a cascaded line of styling rules that never overlaps with the HTML tree logic.
+- From the CSS file, branch your **CSS Rule** nodes horizontally to the left.
+- *Note:* It is not an enforceable rule to go infinitely to the far left. You are encouraged to arrange CSS rules in a **batch zigzag** pattern, stacking them tighter and closer vertically to conserve space. Because CSS rules can be collapsed into compact headers, this zigzag layout keeps them significantly cleaner than an infinite horizontal line while remaining distinct from the HTML tree.
 
 ## 4. Floating JS Event Modules
 - Keep your global **JS File** nodes (e.g., `app.js`) grouped near the CSS files on the left side (e.g., `x = -400`).
-- However, place the actual **JS Event** script nodes (the logic blocks that bind to elements) **high up** on the canvas, floating above the dense HTML element logic.
+- However, place the actual **JS Event** script nodes (the logic blocks that bind to elements) **high up** on the canvas, floating above the dense HTML element logic (on the right side).
 - Example: Place `JS_EVENT` nodes at `y = -400` or higher, and align them horizontally across the top (e.g., `x = 400, 800, 1200`). This creates a "global cloud" of scripts that you can visually pull down and attach to specific DOM elements.
 
 ## Summary
