@@ -13,6 +13,10 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\PlanController;
 
+use App\Http\Controllers\Admin\PlatformAdminAuthController;
+use App\Http\Controllers\Admin\FeatureFlagController;
+use App\Http\Controllers\Admin\AuditLogController;
+
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthEditorController::class, 'login']);
@@ -65,4 +69,26 @@ Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(func
         Route::post('impersonate',[TenantController::class, 'impersonate']);
         Route::put('plan',        [TenantController::class, 'assignPlan']);
     });
+});
+
+// Platform admin auth — login is public, others need a token
+Route::prefix('admin/auth')->group(function () {
+    Route::post('login', [PlatformAdminAuthController::class, 'login']);
+
+    Route::middleware(['auth:sanctum', 'ensure.service.admin'])->group(function () {
+        Route::post('mfa/verify', [PlatformAdminAuthController::class, 'verifyMfa']);
+        Route::post('logout',     [PlatformAdminAuthController::class, 'logout']);
+    });
+});
+
+// Feature flags + audit logs (service admin only)
+Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->group(function () {
+
+    Route::get('feature-flags',  [FeatureFlagController::class, 'index']);
+    Route::post('feature-flags', [FeatureFlagController::class, 'store']);
+    Route::put('feature-flags/{flagId}/tenants/{tenantId}', [FeatureFlagController::class, 'setTenantOverride']);
+    Route::post('feature-flags/{flagId}/rollout',           [FeatureFlagController::class, 'rollout']);
+
+    Route::get('audit-logs', [AuditLogController::class, 'index']);
+
 });
