@@ -10,10 +10,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'require.auth'        => \App\Http\Middleware\RequireAuth::class,
-            'ensure.admin'        => \App\Http\Middleware\EnsureAdmin::class,
-            'resolve.tenant'      => \App\Http\Middleware\ResolveTenant::class,
-            'ensure.service.admin'=> \App\Http\Middleware\EnsureServiceAdmin::class, // add this
+            'require.auth'         => \App\Http\Middleware\RequireAuth::class,
+            'ensure.admin'         => \App\Http\Middleware\EnsureAdmin::class,
+            'resolve.tenant'       => \App\Http\Middleware\ResolveTenant::class,
+            'ensure.service.admin' => \App\Http\Middleware\EnsureServiceAdmin::class,
+            'ensure.tenant.admin'  => \App\Http\Middleware\EnsureTenantAdmin::class, // add this
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {})

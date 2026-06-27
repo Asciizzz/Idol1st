@@ -39,6 +39,7 @@ return [
         'web'           => ['driver' => 'session', 'provider' => 'users'],
         'sanctum'       => ['driver' => 'sanctum',  'provider' => 'users'],
         'service_admin' => ['driver' => 'sanctum',  'provider' => 'service_admins'],
+        'tenant_admin' => ['driver' => 'sanctum', 'provider' => 'tenant_admins'],
     ],
 
     /*
@@ -61,8 +62,8 @@ return [
     'providers' => [
         'users'          => ['driver' => 'eloquent', 'model' => App\Models\User::class],
         'service_admins' => ['driver' => 'eloquent', 'model' => App\Models\ServiceAdmin::class],
+        'tenant_admins' => ['driver' => 'eloquent', 'model' => App\Models\TenantAdmin::class],
     ],
-    
     /*
     |--------------------------------------------------------------------------
     | Resetting Passwords

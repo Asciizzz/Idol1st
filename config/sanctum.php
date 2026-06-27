@@ -37,7 +37,7 @@ return [
     |
     */
 
-    'guard' => ['web', 'service_admin'],
+    'guard' => ['web', 'service_admin', 'tenant_admin'],
 
     /*
     |--------------------------------------------------------------------------

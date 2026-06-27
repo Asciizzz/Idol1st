@@ -17,6 +17,11 @@ use App\Http\Controllers\Admin\PlatformAdminAuthController;
 use App\Http\Controllers\Admin\FeatureFlagController;
 use App\Http\Controllers\Admin\AuditLogController;
 
+use App\Http\Controllers\Manage\TenantAdminAuthController;
+use App\Http\Controllers\Manage\IdolProfileController;
+use App\Http\Controllers\Manage\SocialLinkController;
+use App\Http\Controllers\Manage\IdolGroupController;
+
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthEditorController::class, 'login']);
@@ -90,5 +95,27 @@ Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->gr
     Route::post('feature-flags/{flagId}/rollout',           [FeatureFlagController::class, 'rollout']);
 
     Route::get('audit-logs', [AuditLogController::class, 'index']);
+
+});
+
+// Tenant admin login — only needs resolve.tenant, no admin auth yet
+Route::middleware('resolve.tenant')->prefix('manage')->group(function () {
+    Route::post('auth/login', [TenantAdminAuthController::class, 'login']);
+});
+
+// Authenticated tenant admin routes
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])->prefix('manage')->group(function () {
+
+    // Auth
+    Route::post('auth/logout', [TenantAdminAuthController::class, 'logout']);
+
+    // Idol profile
+    Route::get('idol/profile',      [IdolProfileController::class, 'show']);
+    Route::put('idol/profile',      [IdolProfileController::class, 'update']);
+    Route::post('idol/social-links',[SocialLinkController::class,  'upsert']);
+
+    // Idol groups
+    Route::get('idol/groups',  [IdolGroupController::class, 'index']);
+    Route::post('idol/groups', [IdolGroupController::class, 'store']);
 
 });
