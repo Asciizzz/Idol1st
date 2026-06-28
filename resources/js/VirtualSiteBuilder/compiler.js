@@ -1,3 +1,5 @@
+import { resolveEdgeConfig } from "./nodedata/edge.js";
+
 export class VsbCompiler {
     static compile(graph, ctx = null) {
         const result = {
@@ -8,6 +10,18 @@ export class VsbCompiler {
         };
         
         const log = (level, msg) => result.logs.push({ level, msg });
+
+        // 0. Validate ALL edges to collect structural errors
+        for (const [edgeId, edge] of graph.edges) {
+            const srcNode = graph.getNode(edge.srcId);
+            const dstNode = graph.getNode(edge.dstId);
+            if (srcNode && dstNode) {
+                const config = resolveEdgeConfig(edge, srcNode, dstNode, graph);
+                if (config.error) {
+                    log("error", `Edge from '${srcNode.data.name || srcNode.id}' to '${dstNode.data.name || dstNode.id}' is invalid: ${config.error}`);
+                }
+            }
+        }
 
         // 1. Gather files
         const htmlFiles = [];

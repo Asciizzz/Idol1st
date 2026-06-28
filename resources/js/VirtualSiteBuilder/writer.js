@@ -20,6 +20,12 @@ export class VsbWriter {
     static addJsEvent(graph, options = {}) { return graph.addNode({ data: new VsbJsEventData(options) }); }
 
     static addEdge(graph, srcId, dstId, options = {}) {
+        const outEdges = graph.outEdges(srcId) || [];
+        const inEdges = graph.inEdges(srcId) || [];
+        if (outEdges.some(e => e.dstId === dstId) || inEdges.some(e => e.srcId === dstId)) {
+            console.warn(`Edge between ${srcId} and ${dstId} already exists! Skipping.`);
+            return null;
+        }
         return Adag.addEdge(graph, srcId, dstId, {
             data: new VsbEdgeData(options),
         });

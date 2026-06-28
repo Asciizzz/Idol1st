@@ -140,10 +140,19 @@ const EDGE_CONFIG_MAP = {
     }
 };
 
-function resolveEdgeConfig(edge, srcNode, dstNode, graph) {
+export function resolveEdgeConfig(edge, srcNode, dstNode, graph) {
     const stype = srcNode.data?.type;
     const dtype = dstNode.data?.type;
     const key = `${stype}->${dtype}`;
+
+    const outEdges = graph.outEdges(edge.srcId) || [];
+    const inEdges = graph.inEdges(edge.srcId) || [];
+    const duplicates = outEdges.filter(e => e.dstId === edge.dstId);
+    const reverseDuplicates = inEdges.filter(e => e.srcId === edge.dstId);
+    if (duplicates.length > 1 || reverseDuplicates.length > 0) {
+        return { dashcolor: "#ff3333", error: `Duplicate or bidirectional edge detected between ${srcNode.data.name || srcNode.id} and ${dstNode.data.name || dstNode.id}.` };
+    }
+
     
     const handler = EDGE_CONFIG_MAP[key];
     if (!handler) {

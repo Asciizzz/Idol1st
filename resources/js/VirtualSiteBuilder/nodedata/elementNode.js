@@ -90,6 +90,17 @@ export class VsbElementData extends VsbNodeData {
 
         element.append(header, body);
 
+        const collapsedBody = document.createElement("div");
+        Object.assign(collapsedBody.style, {
+            padding: "6px 9px",
+            fontSize: "10px",
+            color: "#72798a",
+            textAlign: "left",
+            fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace",
+            display: "none"
+        });
+        element.append(collapsedBody);
+
         // Resize handles
         const leftResizer = document.createElement("div");
         const rightResizer = document.createElement("div");
@@ -149,6 +160,7 @@ export class VsbElementData extends VsbNodeData {
         cache.title  = title;
         cache.body   = body;
         cache.collapseBtn = collapseBtn;
+        cache.collapsedBody = collapsedBody;
 
         return { element, cache };
     }
@@ -168,8 +180,13 @@ export class VsbElementData extends VsbNodeData {
 
         if (vsg?.collapsed) {
             cache.body.style.display = "none";
+            if (cache.collapsedBody) {
+                cache.collapsedBody.style.display = "block";
+                cache.collapsedBody.textContent = node.id;
+            }
         } else {
             cache.body.style.display = "flex";
+            if (cache.collapsedBody) cache.collapsedBody.style.display = "none";
         }
 
         if (document.activeElement !== cache.title) {

@@ -156,8 +156,7 @@ export class VsbHtmlElementData extends VsbElementData {
                         borderLeft: "3px solid #3b82f6", fontWeight: "bold"
                     });
                     
-                    const codeSnippet = style.code.replace(/\n/g, ' ').substring(0, 30);
-                    row.innerHTML = `<span style="color: #8b93a7">style="</span>${codeSnippet}${style.code.length > 30 ? '...' : ''}<span style="color: #8b93a7">"</span>`;
+                    row.textContent = style.name;
                     cache.styleList.append(row);
                 }
             } else {

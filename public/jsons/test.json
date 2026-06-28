@@ -1221,8 +1221,8 @@
     "edges": [
         {
             "id": "e1",
-            "dstId": "css_main",
-            "srcId": "c_body",
+            "srcId": "css_main",
+            "dstId": "c_body",
             "data": {
                 "rootId": "css_main",
                 "order": 0,
