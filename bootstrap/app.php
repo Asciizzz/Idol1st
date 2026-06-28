@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensure.tenant.admin'  => \App\Http\Middleware\EnsureTenantAdmin::class,
             'ensure.fan'           => \App\Http\Middleware\EnsureFan::class, // add this
         ]);
+            $middleware->validateCsrfTokens(except: [
+            'api/webhooks/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {})
     ->create();
+

@@ -210,3 +210,15 @@ Route::middleware('resolve.tenant')->prefix('merch')->group(function () {
         Route::post('orders/{orderId}/cancel',    [FanMerchController::class, 'cancelOrder']);
     });
 });
+
+use App\Http\Controllers\PaymentWebhookController;
+
+// Webhook routes are public — payment providers call these directly.
+// No auth middleware, no CSRF (excluded separately — see checklist).
+Route::post(
+    'webhooks/payment/{provider}',
+    [PaymentWebhookController::class, 'handle']
+)->whereIn('provider', [
+    'stripe', 'paypal', 'promptpay', 'duitnow',
+    'qris', 'paynow', 'instapay', 'wechatpay', 'alipay',
+]);

@@ -11,6 +11,8 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use Stripe\StripeClient;
+
 class CheckoutService
 {
     /**
@@ -131,9 +133,17 @@ class CheckoutService
      */
     private function buildClientKey(Payment $payment, string $method): ?string
     {
-        if (! in_array($method, ['STRIPE', 'CREDIT_CARD', 'PAYPAL'])) return null;
+        if ($method !== 'STRIPE') return null;
 
-        // Stub — replace with real Stripe PaymentIntent or PayPal order creation
-        return "stub_client_key_{$payment->id}";
+        $stripe = new StripeClient(config('services.stripe.secret'));
+        $intent = $stripe->paymentIntents->create([
+            'amount'   => (int) ($payment->amount * 100), // in cents
+            'currency' => strtolower($payment->currency),
+            'metadata' => ['payment_id' => $payment->id],
+        ]);
+
+        $payment->update(['transaction_id' => $intent->id]);
+
+        return $intent->client_secret;
     }
 }
