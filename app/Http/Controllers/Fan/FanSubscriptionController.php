@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use App\Services\NotificationService;
+
 class FanSubscriptionController extends Controller
 {
     /**
@@ -139,6 +141,14 @@ class FanSubscriptionController extends Controller
             'status'     => 'CANCELLED',
             'auto_renew' => false,
         ]);
+
+        app(NotificationService::class)->notify(
+            $fan,
+            'SUBSCRIPTION_EXPIRY',
+            'Your membership has been cancelled.',
+            $subscription->id,
+            'FanSubscription',
+        );
 
         return response()->json([
             'success' => true,

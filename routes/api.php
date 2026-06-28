@@ -254,3 +254,14 @@ Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
         Route::get('addresses', [AddressController::class, 'index']);
         Route::post('addresses',[AddressController::class, 'store']);
     });
+
+    use App\Http\Controllers\Fan\NotificationController;
+
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
+    ->prefix('notifications')
+    ->group(function () {
+        Route::get('/',           [NotificationController::class, 'index']);
+        Route::post('read-all',   [NotificationController::class, 'readAll']);
+        Route::get('preferences', [NotificationController::class, 'preferences']);
+        Route::put('preferences', [NotificationController::class, 'updatePreferences']);
+    });

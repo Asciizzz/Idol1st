@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use App\Services\NotificationService;
+
 class EventController extends Controller
 {
     /**
@@ -61,6 +63,14 @@ class EventController extends Controller
             'visibility'     => $request->input('visibility', 'PUBLIC'),
             'status'         => 'UPCOMING',
         ]);
+
+        app(NotificationService::class)->broadcast(
+            $tenant,
+            'EVENT_REMINDER',
+            "New event announced: {$event->title}",
+            $event->id,
+            'IdolEvent',
+        );
 
         return response()->json([
             'success' => true,

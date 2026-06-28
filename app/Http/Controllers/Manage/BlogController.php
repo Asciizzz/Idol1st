@@ -13,6 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use App\Services\NotificationService;
+
 class BlogController extends Controller
 {
     /**
@@ -64,7 +66,7 @@ class BlogController extends Controller
             'tenant_id'   => $tenant->id,
             'category_id' => $request->category_id,
             'title'       => $request->title,
-            'content'     => $request->content,
+            'content'     => $request->input('content'),
             'tags'        => $request->input('tags', []),
             'visibility'  => $request->input('visibility', 'PUBLIC'),
             'status'      => $status,
@@ -91,6 +93,15 @@ class BlogController extends Controller
             'status'       => 'PUBLISHED',
             'published_at' => $post->published_at ?? now(),
         ]);
+
+        $tenant = app(\App\Models\Tenant::class);
+        app(NotificationService::class)->broadcast(
+            $tenant,
+            'NEW_POST',
+            "New post: {$post->title}",
+            $post->id,
+            'BlogPost',
+        );
 
         return response()->json([
             'success' => true,

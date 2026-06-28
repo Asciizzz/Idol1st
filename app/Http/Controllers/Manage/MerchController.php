@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use App\Services\NotificationService;
+
 class MerchController extends Controller
 {
     /**
@@ -83,6 +85,14 @@ class MerchController extends Controller
 
             return $product->load('category', 'variants');
         });
+
+        app(NotificationService::class)->broadcast(
+            $tenant,
+            'NEW_MERCH',
+            "New merch available: {$product->name}",
+            $product->id,
+            'MerchProduct',
+        );
 
         return response()->json([
             'success' => true,
