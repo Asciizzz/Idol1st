@@ -151,12 +151,24 @@ export class VsbFileData extends VsbNodeData {
         header.append(collapseBtn, title, colorInput, meta);
         element.append(header, body);
 
+        const collapsedBody = document.createElement("div");
+        Object.assign(collapsedBody.style, {
+            padding: "6px 9px",
+            fontSize: "10px",
+            color: "#72798a",
+            textAlign: "left",
+            fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace",
+            display: "none"
+        });
+        element.append(collapsedBody);
+
         cache.header = header;
         cache.title  = title;
         cache.colorInput = colorInput;
         cache.meta   = meta;
         cache.body   = body;
         cache.collapseBtn = collapseBtn;
+        cache.collapsedBody = collapsedBody;
 
         return { element, cache };
     }
@@ -191,8 +203,13 @@ export class VsbFileData extends VsbNodeData {
 
         if (vsg?.collapsed) {
             cache.body.style.display = "none";
+            if (cache.collapsedBody) {
+                cache.collapsedBody.style.display = "block";
+                cache.collapsedBody.textContent = node.id;
+            }
         } else {
             cache.body.style.display = "block";
+            if (cache.collapsedBody) cache.collapsedBody.style.display = "none";
         }
 
         if (document.activeElement !== cache.title) {
