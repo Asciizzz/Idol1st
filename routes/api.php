@@ -25,6 +25,10 @@ use App\Http\Controllers\Manage\IdolGroupController;
 use App\Http\Controllers\Manage\BlogController as ManageBlogController;
 use App\Http\Controllers\Fan\BlogController as FanBlogController;
 
+use App\Http\Controllers\Fan\FanAuthController;
+use App\Http\Controllers\Fan\FanSubscriptionController;
+use App\Http\Controllers\Manage\MembershipTierController;
+
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthEditorController::class, 'login']);
@@ -147,4 +151,31 @@ Route::middleware('resolve.tenant')
             Route::post('posts/{postId}/like',     [FanBlogController::class, 'like']);
             Route::post('posts/{postId}/comments', [FanBlogController::class, 'storeComment']);
         });
+    });
+
+    // ── Fan auth (public — only needs resolve.tenant) ────────────
+Route::middleware('resolve.tenant')->prefix('auth')->group(function () {
+    Route::post('register', [FanAuthController::class, 'register']);
+    Route::post('login',    [FanAuthController::class, 'login']);
+    Route::post('logout',   [FanAuthController::class, 'logout'])->middleware('auth:sanctum');
+});
+
+// ── Fan membership — tiers are public, subscription actions need fan auth ──
+Route::middleware('resolve.tenant')->prefix('membership')->group(function () {
+    Route::get('tiers', [FanSubscriptionController::class, 'tiers']);
+
+    Route::middleware(['auth:sanctum', 'ensure.fan'])->group(function () {
+        Route::post('subscribe',              [FanSubscriptionController::class, 'subscribe']);
+        Route::get('subscription',            [FanSubscriptionController::class, 'show']);
+        Route::post('subscription/cancel',    [FanSubscriptionController::class, 'cancel']);
+        Route::post('subscription/upgrade',   [FanSubscriptionController::class, 'upgrade']);
+    });
+});
+
+// ── Tenant admin membership tier management ───────────────────
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])
+    ->prefix('manage/membership')
+    ->group(function () {
+        Route::get('tiers',  [MembershipTierController::class, 'index']);
+        Route::post('tiers', [MembershipTierController::class, 'store']);
     });
