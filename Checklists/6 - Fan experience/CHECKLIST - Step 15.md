@@ -20,7 +20,27 @@ One new migration will run:
 | `Controllers/Fan/EventController.php` | `app/Http/Controllers/Fan/` |
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_events.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Manage\EventController as ManageEventController;
+use App\Http\Controllers\Fan\EventController as FanEventController;
+ 
+// ── Tenant admin event management ─────────────────────────────
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])
+    ->prefix('manage/events')
+    ->group(function () {
+        Route::get('/',  [ManageEventController::class, 'index']);
+        Route::post('/', [ManageEventController::class, 'store']);
+    });
+ 
+// ── Fan-facing events (optional fan auth) ─────────────────────
+Route::middleware('resolve.tenant')->prefix('events')->group(function () {
+    Route::get('/', [FanEventController::class, 'index']);
+ 
+    Route::middleware(['auth:sanctum', 'ensure.fan'])->group(function () {
+        Route::post('{eventId}/rsvp', [FanEventController::class, 'rsvp']);
+    });
+});
+```
 
 ## 4. Endpoints available after this step
 | Method | URI | Middleware | Description |

@@ -25,7 +25,19 @@ Gate::policy(Asset::class, AssetPolicy::class);
 ```
 
 ## 4. Add routes to routes/api.php
-Paste the contents of `api_assets.php` into the existing `auth:sanctum` group in `routes/api.php`.
+```php
+use App\Http\Controllers\AssetController;
+ 
+Route::middleware('auth:sanctum')->group(function () {
+ 
+    Route::prefix('projects/{project}')->group(function () {
+        Route::get('assets',              [AssetController::class, 'index']);
+        Route::post('assets',             [AssetController::class, 'store']);
+        Route::delete('assets/{asset}',   [AssetController::class, 'destroy']);
+    });
+ 
+});
+```
 
 ## 5. Add the assets relationship to Project model
 Make sure `app/Models/Project.php` has this (already included in the Step 2 file):

@@ -16,7 +16,19 @@ from Steps 12 and 13.
 Note: create `app/Services/Payment/` directory if it doesn't exist.
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_webhooks.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\PaymentWebhookController;
+ 
+// Webhook routes are public — payment providers call these directly.
+// No auth middleware, no CSRF (excluded separately — see checklist).
+Route::post(
+    'webhooks/payment/{provider}',
+    [PaymentWebhookController::class, 'handle']
+)->whereIn('provider', [
+    'stripe', 'paypal', 'promptpay', 'duitnow',
+    'qris', 'paynow', 'instapay', 'wechatpay', 'alipay',
+]);
+```
 
 ## 4. Exclude webhook routes from CSRF verification
 Webhook endpoints must not be CSRF-verified since providers don't send CSRF tokens.

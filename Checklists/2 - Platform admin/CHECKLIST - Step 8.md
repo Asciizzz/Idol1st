@@ -44,7 +44,32 @@ In `bootstrap/app.php`, add `resolve.tenant` alongside existing aliases:
 ```
 
 ## 4. Add routes to routes/api.php
-Paste the contents of `api_tenants.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Admin\TenantController;
+use App\Http\Controllers\Admin\PlanController;
+ 
+// Tenant management (admin only)
+Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(function () {
+ 
+    // Plans
+    Route::get('plans',  [PlanController::class, 'index']);
+    Route::post('plans', [PlanController::class, 'store']);
+ 
+    // Tenants
+    Route::get('tenants',    [TenantController::class, 'index']);
+    Route::post('tenants',   [TenantController::class, 'store']);
+ 
+    Route::prefix('tenants/{tenantId}')->group(function () {
+        Route::get('/',           [TenantController::class, 'show']);
+        Route::patch('/',         [TenantController::class, 'update']);
+        Route::post('suspend',    [TenantController::class, 'suspend']);
+        Route::post('reactivate', [TenantController::class, 'reactivate']);
+        Route::post('impersonate',[TenantController::class, 'impersonate']);
+        Route::put('plan',        [TenantController::class, 'assignPlan']);
+    });
+ 
+});
+```
 
 ## 5. Endpoints available after this step
 | Method | URI | Description |

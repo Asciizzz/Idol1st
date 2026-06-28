@@ -1,7 +1,7 @@
 # Step 1 — Wire-up Checklist
 
 ## 1. Ensure the users table exists
-If you haven't already, add the default Laravel users migration at
+Add the default Laravel users migration at
 `database/migrations/0001_01_01_000000_create_users_table.php`:
 
 ```php
@@ -38,7 +38,6 @@ This publishes the Sanctum config and creates the `personal_access_tokens` table
 | `Controllers/AuthEditorController.php` | `app/Http/Controllers/` |
 
 ## 5. Add routes to routes/api.php
-Paste the contents of `api_auth.php` into `routes/api.php`:
 ```php
 use App\Http\Controllers\AuthEditorController;
 

@@ -21,7 +21,18 @@ One new migration will run:
 | `notification_hooks.php` | Reference only — see step 4 below |
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_notifications.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Fan\NotificationController;
+ 
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
+    ->prefix('notifications')
+    ->group(function () {
+        Route::get('/',           [NotificationController::class, 'index']);
+        Route::post('read-all',   [NotificationController::class, 'readAll']);
+        Route::get('preferences', [NotificationController::class, 'preferences']);
+        Route::put('preferences', [NotificationController::class, 'updatePreferences']);
+    });
+```
 
 ## 4. Wire notification hooks into prior controllers
 The `notification_hooks.php` file contains snippets for each trigger point.

@@ -15,7 +15,20 @@ php artisan migrate
 | `Controllers/SnapshotController.php` | `app/Http/Controllers/` |
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_snapshots.php` into the existing `auth:sanctum` group in `routes/api.php` — alongside the project routes from Step 2.
+```php
+use App\Http\Controllers\SnapshotController;
+ 
+Route::middleware('auth:sanctum')->group(function () {
+ 
+    Route::prefix('projects/{project}')->group(function () {
+        Route::get('snapshots',           [SnapshotController::class, 'index']);
+        Route::post('snapshots',          [SnapshotController::class, 'store']);
+        Route::get('snapshots/{version}', [SnapshotController::class, 'show'])
+            ->where('version', '[0-9]+');
+    });
+ 
+});
+```
 
 ## 4. Add the snapshots relationship to Project model
 Make sure `app/Models/Project.php` has this (already included in the Step 2 file):

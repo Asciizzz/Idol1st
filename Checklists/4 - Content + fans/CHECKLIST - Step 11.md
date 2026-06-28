@@ -31,7 +31,36 @@ Three new migrations will run:
 Note: create `app/Services/` and `app/Http/Controllers/Fan/` directories if they don't exist.
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_blog.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Manage\BlogController as ManageBlogController;
+use App\Http\Controllers\Fan\BlogController as FanBlogController;
+ 
+// ── Tenant admin blog management ──────────────────────────────
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])
+    ->prefix('manage/blog')
+    ->group(function () {
+        Route::get('posts',                        [ManageBlogController::class, 'index']);
+        Route::post('posts',                       [ManageBlogController::class, 'store']);
+        Route::post('posts/{postId}/publish',      [ManageBlogController::class, 'publish']);
+        Route::post('comments/{commentId}/hide',   [ManageBlogController::class, 'hideComment']);
+    });
+ 
+// ── Fan-facing blog (optional fan auth) ───────────────────────
+// resolve.tenant runs for all; auth:sanctum is optional (guests can browse PUBLIC posts)
+Route::middleware('resolve.tenant')
+    ->prefix('blog')
+    ->group(function () {
+        Route::get('posts',              [FanBlogController::class, 'index']);
+        Route::get('posts/{postId}',     [FanBlogController::class, 'show']);
+        Route::get('posts/{postId}/comments', [FanBlogController::class, 'comments']);
+ 
+        // These require fan auth
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('posts/{postId}/like',     [FanBlogController::class, 'like']);
+            Route::post('posts/{postId}/comments', [FanBlogController::class, 'storeComment']);
+        });
+    });
+```
 
 ## 4. Note on fan FK constraints
 `blog_comments.fan_id` and `blog_post_likes.fan_id` don't have FK constraints yet

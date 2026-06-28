@@ -15,7 +15,18 @@ php artisan migrate
 | `Controllers/PublishController.php` | `app/Http/Controllers/` |
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_publish.php` into the existing `auth:sanctum` group in `routes/api.php`.
+```php
+use App\Http\Controllers\PublishController;
+ 
+Route::middleware('auth:sanctum')->group(function () {
+ 
+    Route::prefix('projects/{project}')->group(function () {
+        Route::post('publish',    [PublishController::class, 'publish']);
+        Route::get('published',   [PublishController::class, 'show']);
+    });
+ 
+});
+```
 
 ## 4. Add the publishedSite relationship to Project model
 Add to `app/Models/Project.php`:

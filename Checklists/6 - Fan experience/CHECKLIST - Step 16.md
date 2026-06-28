@@ -14,7 +14,19 @@ Step 16 reuses the `fans` table from Step 12 and `addresses` table from Step 13.
 `StoreAddressRequest` from Step 13 is reused for the address store endpoint.
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_profile.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Fan\FanProfileController;
+use App\Http\Controllers\Fan\AddressController;
+ 
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
+    ->prefix('profile')
+    ->group(function () {
+        Route::get('/',         [FanProfileController::class, 'show']);
+        Route::patch('/',       [FanProfileController::class, 'update']);
+        Route::get('addresses', [AddressController::class, 'index']);
+        Route::post('addresses',[AddressController::class, 'store']);
+    });
+```
 
 ## 4. Endpoints available after this step
 | Method | URI | Middleware | Description |

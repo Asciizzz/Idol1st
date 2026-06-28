@@ -23,7 +23,15 @@ In `bootstrap/app.php`, add `ensure.admin` alongside the existing `require.auth`
 ```
 
 ## 4. Add routes to routes/api.php
-Paste the contents of `api_admin.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\AdminController;
+ 
+Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(function () {
+    Route::get('users',    [AdminController::class, 'users']);
+    Route::get('projects', [AdminController::class, 'projects']);
+    Route::get('stats',    [AdminController::class, 'stats']);
+});
+```
 
 ## 5. Endpoints available after this step
 | Method | URI | Middleware | Description |

@@ -12,7 +12,15 @@ Step 4 reuses `project_snapshots` from Step 3 — no new table needed.
 `SnapshotResource` from Step 3 is reused as the response shape — no new resource needed.
 
 ## 3. Add route to routes/api.php
-Paste the contents of `api_compiler.php` into the existing `auth:sanctum` group in `routes/api.php` — alongside the project and snapshot routes.
+```php
+use App\Http\Controllers\CompilerController;
+ 
+Route::middleware('auth:sanctum')->group(function () {
+ 
+    Route::post('projects/{project}/compile', [CompilerController::class, 'compile']);
+ 
+});
+```
 
 ## 4. Endpoints available after this step
 | Method | URI | Description |

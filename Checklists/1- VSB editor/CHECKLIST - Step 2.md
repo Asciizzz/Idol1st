@@ -24,7 +24,13 @@ and `ProjectPolicy.php` is in `app/Policies/` — so this step may be optional,
 but explicit registration is safer.
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_projects.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\ProjectController;
+ 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('projects', ProjectController::class);
+});
+```
 
 ## 4. File placement summary
 | File | Destination |

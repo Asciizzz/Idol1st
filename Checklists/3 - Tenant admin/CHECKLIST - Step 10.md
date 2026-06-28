@@ -70,7 +70,33 @@ In `config/sanctum.php`:
 ```
 
 ## 5. Add routes to routes/api.php
-Paste the contents of `api_manage.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Admin\PlatformAdminAuthController;
+use App\Http\Controllers\Admin\FeatureFlagController;
+use App\Http\Controllers\Admin\AuditLogController;
+ 
+// Platform admin auth — login is public, others need a token
+Route::prefix('admin/auth')->group(function () {
+    Route::post('login', [PlatformAdminAuthController::class, 'login']);
+ 
+    Route::middleware(['auth:sanctum', 'ensure.service.admin'])->group(function () {
+        Route::post('mfa/verify', [PlatformAdminAuthController::class, 'verifyMfa']);
+        Route::post('logout',     [PlatformAdminAuthController::class, 'logout']);
+    });
+});
+ 
+// Feature flags + audit logs (service admin only)
+Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->group(function () {
+ 
+    Route::get('feature-flags',  [FeatureFlagController::class, 'index']);
+    Route::post('feature-flags', [FeatureFlagController::class, 'store']);
+    Route::put('feature-flags/{flagId}/tenants/{tenantId}', [FeatureFlagController::class, 'setTenantOverride']);
+    Route::post('feature-flags/{flagId}/rollout',           [FeatureFlagController::class, 'rollout']);
+ 
+    Route::get('audit-logs', [AuditLogController::class, 'index']);
+ 
+});
+```
 
 ## 6. Create a test tenant admin via tinker
 ```bash

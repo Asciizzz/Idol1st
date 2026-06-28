@@ -47,7 +47,38 @@ Four new migrations will run:
 | `Controllers/Fan/MerchController.php` | `app/Http/Controllers/Fan/` |
 
 ## 3. Add routes to routes/api.php
-Paste the contents of `api_merch.php` into `routes/api.php`.
+```php
+use App\Http\Controllers\Manage\MerchController as ManageMerchController;
+use App\Http\Controllers\Fan\MerchController as FanMerchController;
+ 
+// ── Tenant admin merch management ─────────────────────────────
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])
+    ->prefix('manage/merch')
+    ->group(function () {
+        Route::get('products',                        [ManageMerchController::class, 'index']);
+        Route::post('products',                       [ManageMerchController::class, 'store']);
+        Route::patch('variants/{variantId}/stock',    [ManageMerchController::class, 'updateStock']);
+        Route::get('orders',                          [ManageMerchController::class, 'orders']);
+        Route::post('orders/{orderId}/ship',          [ManageMerchController::class, 'ship']);
+    });
+ 
+// ── Fan merch — products are public, cart/orders need fan auth ─
+Route::middleware('resolve.tenant')->prefix('merch')->group(function () {
+ 
+    Route::get('products', [FanMerchController::class, 'products']);
+ 
+    Route::middleware(['auth:sanctum', 'ensure.fan'])->group(function () {
+        Route::get('cart',                        [FanMerchController::class, 'cart']);
+        Route::post('cart/items',                 [FanMerchController::class, 'addItem']);
+        Route::patch('cart/items/{itemId}',       [FanMerchController::class, 'updateItem']);
+        Route::delete('cart/items/{itemId}',      [FanMerchController::class, 'removeItem']);
+        Route::post('checkout',                   [FanMerchController::class, 'checkout']);
+        Route::get('orders',                      [FanMerchController::class, 'orders']);
+        Route::get('orders/{orderId}',            [FanMerchController::class, 'showOrder']);
+        Route::post('orders/{orderId}/cancel',    [FanMerchController::class, 'cancelOrder']);
+    });
+});
+```
 
 ## 4. Endpoints available after this step
 | Method | URI | Middleware | Description |
