@@ -9,8 +9,8 @@
 | `Routes/web.php` | `routes/web.php` (replace existing) |
 
 ## 2. Add methods to AuthEditorController
-Open `app/Http/Controllers/AuthEditorController.php` and paste in the four
-methods from `AuthEditorController_additions.php`:
+Open `app/Http/Controllers/AuthEditorController.php` and add the four
+methods:
 - `showLogin()`
 - `handleLogin()`
 - `webLogout()`

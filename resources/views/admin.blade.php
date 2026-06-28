@@ -36,5 +36,11 @@
             </div>
         </main>
     </div>
+
+    <form method="POST" action="/logout" style="position:fixed;bottom:10px;left:100px;z-index:99999;">
+        @csrf
+        <button type="submit">Log out</button>
+    </form>
+    
 </body>
 </html>

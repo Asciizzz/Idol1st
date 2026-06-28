@@ -20,11 +20,15 @@
             overflow: hidden;
         }
     </style>
-    @vite('resources/js/vsb.js')
 </head>
 
 <body>
     <div id="app"></div>
+
+    <form method="POST" action="/logout" style="position:fixed;bottom:10px;left:100px;z-index:99999;">
+        @csrf
+        <button type="submit">Log out</button>
+    </form>
 
     {{-- Seed VSB canvas with graph state and draft metadata --}}
     <script>
@@ -35,7 +39,7 @@
         {{-- Usage in JS: const token = window.__VSB_TOKEN__ --}}
         window.__VSB_TOKEN__ = @json(session('sanctum_token'));
     </script>
-</form>
+    @vite('resources/js/vsb.js')
 </body>
 
 </html>
