@@ -242,3 +242,15 @@ Route::middleware('resolve.tenant')->prefix('events')->group(function () {
         Route::post('{eventId}/rsvp', [FanEventController::class, 'rsvp']);
     });
 });
+
+use App\Http\Controllers\Fan\FanProfileController;
+use App\Http\Controllers\Fan\AddressController;
+
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
+    ->prefix('profile')
+    ->group(function () {
+        Route::get('/',         [FanProfileController::class, 'show']);
+        Route::patch('/',       [FanProfileController::class, 'update']);
+        Route::get('addresses', [AddressController::class, 'index']);
+        Route::post('addresses',[AddressController::class, 'store']);
+    });
