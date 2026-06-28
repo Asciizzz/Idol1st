@@ -222,3 +222,23 @@ Route::post(
     'stripe', 'paypal', 'promptpay', 'duitnow',
     'qris', 'paynow', 'instapay', 'wechatpay', 'alipay',
 ]);
+
+use App\Http\Controllers\Manage\EventController as ManageEventController;
+use App\Http\Controllers\Fan\EventController as FanEventController;
+
+// ── Tenant admin event management ─────────────────────────────
+Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.tenant.admin'])
+    ->prefix('manage/events')
+    ->group(function () {
+        Route::get('/',  [ManageEventController::class, 'index']);
+        Route::post('/', [ManageEventController::class, 'store']);
+    });
+
+// ── Fan-facing events (optional fan auth) ─────────────────────
+Route::middleware('resolve.tenant')->prefix('events')->group(function () {
+    Route::get('/', [FanEventController::class, 'index']);
+
+    Route::middleware(['auth:sanctum', 'ensure.fan'])->group(function () {
+        Route::post('{eventId}/rsvp', [FanEventController::class, 'rsvp']);
+    });
+});
