@@ -94,7 +94,7 @@ class BlogController extends Controller
             'published_at' => $post->published_at ?? now(),
         ]);
 
-        $tenant = app(\App\Models\Tenant::class);
+        $tenant = app(Tenant::class);
         app(NotificationService::class)->broadcast(
             $tenant,
             'NEW_POST',
