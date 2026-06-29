@@ -60,7 +60,7 @@ class AuthEditorController extends Controller
         ]);
 
         $file = $request->file('file');
-        
+
         // Save to storage/app/public/editor-assets
         $path = $file->store('editor-assets', 'public');
 
@@ -237,6 +237,8 @@ class AuthEditorController extends Controller
      */
     public function showAdmin(): View
     {
-        return view('admin');
+        return view('admin', [
+            'sanctumToken' => session('sanctum_token'),
+        ]);
     }
 }

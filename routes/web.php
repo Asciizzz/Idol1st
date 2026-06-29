@@ -14,6 +14,11 @@ Route::middleware('require.auth')->group(function () {
     Route::get('/editor',       [AuthEditorController::class, 'showEditor'])->name('editor');
     Route::post('/editor/save', [AuthEditorController::class, 'saveEditor'])->name('editor.save');
     Route::post('/logout',      [AuthEditorController::class, 'webLogout'])->name('logout');
+
+    // Fan site tester — accessible to any authenticated user
+    Route::get('/fan', function () {
+        return view('fan');
+    })->name('fan');
 });
 
 // ── Admin only ────────────────────────────────────────────────

@@ -60,7 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Tenant management (admin only)
-Route::middleware(['auth:sanctum', 'ensure.admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->group(function () {
     Route::get('users',    [AdminController::class, 'users']);
     Route::get('projects', [AdminController::class, 'projects']);
     Route::get('stats',    [AdminController::class, 'stats']);
@@ -94,7 +94,7 @@ Route::prefix('admin/auth')->group(function () {
 });
 
 // Feature flags + audit logs (service admin only)
-Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:service_admin', 'ensure.service.admin'])->prefix('admin')->group(function () {
 
     Route::get('feature-flags',  [FeatureFlagController::class, 'index']);
     Route::post('feature-flags', [FeatureFlagController::class, 'store']);
@@ -265,3 +265,16 @@ Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
         Route::get('preferences', [NotificationController::class, 'preferences']);
         Route::put('preferences', [NotificationController::class, 'updatePreferences']);
     });
+
+Route::get('/admin/test-plans', function () {
+    return response()->json([
+        'success' => true
+    ]);
+});
+
+Route::middleware(['auth:service_admin'])
+->get('/admin/test-auth', function () {
+    return response()->json([
+        'user' => auth()->user()
+    ]);
+});

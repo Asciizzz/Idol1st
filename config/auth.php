@@ -37,10 +37,6 @@ return [
 
     'guards' => [
         'web'           => ['driver' => 'session', 'provider' => 'users'],
-        'sanctum'       => ['driver' => 'sanctum',  'provider' => 'users'],
-        'service_admin' => ['driver' => 'sanctum',  'provider' => 'service_admins'],
-        'tenant_admin' => ['driver' => 'sanctum', 'provider' => 'tenant_admins'],
-        'fan' => ['driver' => 'sanctum', 'provider' => 'fans'],
     ],
 
     /*

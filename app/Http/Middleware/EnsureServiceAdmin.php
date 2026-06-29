@@ -10,7 +10,7 @@ class EnsureServiceAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user('sanctum');
+        $user = $request->user();
 
         if (! $user || ! ($user instanceof \App\Models\ServiceAdmin)) {
             return response()->json([
