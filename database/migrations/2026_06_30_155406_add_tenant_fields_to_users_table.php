@@ -6,23 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->uuid('tenant_id')->nullable()->index()->after('id');
+            $table->boolean('is_tenant_admin')->default(false)->after('role');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn(['tenant_id', 'is_tenant_admin']);
         });
     }
 };

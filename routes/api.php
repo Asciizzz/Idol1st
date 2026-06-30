@@ -41,22 +41,22 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 });
 
 // Project routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['resolve.tenant', 'auth:sanctum'])->group(function () {
+
     Route::apiResource('projects', ProjectController::class);
 
     Route::prefix('projects/{project}')->group(function () {
-        Route::get('snapshots',           [SnapshotController::class, 'index']);
-        Route::post('snapshots',          [SnapshotController::class, 'store']);
-        Route::get('snapshots/{version}', [SnapshotController::class, 'show'])
-            ->where('version', '[0-9]+');
+
+        Route::get('snapshots', [SnapshotController::class, 'index']);
+        Route::post('snapshots', [SnapshotController::class, 'store']);
+
+        Route::get('snapshots/{version}', [SnapshotController::class, 'show'])->where('version', '[0-9]+');
+
+        Route::post('compile', [CompilerController::class, 'compile']);
+        Route::post('publish', [PublishController::class, 'publish']);
+        Route::get('published',[PublishController::class, 'show']);
     });
 
-    Route::post('projects/{project}/compile', [CompilerController::class, 'compile']);
-
-    Route::prefix('projects/{project}')->group(function () {
-        Route::post('publish',    [PublishController::class, 'publish']);
-        Route::get('published',   [PublishController::class, 'show']);
-    });
 });
 
 // Tenant management (admin only)
@@ -106,8 +106,8 @@ Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->gr
 });
 
 // Tenant admin login — only needs resolve.tenant, no admin auth yet
-Route::middleware('resolve.tenant')->prefix('manage')->group(function () {
-    Route::post('auth/login', [TenantAdminAuthController::class, 'login']);
+Route::prefix('manage')->group(function () {
+    Route::post('auth/login', [AuthEditorController::class, 'login']);
 });
 
 // Authenticated tenant admin routes
@@ -277,4 +277,19 @@ Route::middleware(['auth:sanctum'])
     return response()->json([
         'user' => auth()->user()
     ]);
+});
+
+
+use Illuminate\Http\Request;
+
+// temp (for testing routes)
+Route::get('/manage/test', function(){
+    return "tenant routes work";
+});
+
+Route::middleware('resolve.tenant')
+->get('/tenant-test', function(Request $request){
+
+    return $request->tenant()->toArray();
+
 });

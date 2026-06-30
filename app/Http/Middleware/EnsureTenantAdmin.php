@@ -12,22 +12,50 @@ class EnsureTenantAdmin
     {
         $user = $request->user();
 
-        if (! $user || ! ($user instanceof \App\Models\TenantAdmin)) {
+
+        /*
+         * User must be logged in
+         * AND must have tenant admin permission
+         */
+        if (
+            ! $user ||
+            ! $user->is_tenant_admin
+        ) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden. Tenant admin access required.',
             ], 403);
+
         }
 
-        // Ensure the admin belongs to the resolved tenant
-        $tenant = app(\App\Models\Tenant::class);
+
+        /*
+         * Make sure user belongs to current subdomain tenant
+         *
+         * Example:
+         *
+         * sakura.idol1st.test
+         *
+         * resolves:
+         *
+         * tenant_id = xxx
+         *
+         * User must have same tenant_id
+         */
+
+        $tenant = $request->tenant();
+
 
         if ($user->tenant_id !== $tenant->id) {
+
             return response()->json([
                 'success' => false,
-                'message' => 'Forbidden. This admin does not belong to this tenant.',
-            ], 403);
+                'message' => 'Forbidden. User does not belong to this tenant.',
+            ],403);
+
         }
+
 
         return $next($request);
     }

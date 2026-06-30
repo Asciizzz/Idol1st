@@ -49,8 +49,8 @@ class AssetController extends Controller
         // Using a UUID prevents filename collisions and avoids exposing
         // original filenames in the storage path.
         $extension = $file->getClientOriginalExtension() ?: $file->guessExtension();
-        $path      = $file->storeAs(
-            "assets/{$request->user()->id}/{$type}",
+        $path = $file->storeAs(
+            "assets/{$request->user()->tenant_id}/{$request->user()->id}/{$type}",
             Str::uuid() . '.' . $extension,
             ['disk' => $disk, 'visibility' => 'public']
         );

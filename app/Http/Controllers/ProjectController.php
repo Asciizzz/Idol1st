@@ -20,9 +20,16 @@ class ProjectController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $projects = $request->user()->role === 'admin'
-            ? Project::latest()->paginate(20)
-            : Project::where('user_id', $request->user()->id)->latest()->paginate(20);
+        $tenant = $request->tenant();
+
+
+        $projects = Project::where(
+                'tenant_id',
+                $tenant->id
+            )
+            ->latest()
+            ->paginate(20);
+
 
         return ProjectResource::collection($projects);
     }
@@ -37,11 +44,13 @@ class ProjectController extends Controller
         $this->authorize('create', Project::class);
 
         $project = Project::create([
-            'user_id'  => $request->user()->id,
-            'name'     => $request->name,
-            'slug'     => Project::generateUniqueSlug($request->name),
-            'status'   => $request->input('status', 'draft'),
-            'settings' => $request->input('settings'),
+            'user_id'   => $request->user()->id,
+            'tenant_id' => $request->tenant()->id,
+
+            'name'      => $request->name,
+            'slug'      => Project::generateUniqueSlug($request->name),
+            'status'    => $request->input('status', 'draft'),
+            'settings'  => $request->input('settings'),
         ]);
 
         return response()->json([

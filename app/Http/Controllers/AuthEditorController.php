@@ -120,7 +120,8 @@ class AuthEditorController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        if (! Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt(['email' => $request->email,'password' => $request->password,]))
+        {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials.',
@@ -128,7 +129,19 @@ class AuthEditorController extends Controller
         }
 
         $user  = Auth::user();
-        $token = $user->createToken('editor-token')->plainTextToken;
+        // Ensure the user belongs to the current tenant.
+        if (app()->bound(\App\Models\Tenant::class) &&
+            $user->tenant_id !== $request->tenant()->id)
+        {
+            Auth::logout();
+
+            return response()->json([
+                'success'=>false,
+                'message'=>'User does not belong to this tenant.'
+            ],403);
+
+        }
+        $token = $user->createToken('web-token')->plainTextToken;
 
         return response()->json([
             'success' => true,
@@ -145,7 +158,8 @@ class AuthEditorController extends Controller
     public function logout(Request $request): JsonResponse
     {
         // Revoke only the token that was used to authenticate this request.
-        $request->user()->currentAccessToken()->delete();
+        // Ensure no crash happens if the user is not authenticated (e.g., token already revoked).
+        $request->user()?->currentAccessToken()?->delete();
 
         return response()->json([
             'success' => true,
@@ -203,11 +217,11 @@ class AuthEditorController extends Controller
         // Mint a Sanctum token and store it in the session so vsb.js
         // can read window.__VSB_TOKEN__ for API calls without a separate login.
         $user  = Auth::user();
-        $token = $user->createToken('editor-session')->plainTextToken;
+        $token = $user->createToken('web-session')->plainTextToken;
         $request->session()->put('sanctum_token', $token);
 
         // Admins go to the admin panel, editors go to the editor
-        return $user->role === 'admin'
+        return $user->is_tenant_admin
             ? redirect()->route('admin')
             : redirect()->route('editor');
     }
@@ -221,7 +235,7 @@ class AuthEditorController extends Controller
         // Revoke the session-stored Sanctum token if it exists
         $user = Auth::user();
         if ($user) {
-            $user->tokens()->where('name', 'editor-session')->delete();
+            $user->tokens()->where('name', 'web-session')->delete();
         }
 
         Auth::logout();

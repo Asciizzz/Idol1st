@@ -71,4 +71,27 @@ class Project extends Model
     {
         return $this->hasMany(PublishedSite::class);
     }
+
+    // Added a global scope to filter projects by the current tenant.
+    protected static function booted()
+    {
+        static::addGlobalScope('tenant', function ($query) {
+
+            if (request()->hasMacro('tenant')) {
+
+                $tenant = request()->tenant();
+
+                $query->where(
+                    'tenant_id',
+                    $tenant->id
+                );
+            }
+
+        });
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 }

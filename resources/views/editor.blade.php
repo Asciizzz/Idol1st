@@ -143,12 +143,11 @@
             <!-- TENANT AUTH -->
             <div id="p-ta-auth" class="panel active">
                 <div class="box"><div class="box-title">Tenant Admin Login</div>
-                    <label>X-Tenant-ID</label><input id="ta-tid" placeholder="uuid" oninput="setTid(this.value)">
                     <label>Email</label><input id="ta-em" value="admin@sakura.com">
                     <label>Password</label><input id="ta-pw" type="password" value="password">
                     <div class="row">
                         <button class="btn bp" onclick="tenantLogin()">Login</button>
-                        <button class="btn bd" onclick="tm('POST','auth/logout',{})">Logout</button>
+                        <button class="btn bd" onclick="api('POST', '/api/auth/logout', {}, tok())">Logout</button>
                     </div>
                 </div>
             </div>
@@ -248,13 +247,12 @@
 <script>
 // ── State ──────────────────────────────────────────────────────────
 let _tok = @json($sanctumToken ?? null);
-let _tid = null, _ttok = null;
+let _vsbLoaded = false;
 let _vsbLoaded = false;
 
 const g  = id => document.getElementById(id)?.value ?? '';
 const el = id => document.getElementById(id);
 const tok = () => _tok;
-const setTid = v => { _tid = v; };
 
 // Seed the token badge from the session token (if any)
 if (_tok) {
@@ -300,33 +298,108 @@ async function api(method,url,body,bearer,cb){
 }
 
 async function tm(method,path,body){
-    const tid=_tid||g('ta-tid'); const tok2=_ttok||_tok;
-    if(!tid){el('rb').textContent='Set X-Tenant-ID in the Tenant Auth panel first.';return;}
-    const t0=Date.now(); const url='/api/manage/'+path;
-    el('rm').textContent=method; el('ru').textContent=url+' [tid:'+tid.substring(0,8)+'...]';
-    el('rs').textContent='...'; el('rb').textContent='Loading...';
-    const h={'Content-Type':'application/json','Accept':'application/json','X-Tenant-ID':tid};
-    if(tok2)h['Authorization']='Bearer '+tok2;
+
+    const tok2 = _tok;
+
+    const t0=Date.now();
+    const url='/api/manage/'+path;
+
+    el('rm').textContent=method;
+    el('ru').textContent=url;
+    el('rs').textContent='...';
+    el('rb').textContent='Loading...';
+
+
+    const h={
+        'Content-Type':'application/json',
+        'Accept':'application/json'
+    };
+
+
+    if(tok2){
+        h['Authorization']='Bearer '+tok2;
+    }
+
+
     try{
-        const r=await fetch(url,{method,headers:h,body:body?JSON.stringify(body):undefined});
+
+        const r=await fetch(url,{
+            method,
+            headers:h,
+            body:body?JSON.stringify(body):undefined
+        });
+
+
         const d=await r.json();
-        el('rs').textContent=r.status; el('rs').className=r.ok?'ok':'err';
+
+
+        el('rs').textContent=r.status;
+        el('rs').className=r.ok?'ok':'err';
+
         el('rt').textContent=(Date.now()-t0)+'ms';
-        el('rb').textContent=JSON.stringify(d,null,2);
-    }catch(e){el('rb').textContent=String(e);}
+
+        el('rb').textContent=
+            JSON.stringify(d,null,2);
+
+
+    }catch(e){
+
+        el('rb').textContent=String(e);
+
+    }
 }
 
 async function tenantLogin(){
-    const tid=g('ta-tid'); _tid=tid;
-    const t0=Date.now(); const url='/api/manage/auth/login';
-    const h={'Content-Type':'application/json','Accept':'application/json','X-Tenant-ID':tid};
+
+    const t0=Date.now();
+
+    const url='/api/auth/login';
+
+
+    const h={
+        'Content-Type':'application/json',
+        'Accept':'application/json'
+    };
+
+
     try{
-        const r=await fetch(url,{method:'POST',headers:h,body:JSON.stringify({email:g('ta-em'),password:g('ta-pw')})});
+
+        const r=await fetch(url,{
+            method:'POST',
+            headers:h,
+            body:JSON.stringify({
+                email:g('ta-em'),
+                password:g('ta-pw')
+            })
+        });
+
+
         const d=await r.json();
-        if(d.token){_ttok=d.token;_tok=d.token;saveToken(d);}
-        el('rs').textContent=r.status; el('rs').className=r.ok?'ok':'err';
-        el('rt').textContent=(Date.now()-t0)+'ms'; el('rb').textContent=JSON.stringify(d,null,2);
-    }catch(e){el('rb').textContent=String(e);}
+
+
+        if(d.token){
+
+            _tok=d.token;
+
+            saveToken(d);
+
+        }
+
+
+        el('rs').textContent=r.status;
+        el('rs').className=r.ok?'ok':'err';
+
+        el('rt').textContent=(Date.now()-t0)+'ms';
+
+        el('rb').textContent=
+            JSON.stringify(d,null,2);
+
+
+    }catch(e){
+
+        el('rb').textContent=String(e);
+
+    }
 }
 
 function createProduct(){

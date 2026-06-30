@@ -17,6 +17,6 @@ class AssetPolicy
 
     public function delete(User $user, Asset $asset): bool
     {
-        return $user->id === $asset->user_id;
+        return $user->tenant_id === $asset->project->tenant_id;
     }
 }

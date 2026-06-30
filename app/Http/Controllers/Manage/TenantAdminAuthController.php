@@ -4,42 +4,53 @@ namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\TenantAdminLoginRequest;
-use App\Http\Resources\TenantAdminResource;
 use App\Models\Tenant;
-use App\Models\TenantAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+use App\Models\User;
+use App\Http\Resources\UserResource;
+
 class TenantAdminAuthController extends Controller
 {
     /**
-     * POST /api/manage/auth/login
-     *
-     * Tenant-scoped login — credentials are validated against
-     * the tenant_admins table filtered by the resolved tenant.
+     * New login endpoint for tenant admins.
      */
     public function login(TenantAdminLoginRequest $request): JsonResponse
     {
         $tenant = app(Tenant::class);
 
-        $admin = TenantAdmin::where('tenant_id', $tenant->id)
+
+        $user = User::where('tenant_id', $tenant->id)
             ->where('email', $request->email)
+            ->where('is_tenant_admin', true)
             ->first();
 
-        if (! $admin || ! Hash::check($request->password, $admin->password)) {
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials.',
-            ], 401);
+            ],401);
+
         }
 
-        $token = $admin->createToken('tenant-admin-token')->plainTextToken;
+
+        $token = $user
+            ->createToken('tenant-admin-token')
+            ->plainTextToken;
+
 
         return response()->json([
+
             'success' => true,
-            'token'   => $token,
-            'admin'   => new TenantAdminResource($admin),
+
+            'token' => $token,
+
+            'user' => new UserResource($user),
+
         ]);
     }
 

@@ -58,7 +58,7 @@ class SnapshotController extends Controller
             'compiled_html' => $request->input('compiled_html'),
             'compiled_css'  => $request->input('compiled_css'),
             'compiled_js'   => $request->input('compiled_js'),
-            'version'       => ProjectSnapshot::nextVersion($project->id),
+            'version'       => ProjectSnapshot::nextVersion($project),
             'created_at'    => now(),
         ]);
 

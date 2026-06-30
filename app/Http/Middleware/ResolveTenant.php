@@ -11,37 +11,86 @@ class ResolveTenant
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $tenantId = $request->header('X-Tenant-ID');
+        /*
+         * Example:
+         *
+         * sakura.idol1st.test
+         *
+         * hostname:
+         * sakura.idol1st.test
+         *
+         * tenant slug:
+         * sakura
+         */
 
-        if (! $tenantId) {
+        $host = $request->getHost();
+
+
+        /*
+         * Remove local development ports/domains if needed
+         *
+         * sakura.idol1st.test
+         * becomes
+         * sakura
+         */
+
+        $subdomain = explode('.', $host)[0];
+
+
+        // Reject main domain
+        if (
+            $subdomain === 'idol1st' ||
+            $subdomain === 'www' ||
+            $subdomain === 'localhost'
+        ) {
+
             return response()->json([
                 'success' => false,
-                'message' => 'Missing X-Tenant-ID header.',
+                'message' => 'Tenant subdomain required.',
             ], 400);
+
         }
 
-        $tenant = Tenant::find($tenantId);
+
+        $tenant = Tenant::where('slug', $subdomain)
+            ->first();
+
 
         if (! $tenant) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Tenant not found.',
             ], 404);
+
         }
+
 
         if ($tenant->isSuspended()) {
+
             return response()->json([
                 'success' => false,
-                'message' => 'This tenant account has been suspended.',
+                'message' => 'Tenant suspended.',
             ], 403);
+
         }
 
-        // Bind the resolved tenant to the request so controllers
-        // can access it via $request->tenant()
-        $request->macro('tenant', fn () => $tenant);
 
-        // Also bind into the service container for dependency injection
-        app()->instance(Tenant::class, $tenant);
+        /*
+         * Existing behavior preserved
+         */
+
+        $request->macro(
+            'tenant',
+            fn () => $tenant
+        );
+
+
+        app()->instance(
+            Tenant::class,
+            $tenant
+        );
+
 
         return $next($request);
     }
