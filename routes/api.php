@@ -94,7 +94,7 @@ Route::prefix('admin/auth')->group(function () {
 });
 
 // Feature flags + audit logs (service admin only)
-Route::middleware(['auth:service_admin', 'ensure.service.admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->group(function () {
 
     Route::get('feature-flags',  [FeatureFlagController::class, 'index']);
     Route::post('feature-flags', [FeatureFlagController::class, 'store']);
@@ -272,7 +272,7 @@ Route::get('/admin/test-plans', function () {
     ]);
 });
 
-Route::middleware(['auth:service_admin'])
+Route::middleware(['auth:sanctum'])
 ->get('/admin/test-auth', function () {
     return response()->json([
         'user' => auth()->user()

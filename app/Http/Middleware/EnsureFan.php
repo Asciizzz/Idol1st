@@ -12,7 +12,7 @@ class EnsureFan
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user('sanctum');
+        $user = $request->user();
 
         if (! $user || ! ($user instanceof Fan)) {
             return response()->json([

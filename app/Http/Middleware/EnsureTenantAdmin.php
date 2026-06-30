@@ -10,7 +10,7 @@ class EnsureTenantAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user('sanctum');
+        $user = $request->user();
 
         if (! $user || ! ($user instanceof \App\Models\TenantAdmin)) {
             return response()->json([
