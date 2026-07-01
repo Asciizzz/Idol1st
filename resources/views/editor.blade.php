@@ -234,7 +234,9 @@
 <script>
 // ── State ──────────────────────────────────────────────────────────
 let _tok = @json($sanctumToken ?? null);
+let _initialGraph = @json($initialGraph ?? null);
 let _vsbLoaded = false;
+let _bootstrappingEditor = false;
 
 const g  = id => document.getElementById(id)?.value ?? '';
 const el = id => document.getElementById(id);
@@ -367,11 +369,14 @@ async function editorApi(method,url,body,cb){
 }
 
 function refreshProjectList(){
-    editorApi('GET','/api/projects',null,(d,ok)=>{ if(ok) renderProjectList(d); });
+    editorApi('GET','/api/projects',null,(d,ok)=>{
+        if (ok) renderProjectList(d);
+    });
 }
 
 function renderProjectList(d){
-    const list = Array.isArray(d) ? d : (d.data ?? d.projects ?? []);
+    const data = d?.data ?? d;
+    const list = Array.isArray(data) ? data : (data?.data ?? data?.projects ?? []);
     const sel = el('ed-project-select');
     const current = sel.value;
     sel.innerHTML = '<option value="">Select a project…</option>';
@@ -381,7 +386,49 @@ function renderProjectList(d){
         opt.textContent = p.name ?? p.id;
         sel.appendChild(opt);
     });
-    if (current && list.some(p=>p.id===current)) sel.value = current;
+    if (current && list.some(p=>p.id===current)) {
+        sel.value = current;
+        return;
+    }
+
+    if (list.length > 0) {
+        sel.value = list[0].id;
+        loadSelectedProject();
+        return;
+    }
+
+    bootstrapStarterProject();
+}
+
+async function bootstrapStarterProject(){
+    if (_bootstrappingEditor) return;
+    _bootstrappingEditor = true;
+
+    try {
+        const projectResp = await editorApi('POST','/api/projects', {
+            name: 'Starter Project',
+            status: 'draft',
+            settings: {}
+        }, null);
+
+        const createdProject = projectResp?.data ?? projectResp;
+        const projectId = createdProject?.id;
+
+        if (!projectId) return;
+
+        const starterGraph = _initialGraph ?? { nodes: [], edges: [] };
+
+        await editorApi('POST', '/api/projects/' + projectId + '/snapshots', {
+            graph_data: starterGraph,
+            compiled_html: '',
+            compiled_css: '',
+            compiled_js: ''
+        }, null);
+
+        await refreshProjectList();
+    } finally {
+        _bootstrappingEditor = false;
+    }
 }
 
 async function loadSelectedProject(){
@@ -395,10 +442,35 @@ async function loadSelectedProject(){
     el('editor-empty').style.display = 'flex';
     el('editor-empty').textContent = 'Loading project…';
 
-    const project = await editorApi('GET','/api/projects/'+pid,null);
+    const projectResp = await editorApi('GET','/api/projects/'+pid,null);
+    const project = projectResp?.data ?? projectResp;
     if (!project) return;
 
-    const graph = project.graph_data ?? project.initial_graph ?? { nodes: [], edges: [] };
+    let graph = null;
+
+    // Project payload does not include graph_data directly; load newest snapshot.
+    const snapshotsResp = await editorApi('GET', '/api/projects/' + pid + '/snapshots', null);
+    const snapshots = snapshotsResp?.data ?? [];
+
+    if (Array.isArray(snapshots) && snapshots.length > 0) {
+        const latestVersion = snapshots[0].version;
+        const snapshotResp = await editorApi('GET', '/api/projects/' + pid + '/snapshots/' + latestVersion, null);
+        graph = snapshotResp?.data?.graph_data ?? null;
+    } else {
+        graph = _initialGraph ?? { nodes: [], edges: [] };
+
+        await editorApi('POST', '/api/projects/' + pid + '/snapshots', {
+            graph_data: graph,
+            compiled_html: '',
+            compiled_css: '',
+            compiled_js: ''
+        }, null);
+    }
+
+    if (!graph) {
+        graph = _initialGraph ?? { nodes: [], edges: [] };
+    }
+
     mountVsb(graph, project);
 }
 
@@ -408,8 +480,30 @@ function mountVsb(graph, draft){
     window.__VSB_TOKEN__  = tok();
 
     el('editor-empty').style.display = 'none';
+    if (_vsbLoaded && window.VSB && typeof window.VSB.remount === 'function') {
+        window.VSB.remount(graph, draft);
+        return;
+    }
+
     const mount = el('vsb-app');
     mount.innerHTML = '';
+
+    // VSB runtime expects #main-layout and #app containers.
+    const layout = document.createElement('div');
+    layout.id = 'main-layout';
+    layout.style.position = 'absolute';
+    layout.style.inset = '0';
+    layout.style.display = 'flex';
+    layout.style.overflow = 'hidden';
+
+    const app = document.createElement('div');
+    app.id = 'app';
+    app.style.position = 'relative';
+    app.style.flex = '1';
+    app.style.overflow = 'hidden';
+
+    layout.appendChild(app);
+    mount.appendChild(layout);
 
     if (!_vsbLoaded) {
         // vsb.js mounts itself into #vsb-app on first load, reading the
@@ -420,8 +514,10 @@ function mountVsb(graph, draft){
         script.src = '{{ Vite::asset("resources/js/vsb.js") }}';
         document.body.appendChild(script);
         _vsbLoaded = true;
-    } else if (window.VSB && typeof window.VSB.remount === 'function') {
-        window.VSB.remount(graph, draft);
+    } else {
+        // Fallback if module state was lost but flag stayed true.
+        _vsbLoaded = false;
+        mountVsb(graph, draft);
     }
 }
 

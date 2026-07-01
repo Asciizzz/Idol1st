@@ -6,6 +6,7 @@ use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use App\Models\ProjectSnapshot;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -51,6 +52,16 @@ class ProjectController extends Controller
             'slug'      => Project::generateUniqueSlug($request->name),
             'status'    => $request->input('status', 'draft'),
             'settings'  => $request->input('settings'),
+        ]);
+
+        ProjectSnapshot::create([
+            'project_id'    => $project->id,
+            'graph_data'    => json_encode(['nodes' => [], 'edges' => []]),
+            'compiled_html' => null,
+            'compiled_css'  => null,
+            'compiled_js'   => null,
+            'version'       => 1,
+            'created_at'    => now(),
         ]);
 
         return response()->json([
