@@ -253,16 +253,29 @@ export class VsbCompiler {
         let html = compiled.htmlFiles[activeFileName];
         if (!html) html = compiled.htmlFiles[htmlFileNames[0]];
         
-        // Strip external link/script tags so the iframe doesn't try to fetch them
-        html = html.replace(/<link rel="stylesheet" href="[^"]+">\n?/g, '');
-        html = html.replace(/<script src="[^"]+" defer><\/script>\n?/g, '');
+        const includedCss = [];
+        const includedJs = [];
+
+        // Strip external link/script tags and collect which files are actually included
+        html = html.replace(/<link rel="stylesheet" href="([^"]+)">\n?/g, (match, href) => {
+            includedCss.push(href);
+            return '';
+        });
+        html = html.replace(/<script src="([^"]+)" defer><\/script>\n?/g, (match, src) => {
+            includedJs.push(src);
+            return '';
+        });
         
         let cssStr = "<style>\n";
-        for (const css in compiled.cssFiles) cssStr += compiled.cssFiles[css] + "\n";
+        for (const css of includedCss) {
+            if (compiled.cssFiles[css]) cssStr += compiled.cssFiles[css] + "\n";
+        }
         cssStr += "</style>";
         
         let jsStr = "<script>\n";
-        for (const js in compiled.jsFiles) jsStr += compiled.jsFiles[js] + "\n";
+        for (const js of includedJs) {
+            if (compiled.jsFiles[js]) jsStr += compiled.jsFiles[js] + "\n";
+        }
         jsStr += "</script>";
         
         html = html.replace("</head>", `${cssStr}\n${jsStr}\n</head>`);
