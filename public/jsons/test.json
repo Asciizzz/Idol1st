@@ -1,15 +1,15 @@
 {
-    "label": "VTuber Multi-Page Site",
-    "_nextNodeId": 9999,
-    "_nextEdgeId": 9999,
+    "label": "Luna Vale · Idol1st Showcase",
+    "_nextNodeId": 9000,
+    "_nextEdgeId": 3307,
     "nodes": [
         {
-            "id": "n_html_index",
+            "id": "html_idx",
             "data": {
                 "type": "HTML",
                 "name": "index",
                 "vsgdata": {
-                    "x": -1200,
+                    "x": 0,
                     "y": 0,
                     "z": 0,
                     "collapsed": false
@@ -17,52 +17,159 @@
             }
         },
         {
-            "id": "n_html_about",
+            "id": "html_abt",
             "data": {
                 "type": "HTML",
                 "name": "about",
                 "vsgdata": {
-                    "x": -1200,
-                    "y": 1000,
+                    "x": 0,
+                    "y": 1800,
                     "z": 0,
                     "collapsed": false
                 }
             }
         },
         {
-            "id": "n_html_stream",
-            "data": {
-                "type": "HTML",
-                "name": "stream",
-                "vsgdata": {
-                    "x": -1200,
-                    "y": 2000,
-                    "z": 0,
-                    "collapsed": false
-                }
-            }
-        },
-        {
-            "id": "n_css",
+            "id": "css_main",
             "data": {
                 "type": "CSS",
-                "name": "main_styles",
+                "name": "idol_theme",
                 "vsgdata": {
-                    "x": -1200,
-                    "y": 3000,
+                    "x": -400,
+                    "y": 0,
                     "z": 0,
                     "collapsed": false
                 }
             }
         },
         {
-            "id": "n_js",
+            "id": "js_main",
             "data": {
                 "type": "JS",
-                "name": "app_logic",
+                "name": "idol_logic",
                 "vsgdata": {
-                    "x": -1200,
-                    "y": 4000,
+                    "x": -400,
+                    "y": -500,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_glow",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Hover Lift + Glow",
+                "event": "mouseenter",
+                "code": "const el = event.currentTarget;\nel.style.transform = 'translateY(-6px) scale(1.03)';\nel.style.boxShadow = '0 20px 40px rgba(255, 45, 149, 0.35), 0 0 30px rgba(0, 229, 255, 0.25)';",
+                "vsgdata": {
+                    "x": 400,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_unglow",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Hover Reset",
+                "event": "mouseleave",
+                "code": "const el = event.currentTarget;\nel.style.transform = 'translateY(0) scale(1)';\nel.style.boxShadow = 'none';",
+                "vsgdata": {
+                    "x": 800,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_nav_home",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Route to Stage",
+                "event": "click",
+                "code": "console.log('[Idol1st] Routing to the Main Stage...');",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_nav_about",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Route to Builder Page",
+                "event": "click",
+                "code": "console.log('[Idol1st] Routing to the Builder Lore page...');",
+                "vsgdata": {
+                    "x": 1600,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_blog_read",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Expand Diary Entry",
+                "event": "click",
+                "code": "alert('Full diary entry unlocks in the next patch! Stay tuned~');",
+                "vsgdata": {
+                    "x": 2000,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_social_ping",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Social Link Placeholder",
+                "event": "click",
+                "code": "event.preventDefault();\nalert('Swap this button\\'s link with your real profile URL!');",
+                "vsgdata": {
+                    "x": 2400,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "j_badge_pulse",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Live Badge Secret",
+                "event": "click",
+                "code": "alert('You found the secret badge! Thanks for tuning in today~');",
+                "vsgdata": {
+                    "x": 2800,
+                    "y": -900,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "c_root",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Design Tokens",
+                "selector": ":root",
+                "code": "--bg-void: #0b0713;\n--bg-panel: #17101f;\n--bg-panel-alt: #1f1530;\n--pink: #ff2d95;\n--purple: #9b5cff;\n--cyan: #00e5ff;\n--yellow: #ffd23f;\n--text-main: #fdf7ff;\n--text-dim: #b9a8cf;\n--grad-idol: linear-gradient(120deg, var(--pink), var(--purple) 55%, var(--cyan));\n--radius-lg: 24px;\n--radius-pill: 999px;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 0,
                     "z": 0,
                     "collapsed": false
                 }
@@ -72,165 +179,180 @@
             "id": "c_reset",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Reset",
+                "name": "Global Reset",
+                "selector": "*",
+                "code": "box-sizing: border-box;\nmargin: 0;\npadding: 0;",
                 "vsgdata": {
-                    "x": -800,
-                    "y": 3000,
+                    "x": -700,
+                    "y": 90,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": "*",
-                "code": "margin: 0;\npadding: 0;\nbox-sizing: border-box;"
+                }
             }
         },
         {
             "id": "c_body",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Body",
-                "vsgdata": {
-                    "x": -500,
-                    "y": 3000,
-                    "z": 0,
-                    "collapsed": true
-                },
+                "name": "Body Base",
                 "selector": "body",
-                "code": "background-color: #0b0c10;\ncolor: #c5c6c7;\nfont-family: 'Inter', sans-serif;\noverflow-x: hidden;\ntransition: background 0.5s ease;"
+                "code": "background: radial-gradient(circle at 15% 0%, var(--bg-panel-alt), var(--bg-void) 60%);\ncolor: var(--text-main);\nfont-family: 'Poppins', 'Quicksand', sans-serif;\nmin-height: 100vh;\noverflow-x: hidden;\nscroll-behavior: smooth;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 180,
+                    "z": 0,
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "c_body_disco",
+            "id": "c_kf_pulse",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Disco Class",
+                "name": "Keyframes: Badge Pulse",
+                "selector": "@keyframes badge-pulse",
+                "code": "0% { box-shadow: 0 0 0 0 rgba(255, 45, 149, 0.55); }\n70% { box-shadow: 0 0 0 12px rgba(255, 45, 149, 0); }\n100% { box-shadow: 0 0 0 0 rgba(255, 45, 149, 0); }",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 3000,
+                    "x": -700,
+                    "y": 270,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": "body.disco-mode",
-                "code": "background: linear-gradient(45deg, #1f0033, #33001b);"
+                }
             }
         },
         {
-            "id": "c_header",
+            "id": "c_kf_float",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Header",
+                "name": "Keyframes: Avatar Float",
+                "selector": "@keyframes avatar-float",
+                "code": "0% { transform: translateY(0px) rotate(-1deg); }\n50% { transform: translateY(-18px) rotate(1deg); }\n100% { transform: translateY(0px) rotate(-1deg); }",
                 "vsgdata": {
-                    "x": 100,
-                    "y": 3000,
+                    "x": -400,
+                    "y": 360,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".header",
-                "code": "position: fixed;\ntop: 0;\nwidth: 100%;\npadding: 20px 50px;\ndisplay: flex;\njustify-content: space-between;\nalign-items: center;\nbackground: rgba(11, 12, 16, 0.8);\nbackdrop-filter: blur(15px);\nz-index: 100;\nborder-bottom: 1px solid rgba(102, 252, 241, 0.2);\nbox-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);"
-            }
-        },
-        {
-            "id": "c_logo",
-            "data": {
-                "type": "CSS_RULE",
-                "name": "Logo",
-                "vsgdata": {
-                    "x": 400,
-                    "y": 3000,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "selector": ".logo",
-                "code": "font-size: 28px;\nfont-weight: 900;\ncolor: #66fcf1;\ntext-shadow: 0 0 10px rgba(102, 252, 241, 0.5);\ncursor: pointer;"
+                }
             }
         },
         {
             "id": "c_nav",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Nav",
+                "name": "Navbar",
+                "selector": ".nav",
+                "code": "display: flex;\njustify-content: space-between;\nalign-items: center;\npadding: 1.4rem 4rem;\nbackground: rgba(11, 7, 19, 0.75);\nbackdrop-filter: blur(14px);\nborder-bottom: 1px solid rgba(155, 92, 255, 0.35);\nposition: sticky;\ntop: 0;\nz-index: 100;",
                 "vsgdata": {
-                    "x": 700,
-                    "y": 3000,
+                    "x": -700,
+                    "y": 450,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".nav-links",
-                "code": "display: flex;\ngap: 40px;"
+                }
             }
         },
         {
-            "id": "c_nav_item",
+            "id": "c_nav_link",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Nav Item",
+                "name": "Nav Link",
+                "selector": ".nav a",
+                "code": "color: var(--text-dim);\ntext-decoration: none;\nfont-weight: 700;\nfont-size: 0.95rem;\nletter-spacing: 0.5px;\nmargin-left: 2rem;\ntransition: 0.25s ease;",
                 "vsgdata": {
-                    "x": 1000,
-                    "y": 3000,
+                    "x": -400,
+                    "y": 540,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".nav-item",
-                "code": "cursor: pointer;\nfont-weight: 600;\ncolor: #45a29e;\ntransition: all 0.3s;\ntext-transform: uppercase;\nletter-spacing: 2px;"
+                }
             }
         },
         {
-            "id": "c_nav_item_hover",
+            "id": "c_nav_link_hover",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Nav Hover",
+                "name": "Nav Link Hover",
+                "selector": ".nav a:hover",
+                "code": "color: var(--cyan);\ntext-shadow: 0 0 12px rgba(0, 229, 255, 0.6);",
                 "vsgdata": {
-                    "x": 1300,
-                    "y": 3000,
+                    "x": -700,
+                    "y": 630,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".nav-item:hover",
-                "code": "color: #66fcf1;\ntext-shadow: 0 0 15px rgba(102, 252, 241, 0.8);\ntransform: translateY(-2px);"
+                }
             }
         },
         {
-            "id": "c_section",
+            "id": "c_logo",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Section Base",
+                "name": "Logo Mark",
+                "selector": ".logo",
+                "code": "font-size: 1.5rem;\nfont-weight: 900;\nbackground: var(--grad-idol);\n-webkit-background-clip: text;\n-webkit-text-fill-color: transparent;",
                 "vsgdata": {
-                    "x": 1600,
-                    "y": 3000,
+                    "x": -400,
+                    "y": 720,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".section",
-                "code": "padding: 120px 50px 50px;\nmin-height: 100vh;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;"
+                }
             }
         },
         {
             "id": "c_hero",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Hero Container",
+                "name": "Hero Layout",
+                "selector": ".hero",
+                "code": "display: flex;\nalign-items: center;\njustify-content: space-between;\ngap: 3rem;\npadding: 6rem 4rem 4rem;\nmax-width: 1300px;\nmargin: 0 auto;\nflex-wrap: wrap;",
                 "vsgdata": {
-                    "x": 1900,
-                    "y": 3000,
+                    "x": -700,
+                    "y": 810,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".hero",
-                "code": "justify-content: center;\ntext-align: center;\nbackground: radial-gradient(circle at center, #1f2833 0%, #0b0c10 70%);"
+                }
             }
         },
         {
-            "id": "c_title",
+            "id": "c_hero_h1",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Hero Title",
+                "name": "Hero Heading",
+                "selector": ".hero-text h1",
+                "code": "font-size: 3.2rem;\nline-height: 1.15;\nmargin-bottom: 1rem;\nbackground: var(--grad-idol);\n-webkit-background-clip: text;\n-webkit-text-fill-color: transparent;\ndisplay: inline-block;",
                 "vsgdata": {
-                    "x": -800,
-                    "y": 3150,
+                    "x": -400,
+                    "y": 900,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".hero-title",
-                "code": "font-size: 90px;\nfont-weight: 900;\nline-height: 1;\nbackground: linear-gradient(to right, #66fcf1, #45a29e);\n-webkit-background-clip: text;\n-webkit-text-fill-color: transparent;\nanimation: pulse 2s infinite;"
+                }
+            }
+        },
+        {
+            "id": "c_hero_p",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Hero Paragraph",
+                "selector": ".hero-text p",
+                "code": "font-size: 1.15rem;\ncolor: var(--text-dim);\nmax-width: 480px;\nline-height: 1.7;\nmargin-bottom: 1.8rem;",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 990,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_badge",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Live Badge",
+                "selector": ".badge-live",
+                "code": "display: inline-block;\nbackground: var(--pink);\ncolor: white;\nfont-size: 0.8rem;\nfont-weight: 800;\npadding: 0.4rem 1rem;\nborder-radius: var(--radius-pill);\nmargin-bottom: 1.2rem;\ncursor: pointer;\nanimation: badge-pulse 2s infinite;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 1080,
+                    "z": 0,
+                    "collapsed": true
+                }
             }
         },
         {
@@ -238,1917 +360,4306 @@
             "data": {
                 "type": "CSS_RULE",
                 "name": "Primary Button",
+                "selector": ".btn-primary",
+                "code": "display: inline-block;\nbackground: var(--grad-idol);\nborder: none;\ncolor: white;\nfont-weight: 800;\nfont-size: 1rem;\npadding: 0.95rem 2.2rem;\nborder-radius: var(--radius-pill);\ncursor: pointer;\ntext-decoration: none;\ntransition: 0.3s ease;",
                 "vsgdata": {
-                    "x": -500,
-                    "y": 3150,
+                    "x": -700,
+                    "y": 1170,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".btn",
-                "code": "margin-top: 30px;\npadding: 15px 40px;\nbackground: transparent;\nborder: 2px solid #66fcf1;\nborder-radius: 5px;\ncolor: #66fcf1;\nfont-size: 18px;\nfont-weight: bold;\ncursor: pointer;\ntransition: 0.3s;\ntext-transform: uppercase;\nletter-spacing: 3px;"
+                }
             }
         },
         {
             "id": "c_btn_hover",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Btn Hover",
+                "name": "Primary Button Hover",
+                "selector": ".btn-primary:hover",
+                "code": "filter: brightness(1.15);",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 3150,
+                    "x": -400,
+                    "y": 1260,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".btn:hover",
-                "code": "background: #66fcf1;\ncolor: #0b0c10;\nbox-shadow: 0 0 20px rgba(102, 252, 241, 0.6);\ntransform: scale(1.05);"
+                }
             }
         },
         {
-            "id": "c_grid",
+            "id": "c_avatar_wrap",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Grid",
+                "name": "Avatar Wrapper",
+                "selector": ".avatar-wrap",
+                "code": "flex: 1;\nmin-width: 280px;\ndisplay: flex;\njustify-content: center;\nanimation: avatar-float 5s ease-in-out infinite;",
                 "vsgdata": {
-                    "x": 100,
-                    "y": 3150,
+                    "x": -700,
+                    "y": 1350,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".grid",
-                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\ngap: 30px;\nwidth: 100%;\nmax-width: 1200px;\nmargin-top: 50px;"
+                }
+            }
+        },
+        {
+            "id": "c_avatar_img",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Avatar Image",
+                "selector": ".avatar-img",
+                "code": "max-width: 380px;\nwidth: 100%;\nborder-radius: var(--radius-lg);\nobject-fit: cover;\nborder: 3px solid var(--cyan);\nbox-shadow: 0 0 60px rgba(0, 229, 255, 0.35);",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 1440,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_section_title",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Section Title",
+                "selector": ".section-title",
+                "code": "font-size: 2.3rem;\ntext-align: center;\nmargin-bottom: 2.5rem;\ncolor: var(--text-main);",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 1530,
+                    "z": 0,
+                    "collapsed": true
+                }
             }
         },
         {
             "id": "c_card",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Card",
+                "name": "Glass Card",
+                "selector": ".card",
+                "code": "background: rgba(255, 255, 255, 0.04);\nbackdrop-filter: blur(16px);\nborder-radius: var(--radius-lg);\npadding: 1.8rem;\nborder: 1px solid rgba(155, 92, 255, 0.25);\ncursor: pointer;\ntransition: 0.35s ease;",
                 "vsgdata": {
-                    "x": 400,
-                    "y": 3150,
+                    "x": -400,
+                    "y": 1620,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".card",
-                "code": "background: #1f2833;\nborder-radius: 15px;\npadding: 30px;\ntext-align: center;\nborder: 1px solid rgba(255,255,255,0.05);\ntransition: 0.3s;"
+                }
             }
         },
         {
             "id": "c_card_hover",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Card Hover",
-                "vsgdata": {
-                    "x": 700,
-                    "y": 3150,
-                    "z": 0,
-                    "collapsed": true
-                },
+                "name": "Glass Card Hover",
                 "selector": ".card:hover",
-                "code": "transform: translateY(-10px);\nborder-color: #45a29e;\nbox-shadow: 0 15px 30px rgba(0,0,0,0.5);"
+                "code": "border-color: var(--cyan);",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 1710,
+                    "z": 0,
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "c_stream_layout",
+            "id": "c_schedule_grid",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Stream Layout",
+                "name": "Schedule Grid",
+                "selector": ".schedule-grid",
+                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(260px, 1fr));\ngap: 1.6rem;\nmax-width: 1200px;\nmargin: 0 auto;\npadding: 0 4rem;",
                 "vsgdata": {
-                    "x": 1000,
-                    "y": 3150,
+                    "x": -400,
+                    "y": 1800,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".stream-layout",
-                "code": "display: flex;\nwidth: 100%;\nmax-width: 1600px;\ngap: 20px;\nheight: 70vh;\nmargin-top: 40px;"
+                }
             }
         },
         {
-            "id": "c_video_player",
+            "id": "c_blog_post",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Video Player",
+                "name": "Blog Post Card",
+                "selector": ".blog-post",
+                "code": "background: rgba(255, 255, 255, 0.03);\nborder-left: 3px solid var(--pink);\nborder-radius: 12px;\npadding: 1.6rem 2rem;\nmargin-bottom: 1.2rem;\ncursor: pointer;\ntransition: 0.3s ease;",
                 "vsgdata": {
-                    "x": 1300,
-                    "y": 3150,
+                    "x": -700,
+                    "y": 1890,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".video-player",
-                "code": "flex: 3;\nbackground: #000;\nborder-radius: 10px;\ndisplay: flex;\nalign-items: center;\njustify-content: center;\nfont-size: 24px;\ncolor: #45a29e;\nborder: 1px solid #1f2833;"
+                }
             }
         },
         {
-            "id": "c_chat_box",
+            "id": "c_blog_date",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Chat Box",
+                "name": "Blog Date Tag",
+                "selector": ".blog-date",
+                "code": "font-size: 0.8rem;\ncolor: var(--cyan);\nfont-weight: 700;\nletter-spacing: 1px;\ntext-transform: uppercase;",
                 "vsgdata": {
-                    "x": 1600,
-                    "y": 3150,
+                    "x": -400,
+                    "y": 1980,
                     "z": 0,
                     "collapsed": true
-                },
-                "selector": ".chat-box",
-                "code": "flex: 1;\nbackground: #1f2833;\nborder-radius: 10px;\npadding: 20px;\ndisplay: flex;\nflex-direction: column;\ngap: 15px;\nborder: 1px solid rgba(102, 252, 241, 0.2);"
+                }
             }
         },
         {
-            "id": "j_nav_home",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Go Home",
-                "vsgdata": {
-                    "x": -800,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "click",
-                "code": "alert('Routing to Home (index.html)');"
-            }
-        },
-        {
-            "id": "j_nav_about",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Go About",
-                "vsgdata": {
-                    "x": -350,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "click",
-                "code": "alert('Routing to About Lore (about.html)');"
-            }
-        },
-        {
-            "id": "j_nav_stream",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Go Stream",
-                "vsgdata": {
-                    "x": 100,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "click",
-                "code": "alert('Loading Live Stream Interface (stream.html)');"
-            }
-        },
-        {
-            "id": "j_disco",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Toggle Disco Mode",
-                "vsgdata": {
-                    "x": 550,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "click",
-                "code": "document.body.classList.toggle('disco-mode');\nalert('DISCO MODE INITIATED!');"
-            }
-        },
-        {
-            "id": "j_color_shift",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Hacker Color Shift",
-                "vsgdata": {
-                    "x": 1000,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "pointerenter",
-                "code": "event.target.style.filter = `hue-rotate(${Math.random() * 360}deg)`;"
-            }
-        },
-        {
-            "id": "j_chat_spam",
-            "data": {
-                "type": "JS_EVENT",
-                "name": "Simulate Chat",
-                "vsgdata": {
-                    "x": 1450,
-                    "y": 4000,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "event": "click",
-                "code": "alert('Chat: POGCHAMP!\\nChat: LOL\\nChat: KUSA');"
-            }
-        },
-        {
-            "id": "e_index_wrap",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Body Wrap",
-                "vsgdata": {
-                    "x": -800,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "div"
-            }
-        },
-        {
-            "id": "e_header_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Header",
-                "vsgdata": {
-                    "x": -500,
-                    "y": -200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "header",
-                "attrsText": "class='header'"
-            }
-        },
-        {
-            "id": "e_logo_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Logo",
-                "vsgdata": {
-                    "x": -200,
-                    "y": -300,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='logo'",
-                "text": "ASTRAL.VT"
-            }
-        },
-        {
-            "id": "e_nav_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Nav",
-                "vsgdata": {
-                    "x": -200,
-                    "y": -100,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "nav",
-                "attrsText": "class='nav-links'"
-            }
-        },
-        {
-            "id": "e_nav1_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Nav Home",
-                "vsgdata": {
-                    "x": 100,
-                    "y": -200,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "HOME"
-            }
-        },
-        {
-            "id": "e_nav2_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Nav About",
-                "vsgdata": {
-                    "x": 100,
-                    "y": -100,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LORE"
-            }
-        },
-        {
-            "id": "e_nav3_n_html_index",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Nav Stream",
-                "vsgdata": {
-                    "x": 100,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LIVE"
-            }
-        },
-        {
-            "id": "e_index_hero",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Hero Section",
-                "vsgdata": {
-                    "x": -500,
-                    "y": 200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "section",
-                "attrsText": "class='section hero'"
-            }
-        },
-        {
-            "id": "e_hero_title",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Hero Title",
-                "vsgdata": {
-                    "x": -200,
-                    "y": 100,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "h1",
-                "attrsText": "class='hero-title'",
-                "text": "VIRTUAL REALITY"
-            }
-        },
-        {
-            "id": "c_inline_glow",
+            "id": "c_social_grid",
             "data": {
                 "type": "CSS_RULE",
-                "name": "Inline Text Glow",
+                "name": "Socials Grid",
+                "selector": ".social-grid",
+                "code": "display: flex;\nflex-wrap: wrap;\njustify-content: center;\ngap: 1.2rem;\npadding: 0 4rem;",
                 "vsgdata": {
-                    "x": 200,
+                    "x": -700,
+                    "y": 2070,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_social_btn",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Social Pill Button",
+                "selector": ".social-btn",
+                "code": "background: var(--bg-panel);\nborder: 1px solid rgba(255, 255, 255, 0.12);\ncolor: var(--text-main);\ntext-decoration: none;\nfont-weight: 700;\npadding: 0.9rem 1.8rem;\nborder-radius: var(--radius-pill);\ntransition: 0.3s ease;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 2160,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_footer",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Footer",
+                "selector": "footer",
+                "code": "text-align: center;\npadding: 3rem 2rem;\ncolor: var(--text-dim);\nfont-size: 0.9rem;\nborder-top: 1px solid rgba(155, 92, 255, 0.2);\nmargin-top: 2rem;",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 2250,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_features_grid",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Features Grid",
+                "selector": ".features-grid",
+                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(280px, 1fr));\ngap: 1.8rem;\nmax-width: 1300px;\nmargin: 0 auto;\npadding: 0 4rem;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 2340,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_feature_card",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Feature Card",
+                "selector": ".feature-card",
+                "code": "background: rgba(255, 255, 255, 0.04);\nbackdrop-filter: blur(16px);\nborder-radius: var(--radius-lg);\npadding: 2rem;\nborder: 1px solid rgba(0, 229, 255, 0.2);\ncursor: default;\ntransition: 0.35s ease;",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 2430,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_feature_icon",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Feature Icon",
+                "selector": ".feature-icon",
+                "code": "font-size: 2.2rem;\nmargin-bottom: 0.8rem;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 2520,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_steps_wrap",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Steps Wrapper",
+                "selector": ".steps-wrap",
+                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\ngap: 1.6rem;\nmax-width: 1300px;\nmargin: 0 auto;\npadding: 0 4rem;",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 2610,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_step",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Step Card",
+                "selector": ".step",
+                "code": "background: rgba(255, 255, 255, 0.03);\nborder-radius: 16px;\npadding: 1.8rem;\nborder: 1px dashed rgba(255, 210, 63, 0.4);",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 2700,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_step_num",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Step Number",
+                "selector": ".step-num",
+                "code": "font-size: 1.8rem;\nfont-weight: 900;\ncolor: var(--yellow);\nmargin-bottom: 0.5rem;",
+                "vsgdata": {
+                    "x": -700,
+                    "y": 2790,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "c_tech_panel",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Tech Panel",
+                "selector": ".tech-panel",
+                "code": "max-width: 900px;\nmargin: 0 auto;\npadding: 4rem 2rem;\ntext-align: center;",
+                "vsgdata": {
+                    "x": -400,
+                    "y": 2880,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "a_avatar",
+            "data": {
+                "type": "ASSET_IMAGE",
+                "name": "Luna Vale Avatar",
+                "url": "https://images.unsplash.com/photo-1601412436430-a8bf5b071e18?w=800&auto=format&fit=crop",
+                "filename": "luna_avatar.png",
+                "vsgdata": {
+                    "x": 1500,
                     "y": 50,
                     "z": 0,
                     "collapsed": false
-                },
-                "code": "text-shadow: 0 0 50px rgba(102, 252, 241, 0.9);\ntransition: filter 0.3s;"
+                }
             }
         },
         {
-            "id": "e_hero_sub",
+            "id": "a_builder_screenshot",
             "data": {
-                "type": "ELEMENT",
-                "name": "Hero Subtitle",
+                "type": "ASSET_IMAGE",
+                "name": "Builder Canvas Preview",
+                "url": "https://images.unsplash.com/photo-1550439062-609e1531270e?w=900&auto=format&fit=crop",
+                "filename": "builder_canvas.png",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 250,
+                    "x": 1500,
+                    "y": 1900,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "p",
-                "attrsText": "style='font-size: 24px; color: #45a29e; margin-top: 20px;'",
-                "text": "The next generation idol is live."
+                }
             }
         },
         {
-            "id": "e_hero_btn",
+            "id": "idx_root",
             "data": {
                 "type": "ELEMENT",
-                "name": "CTA Button",
+                "name": "Page Wrap",
+                "tag": "div",
+                "attrsText": "class='page'",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 400,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "button",
-                "attrsText": "class='btn'",
-                "text": "INITIATE DISCO PROTOCOL"
-            }
-        },
-        {
-            "id": "e_about_wrap",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Body Wrap",
-                "vsgdata": {
-                    "x": -800,
-                    "y": 1000,
+                    "x": 300,
+                    "y": 0,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "div"
+                }
             }
         },
         {
-            "id": "e_header_n_html_about",
+            "id": "idx_nav",
             "data": {
                 "type": "ELEMENT",
-                "name": "Header",
+                "name": "Nav Bar",
+                "tag": "nav",
+                "attrsText": "class='nav'",
                 "vsgdata": {
-                    "x": -500,
-                    "y": 800,
+                    "x": 600,
+                    "y": -400,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "header",
-                "attrsText": "class='header'"
+                }
             }
         },
         {
-            "id": "e_logo_n_html_about",
+            "id": "idx_logo",
             "data": {
                 "type": "ELEMENT",
                 "name": "Logo",
+                "tag": "div",
+                "text": "🌸 Luna Vale",
+                "attrsText": "class='logo'",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 700,
+                    "x": 900,
+                    "y": -450,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='logo'",
-                "text": "ASTRAL.VT"
+                }
             }
         },
         {
-            "id": "e_nav_n_html_about",
+            "id": "idx_nav_links",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav",
+                "name": "Nav Links Wrap",
+                "tag": "div",
+                "attrsText": "style='display:flex; align-items:center;'",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 900,
+                    "x": 900,
+                    "y": -350,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "nav",
-                "attrsText": "class='nav-links'"
+                }
             }
         },
         {
-            "id": "e_nav1_n_html_about",
+            "id": "idx_link_home",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav Home",
+                "name": "Home Link",
+                "tag": "a",
+                "text": "Home",
+                "attrsText": "href='index.html'",
                 "vsgdata": {
-                    "x": 100,
+                    "x": 1200,
+                    "y": -420,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_link_schedule",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Link",
+                "tag": "a",
+                "text": "Schedule",
+                "attrsText": "href='#schedule'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": -370,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_link_blog",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary Link",
+                "tag": "a",
+                "text": "Diary",
+                "attrsText": "href='#blog'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": -320,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_link_builder",
+            "data": {
+                "type": "ELEMENT",
+                "name": "The Builder Link",
+                "tag": "a",
+                "text": "The Builder",
+                "attrsText": "href='about.html'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": -270,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_hero",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Section",
+                "tag": "section",
+                "attrsText": "class='hero'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_hero_text",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Text Column",
+                "tag": "div",
+                "attrsText": "class='hero-text'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": -50,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_badge",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Live Badge",
+                "tag": "span",
+                "text": "● LIVE NOW",
+                "attrsText": "class='badge-live'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_hero_h1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Greeting",
+                "tag": "h1",
+                "text": "Hii~ I'm Luna Vale!",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_hero_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Bio",
+                "tag": "p",
+                "text": "A cybernetic idol streaming rhythm games, late-night karaoke, and chaotic art sessions. Come hang out in chat!",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_hero_btn",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Watch Stream CTA",
+                "tag": "button",
+                "text": "▶ Watch Stream",
+                "attrsText": "class='btn-primary'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_avatar_wrap",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Avatar Wrap",
+                "tag": "div",
+                "attrsText": "class='avatar-wrap'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_avatar_img",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Avatar Image",
+                "tag": "img",
+                "attrsText": "class='avatar-img' alt='Luna Vale VTuber avatar'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_schedule",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Section",
+                "tag": "section",
+                "attrsText": "id='schedule' style='padding:5rem 0 3rem;'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 400,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_schedule_title",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Title",
+                "tag": "h2",
+                "text": "📅 Broadcast Schedule",
+                "attrsText": "class='section-title'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 350,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_schedule_grid",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Grid",
+                "tag": "div",
+                "attrsText": "class='schedule-grid'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 450,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_sched_card1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Card",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 400,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_sc1_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Title",
+                "tag": "h3",
+                "text": "Mon · Karaoke Night",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 380,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sc1_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Body",
+                "tag": "p",
+                "text": "8 PM EST — request your favorite songs in chat!",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 420,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sched_card2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Card",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 480,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_sc2_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Title",
+                "tag": "h3",
+                "text": "Wed · Rhythm Game Grind",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 460,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sc2_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Body",
+                "tag": "p",
+                "text": "7 PM EST — chasing that S-rank, wish me luck!",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 500,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sched_card3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Card",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 560,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_sc3_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Title",
+                "tag": "h3",
+                "text": "Fri · Horror Collab",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 540,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sc3_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Body",
+                "tag": "p",
+                "text": "9 PM EST — screaming with friends, bring snacks.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 580,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sched_card4",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Schedule Card",
+                "tag": "div",
+                "attrsText": "class='card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 640,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_sc4_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Title",
+                "tag": "h3",
+                "text": "Sat · 12hr Subathon",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 620,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_sc4_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card Body",
+                "tag": "p",
+                "text": "Noon EST — chaos, prizes, maybe a costume change.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 660,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_blog",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary Section",
+                "tag": "section",
+                "attrsText": "id='blog' style='padding:5rem 4rem 3rem; max-width:900px; margin:0 auto;'",
+                "vsgdata": {
+                    "x": 600,
                     "y": 800,
                     "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "HOME"
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "e_nav2_n_html_about",
+            "id": "idx_blog_title",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav About",
+                "name": "Diary Title",
+                "tag": "h2",
+                "text": "📝 Idol Diary",
+                "attrsText": "class='section-title'",
                 "vsgdata": {
-                    "x": 100,
+                    "x": 900,
+                    "y": 750,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_blog_list",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary List",
+                "tag": "div",
+                "attrsText": "class='blog-list'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 850,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_bp1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary Post",
+                "tag": "article",
+                "attrsText": "class='blog-post'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 800,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_bp1_date",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Date",
+                "tag": "span",
+                "text": "Day 142",
+                "attrsText": "class='blog-date'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 780,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp1_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Title",
+                "tag": "h3",
+                "text": "Almost got caught glitching mid-stream 😅",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 810,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp1_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Excerpt",
+                "tag": "p",
+                "text": "Chat noticed my hand clip through the mic for half a second and I had to play it off as a 'new feature.' 10/10 save.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 840,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary Post",
+                "tag": "article",
+                "attrsText": "class='blog-post'",
+                "vsgdata": {
+                    "x": 1200,
                     "y": 900,
                     "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LORE"
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "e_nav3_n_html_about",
+            "id": "idx_bp2_date",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav Stream",
+                "name": "Post Date",
+                "tag": "span",
+                "text": "Day 139",
+                "attrsText": "class='blog-date'",
                 "vsgdata": {
-                    "x": 100,
+                    "x": 1500,
+                    "y": 880,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp2_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Title",
+                "tag": "h3",
+                "text": "New outfit finally unlocked!",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 910,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp2_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Excerpt",
+                "tag": "p",
+                "text": "After three redesigns my rigger finished the winter fit — debuting it live this Saturday, come see!",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 940,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Diary Post",
+                "tag": "article",
+                "attrsText": "class='blog-post'",
+                "vsgdata": {
+                    "x": 1200,
                     "y": 1000,
                     "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LIVE"
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "e_about_sec",
+            "id": "idx_bp3_date",
             "data": {
                 "type": "ELEMENT",
-                "name": "Lore Section",
+                "name": "Post Date",
+                "tag": "span",
+                "text": "Day 130",
+                "attrsText": "class='blog-date'",
                 "vsgdata": {
-                    "x": -500,
-                    "y": 1200,
+                    "x": 1500,
+                    "y": 980,
                     "z": 0,
-                    "collapsed": true
-                },
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp3_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Title",
+                "tag": "h3",
+                "text": "Chat helped me name my plushie army",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 1010,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_bp3_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Post Excerpt",
+                "tag": "p",
+                "text": "We now have Sir Fluffington, Noodle, and a suspiciously judgmental owl named Gerald. Send help.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 1040,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_socials",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Socials Section",
                 "tag": "section",
-                "attrsText": "class='section'"
-            }
-        },
-        {
-            "id": "e_about_title",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Title",
+                "attrsText": "id='socials' style='padding:4rem 0;'",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 1050,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "h2",
-                "attrsText": "style='font-size: 50px; color: #66fcf1;'",
-                "text": "ARCHIVE // LORE"
-            }
-        },
-        {
-            "id": "e_grid",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Stats Grid",
-                "vsgdata": {
-                    "x": -200,
+                    "x": 600,
                     "y": 1200,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='grid'"
+                }
             }
         },
         {
-            "id": "e_card1",
+            "id": "idx_socials_title",
             "data": {
                 "type": "ELEMENT",
-                "name": "Card 1",
+                "name": "Socials Title",
+                "tag": "h2",
+                "text": "💫 Find Me Everywhere",
+                "attrsText": "class='section-title'",
                 "vsgdata": {
-                    "x": 200,
+                    "x": 900,
+                    "y": 1150,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_social_grid",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Socials Grid",
+                "tag": "div",
+                "attrsText": "class='social-grid'",
+                "vsgdata": {
+                    "x": 900,
                     "y": 1250,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='card'"
+                }
             }
         },
         {
-            "id": "e_card_t1",
+            "id": "idx_social_twitch",
             "data": {
                 "type": "ELEMENT",
-                "name": "Title",
+                "name": "Social Button",
+                "tag": "a",
+                "text": "🎥 Twitch",
+                "attrsText": "class='social-btn' href='#'",
                 "vsgdata": {
-                    "x": 500,
+                    "x": 1200,
                     "y": 1200,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "h3",
-                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
-                "text": "ORIGIN"
+                }
             }
         },
         {
-            "id": "e_card_p1",
+            "id": "idx_social_twitter",
             "data": {
                 "type": "ELEMENT",
-                "name": "Text",
+                "name": "Social Button",
+                "tag": "a",
+                "text": "🐦 Twitter / X",
+                "attrsText": "class='social-btn' href='#'",
                 "vsgdata": {
-                    "x": 500,
-                    "y": 1270,
+                    "x": 1200,
+                    "y": 1280,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "p",
-                "text": "Constructed in Sector 7."
+                }
             }
         },
         {
-            "id": "e_card2",
+            "id": "idx_social_youtube",
             "data": {
                 "type": "ELEMENT",
-                "name": "Card 2",
+                "name": "Social Button",
+                "tag": "a",
+                "text": "▶ YouTube",
+                "attrsText": "class='social-btn' href='#'",
                 "vsgdata": {
-                    "x": 200,
+                    "x": 1200,
+                    "y": 1360,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_social_kofi",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Social Button",
+                "tag": "a",
+                "text": "☕ Ko-fi",
+                "attrsText": "class='social-btn' href='#'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1440,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "idx_footer",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Footer",
+                "tag": "footer",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1600,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "idx_footer_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Footer Text",
+                "tag": "p",
+                "text": "Built with 💖 using the Idol1st Virtual Site Builder — © 2026 Luna Vale",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1600,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_root",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Page Wrap",
+                "tag": "div",
+                "attrsText": "class='page'",
+                "vsgdata": {
+                    "x": 300,
+                    "y": 1800,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_nav",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav Bar",
+                "tag": "nav",
+                "attrsText": "class='nav'",
+                "vsgdata": {
+                    "x": 600,
                     "y": 1400,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='card'"
+                }
             }
         },
         {
-            "id": "e_card_t2",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Title",
-                "vsgdata": {
-                    "x": 500,
-                    "y": 1350,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "h3",
-                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
-                "text": "SPECS"
-            }
-        },
-        {
-            "id": "e_card_p2",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Text",
-                "vsgdata": {
-                    "x": 500,
-                    "y": 1420,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "p",
-                "text": "Height: 165cm | Weight: N/A"
-            }
-        },
-        {
-            "id": "e_card3",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Card 3",
-                "vsgdata": {
-                    "x": 200,
-                    "y": 1550,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='card'"
-            }
-        },
-        {
-            "id": "e_card_t3",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Title",
-                "vsgdata": {
-                    "x": 500,
-                    "y": 1500,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "h3",
-                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
-                "text": "CAPABILITIES"
-            }
-        },
-        {
-            "id": "e_card_p3",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Text",
-                "vsgdata": {
-                    "x": 500,
-                    "y": 1570,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "p",
-                "text": "Vocal Synthesis, Reality Distortion"
-            }
-        },
-        {
-            "id": "e_stream_wrap",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Body Wrap",
-                "vsgdata": {
-                    "x": -800,
-                    "y": 2000,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "div"
-            }
-        },
-        {
-            "id": "e_header_n_html_stream",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Header",
-                "vsgdata": {
-                    "x": -500,
-                    "y": 1800,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "header",
-                "attrsText": "class='header'"
-            }
-        },
-        {
-            "id": "e_logo_n_html_stream",
+            "id": "abt_logo",
             "data": {
                 "type": "ELEMENT",
                 "name": "Logo",
+                "tag": "div",
+                "text": "🌸 Idol1st",
+                "attrsText": "class='logo'",
                 "vsgdata": {
-                    "x": -200,
+                    "x": 900,
+                    "y": 1350,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_nav_links",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav Links Wrap",
+                "tag": "div",
+                "attrsText": "style='display:flex; align-items:center;'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1450,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_link_home",
+            "data": {
+                "type": "ELEMENT",
+                "name": "VTuber Demo Link",
+                "tag": "a",
+                "text": "🎀 VTuber Demo",
+                "attrsText": "href='index.html'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1400,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_link_features",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Features Link",
+                "tag": "a",
+                "text": "Features",
+                "attrsText": "href='#features'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1450,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_link_how",
+            "data": {
+                "type": "ELEMENT",
+                "name": "How It Works Link",
+                "tag": "a",
+                "text": "How It Works",
+                "attrsText": "href='#how'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 1500,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_hero",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Section",
+                "tag": "section",
+                "attrsText": "class='hero'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 1800,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_hero_text",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Text Column",
+                "tag": "div",
+                "attrsText": "class='hero-text'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 1750,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_hero_h1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Heading",
+                "tag": "h1",
+                "text": "The Idol1st Virtual Site Builder",
+                "vsgdata": {
+                    "x": 1200,
                     "y": 1700,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='logo'",
-                "text": "ASTRAL.VT"
+                }
             }
         },
         {
-            "id": "e_nav_n_html_stream",
+            "id": "abt_hero_p",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav",
+                "name": "Hero Paragraph",
+                "tag": "p",
+                "text": "A node-based, drag-and-drop site builder made for idols and creators. Wire together HTML, CSS, and JS visually — no terminal, no build step, just a canvas full of glowing nodes.",
                 "vsgdata": {
-                    "x": -200,
-                    "y": 1900,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "nav",
-                "attrsText": "class='nav-links'"
-            }
-        },
-        {
-            "id": "e_nav1_n_html_stream",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Nav Home",
-                "vsgdata": {
-                    "x": 100,
+                    "x": 1200,
                     "y": 1800,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "HOME"
+                }
             }
         },
         {
-            "id": "e_nav2_n_html_stream",
+            "id": "abt_hero_btn",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav About",
+                "name": "Try Demo CTA",
+                "tag": "button",
+                "text": "✨ Try the Live Demo",
+                "attrsText": "class='btn-primary'",
                 "vsgdata": {
-                    "x": 100,
+                    "x": 1200,
                     "y": 1900,
                     "z": 0,
                     "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LORE"
+                }
             }
         },
         {
-            "id": "e_nav3_n_html_stream",
+            "id": "abt_avatar_wrap",
             "data": {
                 "type": "ELEMENT",
-                "name": "Nav Stream",
-                "vsgdata": {
-                    "x": 100,
-                    "y": 2000,
-                    "z": 0,
-                    "collapsed": false
-                },
+                "name": "Screenshot Wrap",
                 "tag": "div",
-                "attrsText": "class='nav-item'",
-                "text": "LIVE"
-            }
-        },
-        {
-            "id": "e_stream_sec",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Stream Interface",
+                "attrsText": "class='avatar-wrap'",
                 "vsgdata": {
-                    "x": -500,
-                    "y": 2200,
+                    "x": 900,
+                    "y": 1900,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "section",
-                "attrsText": "class='section'"
+                }
             }
         },
         {
-            "id": "e_stream_title",
+            "id": "abt_hero_img",
             "data": {
                 "type": "ELEMENT",
-                "name": "Status",
-                "vsgdata": {
-                    "x": -200,
-                    "y": 2050,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "tag": "div",
-                "attrsText": "style='color: #ff003c; font-weight: bold; font-size: 24px; letter-spacing: 5px; animation: pulse 1s infinite;'",
-                "text": "● LIVE NOW"
-            }
-        },
-        {
-            "id": "e_s_layout",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Layout",
-                "vsgdata": {
-                    "x": -200,
-                    "y": 2200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='stream-layout'"
-            }
-        },
-        {
-            "id": "e_vid",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Video Player",
-                "vsgdata": {
-                    "x": 200,
-                    "y": 2100,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='video-player'"
-            }
-        },
-        {
-            "id": "e_vid_img",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Stream Thumb",
-                "vsgdata": {
-                    "x": 500,
-                    "y": 2100,
-                    "z": 0,
-                    "collapsed": false
-                },
+                "name": "Builder Screenshot",
                 "tag": "img",
-                "attrsText": "style='width: 100%; height: 100%; object-fit: cover; border-radius: 10px; opacity: 0.8;'"
-            }
-        },
-        {
-            "id": "a_thumb",
-            "data": {
-                "type": "ASSET_IMAGE",
-                "name": "Game Thumbnail",
+                "attrsText": "class='avatar-img' alt='Idol1st node canvas preview'",
                 "vsgdata": {
-                    "x": 800,
-                    "y": 2100,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "url": "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop",
-                "filename": "Cyberpunk.png"
-            }
-        },
-        {
-            "id": "e_chat",
-            "data": {
-                "type": "ELEMENT",
-                "name": "Chat Box",
-                "vsgdata": {
-                    "x": 200,
-                    "y": 2400,
+                    "x": 1200,
+                    "y": 1900,
                     "z": 0,
                     "collapsed": true
-                },
-                "tag": "div",
-                "attrsText": "class='chat-box'"
+                }
             }
         },
         {
-            "id": "e_chat_h",
+            "id": "abt_features",
             "data": {
                 "type": "ELEMENT",
-                "name": "Header",
+                "name": "Features Section",
+                "tag": "section",
+                "attrsText": "id='features' style='padding:5rem 0 3rem;'",
                 "vsgdata": {
-                    "x": 500,
-                    "y": 2300,
+                    "x": 600,
+                    "y": 2200,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_features_title",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Features Title",
+                "tag": "h2",
+                "text": "Why Idols Choose Idol1st",
+                "attrsText": "class='section-title'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 2150,
                     "z": 0,
                     "collapsed": false
-                },
+                }
+            }
+        },
+        {
+            "id": "abt_features_grid",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Features Grid",
+                "tag": "div",
+                "attrsText": "class='features-grid'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 2250,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
+                "tag": "div",
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2200,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat1_icon",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "🔗",
+                "attrsText": "class='feature-icon'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2170,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat1_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
                 "tag": "h3",
-                "attrsText": "style='color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px;'",
-                "text": "SUPER CHAT"
+                "text": "Node-Based DAG Editor",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2200,
+                    "z": 0,
+                    "collapsed": false
+                }
             }
         },
         {
-            "id": "e_chat_msgs",
+            "id": "abt_feat1_p",
             "data": {
                 "type": "ELEMENT",
-                "name": "Messages",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "Connect HTML, CSS, and JS nodes visually on an infinite canvas — the engine compiles the graph into a real site.",
                 "vsgdata": {
-                    "x": 500,
-                    "y": 2400,
+                    "x": 1500,
+                    "y": 2230,
                     "z": 0,
                     "collapsed": false
-                },
+                }
+            }
+        },
+        {
+            "id": "abt_feat2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
                 "tag": "div",
-                "attrsText": "style='flex: 1; display: flex; flex-direction: column; gap: 10px;'"
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2280,
+                    "z": 0,
+                    "collapsed": true
+                }
             }
         },
         {
-            "id": "e_chat_btn",
+            "id": "abt_feat2_icon",
             "data": {
                 "type": "ELEMENT",
-                "name": "Donate Btn",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "⚡",
+                "attrsText": "class='feature-icon'",
                 "vsgdata": {
-                    "x": 500,
-                    "y": 2500,
+                    "x": 1500,
+                    "y": 2250,
                     "z": 0,
                     "collapsed": false
-                },
+                }
+            }
+        },
+        {
+            "id": "abt_feat2_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
+                "tag": "h3",
+                "text": "Instant Live Preview",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2280,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat2_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "Every edit compiles straight into an iframe preview, so you see your stage update in real time.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2310,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
+                "tag": "div",
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2360,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat3_icon",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "🎨",
+                "attrsText": "class='feature-icon'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2330,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat3_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
+                "tag": "h3",
+                "text": "No-Code Styling Chains",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2360,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat3_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "Chain CSS Rule nodes together for deterministic, cascade-safe stylesheets without writing a single file.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2390,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat4",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
+                "tag": "div",
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2440,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat4_icon",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "🖼️",
+                "attrsText": "class='feature-icon'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2410,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat4_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
+                "tag": "h3",
+                "text": "Built-In Asset Manager",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2440,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat4_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "Drag in images and audio, get instant local previews, and attach them straight onto elements.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2470,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat5",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
+                "tag": "div",
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2520,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat5_icon",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "🧩",
+                "attrsText": "class='feature-icon'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2490,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat5_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
+                "tag": "h3",
+                "text": "Reusable Logic Chains",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2520,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat5_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "One JS Event node can bind to dozens of elements at once — true many-to-one event logic.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2550,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat6",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Card",
+                "tag": "div",
+                "attrsText": "class='feature-card'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2600,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_feat6_icon",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Icon",
+                "tag": "div",
+                "text": "🚀",
+                "attrsText": "class='feature-icon'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2570,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat6_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Title",
+                "tag": "h3",
+                "text": "One-Click Static Export",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2600,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_feat6_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Feature Body",
+                "tag": "p",
+                "text": "Flatten your whole graph into clean, dependency-free HTML/CSS/JS ready to host anywhere.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2630,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_how",
+            "data": {
+                "type": "ELEMENT",
+                "name": "How It Works Section",
+                "tag": "section",
+                "attrsText": "id='how' style='padding:5rem 0 3rem;'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 2800,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_how_title",
+            "data": {
+                "type": "ELEMENT",
+                "name": "How Title",
+                "tag": "h2",
+                "text": "How It Works",
+                "attrsText": "class='section-title'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 2750,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_steps_wrap",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Steps Wrap",
+                "tag": "div",
+                "attrsText": "class='steps-wrap'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 2850,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_step1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Card",
+                "tag": "div",
+                "attrsText": "class='step'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2800,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_step1_num",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Number",
+                "tag": "div",
+                "text": "01",
+                "attrsText": "class='step-num'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2770,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step1_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Title",
+                "tag": "h3",
+                "text": "Drop Your Nodes",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2800,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step1_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Body",
+                "tag": "p",
+                "text": "Add HTML pages, CSS files, JS files, and content nodes anywhere on the canvas.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2830,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Card",
+                "tag": "div",
+                "attrsText": "class='step'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2880,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_step2_num",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Number",
+                "tag": "div",
+                "text": "02",
+                "attrsText": "class='step-num'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2850,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step2_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Title",
+                "tag": "h3",
+                "text": "Wire the Edges",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2880,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step2_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Body",
+                "tag": "p",
+                "text": "Drag connections between nodes to build DOM structure, cascading styles, and event bindings.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2910,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Card",
+                "tag": "div",
+                "attrsText": "class='step'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 2960,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_step3_num",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Number",
+                "tag": "div",
+                "text": "03",
+                "attrsText": "class='step-num'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2930,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step3_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Title",
+                "tag": "h3",
+                "text": "Style & Animate",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2960,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step3_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Body",
+                "tag": "p",
+                "text": "Chain CSS Rule nodes for cascades, and reuse JS Event nodes for hover glows and click logic.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 2990,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step4",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Card",
+                "tag": "div",
+                "attrsText": "class='step'",
+                "vsgdata": {
+                    "x": 1200,
+                    "y": 3040,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_step4_num",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Number",
+                "tag": "div",
+                "text": "04",
+                "attrsText": "class='step-num'",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 3010,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step4_h3",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Title",
+                "tag": "h3",
+                "text": "Publish Your Stage",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 3040,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_step4_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Step Body",
+                "tag": "p",
+                "text": "Compile the graph into a real static site and share your idol page with the world.",
+                "vsgdata": {
+                    "x": 1500,
+                    "y": 3070,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_tech",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Tech Panel Section",
+                "tag": "section",
+                "attrsText": "id='tech' class='tech-panel'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 3400,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_tech_h2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Tech Title",
+                "tag": "h2",
+                "text": "Under the Hood",
+                "attrsText": "class='section-title'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3350,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_tech_p1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Tech Paragraph 1",
+                "tag": "p",
+                "text": "Idol1st runs on Agraph, a custom Directed Acyclic Graph engine. Unlike a rigid DOM tree, a DAG lets many elements share the same CSS Rule or JS Event node, so one glow effect can power an entire site.",
+                "attrsText": "style='color:var(--text-dim); line-height:1.8; margin-bottom:1.2rem;'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3450,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_tech_p2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Tech Paragraph 2",
+                "tag": "p",
+                "text": "Every edge is edge-painted with a rootId so the compiler always knows which file owns a connection, keeping HTML structure, CSS cascades, and JS bindings perfectly deterministic on export.",
+                "attrsText": "style='color:var(--text-dim); line-height:1.8;'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3550,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_cta",
+            "data": {
+                "type": "ELEMENT",
+                "name": "CTA Section",
+                "tag": "section",
+                "attrsText": "style='text-align:center; padding:4rem 2rem;'",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 3700,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_cta_h2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "CTA Heading",
+                "tag": "h2",
+                "text": "Ready to Build Your Own Idol Stage?",
+                "attrsText": "style='font-size:2.2rem; margin-bottom:1.5rem;'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3650,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_cta_btn",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Launch Builder CTA",
                 "tag": "button",
-                "attrsText": "class='btn'",
-                "text": "SEND MESSAGE"
+                "text": "🚀 Launch the Builder",
+                "attrsText": "class='btn-primary'",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3750,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "abt_footer",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Footer",
+                "tag": "footer",
+                "vsgdata": {
+                    "x": 600,
+                    "y": 3900,
+                    "z": 0,
+                    "collapsed": true
+                }
+            }
+        },
+        {
+            "id": "abt_footer_p",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Footer Text",
+                "tag": "p",
+                "text": "Idol1st VSB — crafted for creators, powered by graphs. © 2026",
+                "vsgdata": {
+                    "x": 900,
+                    "y": 3900,
+                    "z": 0,
+                    "collapsed": false
+                }
             }
         }
     ],
     "edges": [
         {
-            "id": "e_1000",
-            "srcId": "n_html_index",
-            "dstId": "n_css",
+            "id": "e_3000",
+            "srcId": "html_idx",
+            "dstId": "css_main",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1001",
-            "srcId": "n_html_index",
-            "dstId": "n_js",
+            "id": "e_3001",
+            "srcId": "html_idx",
+            "dstId": "js_main",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3002",
+            "srcId": "html_abt",
+            "dstId": "css_main",
+            "data": {
+                "rootId": "html_abt",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1002",
-            "srcId": "n_html_about",
-            "dstId": "n_css",
+            "id": "e_3003",
+            "srcId": "html_abt",
+            "dstId": "js_main",
             "data": {
-                "rootId": "n_html_about",
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3004",
+            "srcId": "js_main",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "js_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1003",
-            "srcId": "n_html_about",
-            "dstId": "n_js",
+            "id": "e_3005",
+            "srcId": "js_main",
+            "dstId": "j_unglow",
             "data": {
-                "rootId": "n_html_about",
+                "rootId": "js_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1004",
-            "srcId": "n_html_stream",
-            "dstId": "n_css",
+            "id": "e_3006",
+            "srcId": "js_main",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "js_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1005",
-            "srcId": "n_html_stream",
-            "dstId": "n_js",
+            "id": "e_3007",
+            "srcId": "js_main",
+            "dstId": "j_nav_about",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "js_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1006",
-            "srcId": "n_css",
+            "id": "e_3008",
+            "srcId": "js_main",
+            "dstId": "j_blog_read",
+            "data": {
+                "rootId": "js_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3009",
+            "srcId": "js_main",
+            "dstId": "j_social_ping",
+            "data": {
+                "rootId": "js_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3010",
+            "srcId": "js_main",
+            "dstId": "j_badge_pulse",
+            "data": {
+                "rootId": "js_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3011",
+            "srcId": "css_main",
+            "dstId": "c_root",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3012",
+            "srcId": "c_root",
             "dstId": "c_reset",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1007",
+            "id": "e_3013",
             "srcId": "c_reset",
             "dstId": "c_body",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1008",
+            "id": "e_3014",
             "srcId": "c_body",
-            "dstId": "c_body_disco",
+            "dstId": "c_kf_pulse",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1009",
-            "srcId": "c_body_disco",
-            "dstId": "c_header",
+            "id": "e_3015",
+            "srcId": "c_kf_pulse",
+            "dstId": "c_kf_float",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1010",
-            "srcId": "c_header",
-            "dstId": "c_logo",
-            "data": {
-                "rootId": "n_css",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1011",
-            "srcId": "c_logo",
+            "id": "e_3016",
+            "srcId": "c_kf_float",
             "dstId": "c_nav",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1012",
+            "id": "e_3017",
             "srcId": "c_nav",
-            "dstId": "c_nav_item",
+            "dstId": "c_nav_link",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1013",
-            "srcId": "c_nav_item",
-            "dstId": "c_nav_item_hover",
+            "id": "e_3018",
+            "srcId": "c_nav_link",
+            "dstId": "c_nav_link_hover",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1014",
-            "srcId": "c_nav_item_hover",
-            "dstId": "c_section",
+            "id": "e_3019",
+            "srcId": "c_nav_link_hover",
+            "dstId": "c_logo",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1015",
-            "srcId": "c_section",
+            "id": "e_3020",
+            "srcId": "c_logo",
             "dstId": "c_hero",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1016",
+            "id": "e_3021",
             "srcId": "c_hero",
-            "dstId": "c_title",
+            "dstId": "c_hero_h1",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1017",
-            "srcId": "c_title",
+            "id": "e_3022",
+            "srcId": "c_hero_h1",
+            "dstId": "c_hero_p",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3023",
+            "srcId": "c_hero_p",
+            "dstId": "c_badge",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3024",
+            "srcId": "c_badge",
             "dstId": "c_btn",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1018",
+            "id": "e_3025",
             "srcId": "c_btn",
             "dstId": "c_btn_hover",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1019",
+            "id": "e_3026",
             "srcId": "c_btn_hover",
-            "dstId": "c_grid",
+            "dstId": "c_avatar_wrap",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1020",
-            "srcId": "c_grid",
+            "id": "e_3027",
+            "srcId": "c_avatar_wrap",
+            "dstId": "c_avatar_img",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3028",
+            "srcId": "c_avatar_img",
+            "dstId": "c_section_title",
+            "data": {
+                "rootId": "css_main",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3029",
+            "srcId": "c_section_title",
             "dstId": "c_card",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1021",
+            "id": "e_3030",
             "srcId": "c_card",
             "dstId": "c_card_hover",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1022",
+            "id": "e_3031",
             "srcId": "c_card_hover",
-            "dstId": "c_stream_layout",
+            "dstId": "c_schedule_grid",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1023",
-            "srcId": "c_stream_layout",
-            "dstId": "c_video_player",
+            "id": "e_3032",
+            "srcId": "c_schedule_grid",
+            "dstId": "c_blog_post",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1024",
-            "srcId": "c_video_player",
-            "dstId": "c_chat_box",
+            "id": "e_3033",
+            "srcId": "c_blog_post",
+            "dstId": "c_blog_date",
             "data": {
-                "rootId": "n_css",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1025",
-            "srcId": "n_js",
-            "dstId": "j_nav_home",
+            "id": "e_3034",
+            "srcId": "c_blog_date",
+            "dstId": "c_social_grid",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1026",
-            "srcId": "n_js",
-            "dstId": "j_nav_about",
+            "id": "e_3035",
+            "srcId": "c_social_grid",
+            "dstId": "c_social_btn",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1027",
-            "srcId": "n_js",
-            "dstId": "j_nav_stream",
+            "id": "e_3036",
+            "srcId": "c_social_btn",
+            "dstId": "c_footer",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1028",
-            "srcId": "n_js",
-            "dstId": "j_disco",
+            "id": "e_3037",
+            "srcId": "c_footer",
+            "dstId": "c_features_grid",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1029",
-            "srcId": "n_js",
-            "dstId": "j_color_shift",
+            "id": "e_3038",
+            "srcId": "c_features_grid",
+            "dstId": "c_feature_card",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1030",
-            "srcId": "n_js",
-            "dstId": "j_chat_spam",
+            "id": "e_3039",
+            "srcId": "c_feature_card",
+            "dstId": "c_feature_icon",
             "data": {
-                "rootId": "n_js",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1031",
-            "srcId": "n_html_index",
-            "dstId": "e_index_wrap",
+            "id": "e_3040",
+            "srcId": "c_feature_icon",
+            "dstId": "c_steps_wrap",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1032",
-            "srcId": "e_index_wrap",
-            "dstId": "e_header_n_html_index",
+            "id": "e_3041",
+            "srcId": "c_steps_wrap",
+            "dstId": "c_step",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1033",
-            "srcId": "e_header_n_html_index",
-            "dstId": "e_logo_n_html_index",
+            "id": "e_3042",
+            "srcId": "c_step",
+            "dstId": "c_step_num",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1034",
-            "srcId": "e_logo_n_html_index",
-            "dstId": "j_nav_home",
+            "id": "e_3043",
+            "srcId": "c_step_num",
+            "dstId": "c_tech_panel",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "css_main",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1035",
-            "srcId": "e_header_n_html_index",
-            "dstId": "e_nav_n_html_index",
+            "id": "e_3044",
+            "srcId": "html_idx",
+            "dstId": "idx_root",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3045",
+            "srcId": "idx_root",
+            "dstId": "idx_nav",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3046",
+            "srcId": "idx_nav",
+            "dstId": "idx_logo",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3047",
+            "srcId": "idx_nav",
+            "dstId": "idx_nav_links",
+            "data": {
+                "rootId": "html_idx",
                 "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e_1036",
-            "srcId": "e_nav_n_html_index",
-            "dstId": "e_nav1_n_html_index",
+            "id": "e_3048",
+            "srcId": "idx_nav_links",
+            "dstId": "idx_link_home",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1037",
-            "srcId": "e_nav_n_html_index",
-            "dstId": "e_nav2_n_html_index",
+            "id": "e_3049",
+            "srcId": "idx_link_home",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3050",
+            "srcId": "idx_nav_links",
+            "dstId": "idx_link_schedule",
+            "data": {
+                "rootId": "html_idx",
                 "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e_1038",
-            "srcId": "e_nav_n_html_index",
-            "dstId": "e_nav3_n_html_index",
+            "id": "e_3051",
+            "srcId": "idx_nav_links",
+            "dstId": "idx_link_blog",
             "data": {
-                "rootId": "n_html_index",
+                "rootId": "html_idx",
                 "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e_1039",
-            "srcId": "e_nav1_n_html_index",
-            "dstId": "j_nav_home",
+            "id": "e_3052",
+            "srcId": "idx_nav_links",
+            "dstId": "idx_link_builder",
             "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1040",
-            "srcId": "e_nav2_n_html_index",
-            "dstId": "j_nav_about",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1041",
-            "srcId": "e_nav3_n_html_index",
-            "dstId": "j_nav_stream",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1042",
-            "srcId": "e_index_wrap",
-            "dstId": "e_index_hero",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1043",
-            "srcId": "e_index_hero",
-            "dstId": "e_hero_title",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1044",
-            "srcId": "e_hero_title",
-            "dstId": "c_inline_glow",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1045",
-            "srcId": "e_hero_title",
-            "dstId": "j_color_shift",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1046",
-            "srcId": "e_index_hero",
-            "dstId": "e_hero_sub",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1047",
-            "srcId": "e_index_hero",
-            "dstId": "e_hero_btn",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 2,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1048",
-            "srcId": "e_hero_btn",
-            "dstId": "j_disco",
-            "data": {
-                "rootId": "n_html_index",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1049",
-            "srcId": "n_html_about",
-            "dstId": "e_about_wrap",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1050",
-            "srcId": "e_about_wrap",
-            "dstId": "e_header_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1051",
-            "srcId": "e_header_n_html_about",
-            "dstId": "e_logo_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1052",
-            "srcId": "e_logo_n_html_about",
-            "dstId": "j_nav_home",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1053",
-            "srcId": "e_header_n_html_about",
-            "dstId": "e_nav_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1054",
-            "srcId": "e_nav_n_html_about",
-            "dstId": "e_nav1_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1055",
-            "srcId": "e_nav_n_html_about",
-            "dstId": "e_nav2_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1056",
-            "srcId": "e_nav_n_html_about",
-            "dstId": "e_nav3_n_html_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 2,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1057",
-            "srcId": "e_nav1_n_html_about",
-            "dstId": "j_nav_home",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1058",
-            "srcId": "e_nav2_n_html_about",
-            "dstId": "j_nav_about",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1059",
-            "srcId": "e_nav3_n_html_about",
-            "dstId": "j_nav_stream",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1060",
-            "srcId": "e_about_wrap",
-            "dstId": "e_about_sec",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1061",
-            "srcId": "e_about_sec",
-            "dstId": "e_about_title",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1062",
-            "srcId": "e_about_sec",
-            "dstId": "e_grid",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1063",
-            "srcId": "e_grid",
-            "dstId": "e_card1",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1064",
-            "srcId": "e_card1",
-            "dstId": "e_card_t1",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1065",
-            "srcId": "e_card1",
-            "dstId": "e_card_p1",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1066",
-            "srcId": "e_card1",
-            "dstId": "j_color_shift",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1067",
-            "srcId": "e_grid",
-            "dstId": "e_card2",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 2,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1068",
-            "srcId": "e_card2",
-            "dstId": "e_card_t2",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1069",
-            "srcId": "e_card2",
-            "dstId": "e_card_p2",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1070",
-            "srcId": "e_card2",
-            "dstId": "j_color_shift",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1071",
-            "srcId": "e_grid",
-            "dstId": "e_card3",
-            "data": {
-                "rootId": "n_html_about",
+                "rootId": "html_idx",
                 "order": 3,
                 "enabled": true
             }
         },
         {
-            "id": "e_1072",
-            "srcId": "e_card3",
-            "dstId": "e_card_t3",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1073",
-            "srcId": "e_card3",
-            "dstId": "e_card_p3",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1074",
-            "srcId": "e_card3",
-            "dstId": "j_color_shift",
-            "data": {
-                "rootId": "n_html_about",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1075",
-            "srcId": "n_html_stream",
-            "dstId": "e_stream_wrap",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1076",
-            "srcId": "e_stream_wrap",
-            "dstId": "e_header_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1077",
-            "srcId": "e_header_n_html_stream",
-            "dstId": "e_logo_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1078",
-            "srcId": "e_logo_n_html_stream",
-            "dstId": "j_nav_home",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1079",
-            "srcId": "e_header_n_html_stream",
-            "dstId": "e_nav_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1080",
-            "srcId": "e_nav_n_html_stream",
-            "dstId": "e_nav1_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1081",
-            "srcId": "e_nav_n_html_stream",
-            "dstId": "e_nav2_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1082",
-            "srcId": "e_nav_n_html_stream",
-            "dstId": "e_nav3_n_html_stream",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 2,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1083",
-            "srcId": "e_nav1_n_html_stream",
-            "dstId": "j_nav_home",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1084",
-            "srcId": "e_nav2_n_html_stream",
+            "id": "e_3053",
+            "srcId": "idx_link_builder",
             "dstId": "j_nav_about",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1085",
-            "srcId": "e_nav3_n_html_stream",
-            "dstId": "j_nav_stream",
+            "id": "e_3054",
+            "srcId": "idx_root",
+            "dstId": "idx_hero",
             "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1086",
-            "srcId": "e_stream_wrap",
-            "dstId": "e_stream_sec",
-            "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
                 "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e_1087",
-            "srcId": "e_stream_sec",
-            "dstId": "e_stream_title",
+            "id": "e_3055",
+            "srcId": "idx_hero",
+            "dstId": "idx_hero_text",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e_1088",
-            "srcId": "e_stream_sec",
-            "dstId": "e_s_layout",
+            "id": "e_3056",
+            "srcId": "idx_hero_text",
+            "dstId": "idx_badge",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3057",
+            "srcId": "idx_badge",
+            "dstId": "j_badge_pulse",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3058",
+            "srcId": "idx_hero_text",
+            "dstId": "idx_hero_h1",
+            "data": {
+                "rootId": "html_idx",
                 "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e_1089",
-            "srcId": "e_s_layout",
-            "dstId": "e_vid",
+            "id": "e_3059",
+            "srcId": "idx_hero_text",
+            "dstId": "idx_hero_p",
             "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1090",
-            "srcId": "e_vid",
-            "dstId": "e_vid_img",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1091",
-            "srcId": "e_vid_img",
-            "dstId": "a_thumb",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1092",
-            "srcId": "e_s_layout",
-            "dstId": "e_chat",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1093",
-            "srcId": "e_chat",
-            "dstId": "e_chat_h",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1094",
-            "srcId": "e_chat",
-            "dstId": "e_chat_msgs",
-            "data": {
-                "rootId": "n_html_stream",
-                "order": 1,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e_1095",
-            "srcId": "e_chat",
-            "dstId": "e_chat_btn",
-            "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
                 "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e_1096",
-            "srcId": "e_chat_btn",
-            "dstId": "j_chat_spam",
+            "id": "e_3060",
+            "srcId": "idx_hero_text",
+            "dstId": "idx_hero_btn",
             "data": {
-                "rootId": "n_html_stream",
+                "rootId": "html_idx",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3061",
+            "srcId": "idx_hero_btn",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3062",
+            "srcId": "idx_hero_btn",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3063",
+            "srcId": "idx_hero",
+            "dstId": "idx_avatar_wrap",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3064",
+            "srcId": "idx_avatar_wrap",
+            "dstId": "idx_avatar_img",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3065",
+            "srcId": "idx_avatar_img",
+            "dstId": "a_avatar",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3066",
+            "srcId": "idx_root",
+            "dstId": "idx_schedule",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3067",
+            "srcId": "idx_schedule",
+            "dstId": "idx_schedule_title",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3068",
+            "srcId": "idx_schedule",
+            "dstId": "idx_schedule_grid",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3069",
+            "srcId": "idx_schedule_grid",
+            "dstId": "idx_sched_card1",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3070",
+            "srcId": "idx_sched_card1",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3071",
+            "srcId": "idx_sched_card1",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3072",
+            "srcId": "idx_sched_card1",
+            "dstId": "idx_sc1_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3073",
+            "srcId": "idx_sched_card1",
+            "dstId": "idx_sc1_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3074",
+            "srcId": "idx_schedule_grid",
+            "dstId": "idx_sched_card2",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3075",
+            "srcId": "idx_sched_card2",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3076",
+            "srcId": "idx_sched_card2",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3077",
+            "srcId": "idx_sched_card2",
+            "dstId": "idx_sc2_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3078",
+            "srcId": "idx_sched_card2",
+            "dstId": "idx_sc2_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3079",
+            "srcId": "idx_schedule_grid",
+            "dstId": "idx_sched_card3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3080",
+            "srcId": "idx_sched_card3",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3081",
+            "srcId": "idx_sched_card3",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3082",
+            "srcId": "idx_sched_card3",
+            "dstId": "idx_sc3_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3083",
+            "srcId": "idx_sched_card3",
+            "dstId": "idx_sc3_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3084",
+            "srcId": "idx_schedule_grid",
+            "dstId": "idx_sched_card4",
+            "data": {
+                "rootId": "html_idx",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3085",
+            "srcId": "idx_sched_card4",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3086",
+            "srcId": "idx_sched_card4",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3087",
+            "srcId": "idx_sched_card4",
+            "dstId": "idx_sc4_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3088",
+            "srcId": "idx_sched_card4",
+            "dstId": "idx_sc4_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3089",
+            "srcId": "idx_root",
+            "dstId": "idx_blog",
+            "data": {
+                "rootId": "html_idx",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3090",
+            "srcId": "idx_blog",
+            "dstId": "idx_blog_title",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3091",
+            "srcId": "idx_blog",
+            "dstId": "idx_blog_list",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3092",
+            "srcId": "idx_blog_list",
+            "dstId": "idx_bp1",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3093",
+            "srcId": "idx_bp1",
+            "dstId": "j_blog_read",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3094",
+            "srcId": "idx_bp1",
+            "dstId": "idx_bp1_date",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3095",
+            "srcId": "idx_bp1",
+            "dstId": "idx_bp1_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3096",
+            "srcId": "idx_bp1",
+            "dstId": "idx_bp1_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3097",
+            "srcId": "idx_blog_list",
+            "dstId": "idx_bp2",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3098",
+            "srcId": "idx_bp2",
+            "dstId": "j_blog_read",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3099",
+            "srcId": "idx_bp2",
+            "dstId": "idx_bp2_date",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3100",
+            "srcId": "idx_bp2",
+            "dstId": "idx_bp2_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3101",
+            "srcId": "idx_bp2",
+            "dstId": "idx_bp2_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3102",
+            "srcId": "idx_blog_list",
+            "dstId": "idx_bp3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3103",
+            "srcId": "idx_bp3",
+            "dstId": "j_blog_read",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3104",
+            "srcId": "idx_bp3",
+            "dstId": "idx_bp3_date",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3105",
+            "srcId": "idx_bp3",
+            "dstId": "idx_bp3_h3",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3106",
+            "srcId": "idx_bp3",
+            "dstId": "idx_bp3_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3107",
+            "srcId": "idx_root",
+            "dstId": "idx_socials",
+            "data": {
+                "rootId": "html_idx",
+                "order": 4,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3108",
+            "srcId": "idx_socials",
+            "dstId": "idx_socials_title",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3109",
+            "srcId": "idx_socials",
+            "dstId": "idx_social_grid",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3110",
+            "srcId": "idx_social_grid",
+            "dstId": "idx_social_twitch",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3111",
+            "srcId": "idx_social_twitch",
+            "dstId": "j_social_ping",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3112",
+            "srcId": "idx_social_grid",
+            "dstId": "idx_social_twitter",
+            "data": {
+                "rootId": "html_idx",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3113",
+            "srcId": "idx_social_twitter",
+            "dstId": "j_social_ping",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3114",
+            "srcId": "idx_social_grid",
+            "dstId": "idx_social_youtube",
+            "data": {
+                "rootId": "html_idx",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3115",
+            "srcId": "idx_social_youtube",
+            "dstId": "j_social_ping",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3116",
+            "srcId": "idx_social_grid",
+            "dstId": "idx_social_kofi",
+            "data": {
+                "rootId": "html_idx",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3117",
+            "srcId": "idx_social_kofi",
+            "dstId": "j_social_ping",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3118",
+            "srcId": "idx_root",
+            "dstId": "idx_footer",
+            "data": {
+                "rootId": "html_idx",
+                "order": 5,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3119",
+            "srcId": "idx_footer",
+            "dstId": "idx_footer_p",
+            "data": {
+                "rootId": "html_idx",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3120",
+            "srcId": "html_abt",
+            "dstId": "abt_root",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3121",
+            "srcId": "abt_root",
+            "dstId": "abt_nav",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3122",
+            "srcId": "abt_nav",
+            "dstId": "abt_logo",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3123",
+            "srcId": "abt_nav",
+            "dstId": "abt_nav_links",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3124",
+            "srcId": "abt_nav_links",
+            "dstId": "abt_link_home",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3125",
+            "srcId": "abt_link_home",
+            "dstId": "j_nav_home",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3126",
+            "srcId": "abt_nav_links",
+            "dstId": "abt_link_features",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3127",
+            "srcId": "abt_nav_links",
+            "dstId": "abt_link_how",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3128",
+            "srcId": "abt_root",
+            "dstId": "abt_hero",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3129",
+            "srcId": "abt_hero",
+            "dstId": "abt_hero_text",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3130",
+            "srcId": "abt_hero_text",
+            "dstId": "abt_hero_h1",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3131",
+            "srcId": "abt_hero_text",
+            "dstId": "abt_hero_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3132",
+            "srcId": "abt_hero_text",
+            "dstId": "abt_hero_btn",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3133",
+            "srcId": "abt_hero_btn",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3134",
+            "srcId": "abt_hero_btn",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3135",
+            "srcId": "abt_hero_btn",
+            "dstId": "j_nav_home",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3136",
+            "srcId": "abt_hero",
+            "dstId": "abt_avatar_wrap",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3137",
+            "srcId": "abt_avatar_wrap",
+            "dstId": "abt_hero_img",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3138",
+            "srcId": "abt_hero_img",
+            "dstId": "a_builder_screenshot",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3139",
+            "srcId": "abt_root",
+            "dstId": "abt_features",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3140",
+            "srcId": "abt_features",
+            "dstId": "abt_features_title",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3141",
+            "srcId": "abt_features",
+            "dstId": "abt_features_grid",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3142",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat1",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3143",
+            "srcId": "abt_feat1",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3144",
+            "srcId": "abt_feat1",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3145",
+            "srcId": "abt_feat1",
+            "dstId": "abt_feat1_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3146",
+            "srcId": "abt_feat1",
+            "dstId": "abt_feat1_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3147",
+            "srcId": "abt_feat1",
+            "dstId": "abt_feat1_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3148",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat2",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3149",
+            "srcId": "abt_feat2",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3150",
+            "srcId": "abt_feat2",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3151",
+            "srcId": "abt_feat2",
+            "dstId": "abt_feat2_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3152",
+            "srcId": "abt_feat2",
+            "dstId": "abt_feat2_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3153",
+            "srcId": "abt_feat2",
+            "dstId": "abt_feat2_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3154",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3155",
+            "srcId": "abt_feat3",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3156",
+            "srcId": "abt_feat3",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3157",
+            "srcId": "abt_feat3",
+            "dstId": "abt_feat3_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3158",
+            "srcId": "abt_feat3",
+            "dstId": "abt_feat3_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3159",
+            "srcId": "abt_feat3",
+            "dstId": "abt_feat3_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3160",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat4",
+            "data": {
+                "rootId": "html_abt",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3161",
+            "srcId": "abt_feat4",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3162",
+            "srcId": "abt_feat4",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3163",
+            "srcId": "abt_feat4",
+            "dstId": "abt_feat4_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3164",
+            "srcId": "abt_feat4",
+            "dstId": "abt_feat4_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3165",
+            "srcId": "abt_feat4",
+            "dstId": "abt_feat4_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3166",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat5",
+            "data": {
+                "rootId": "html_abt",
+                "order": 4,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3167",
+            "srcId": "abt_feat5",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3168",
+            "srcId": "abt_feat5",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3169",
+            "srcId": "abt_feat5",
+            "dstId": "abt_feat5_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3170",
+            "srcId": "abt_feat5",
+            "dstId": "abt_feat5_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3171",
+            "srcId": "abt_feat5",
+            "dstId": "abt_feat5_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3172",
+            "srcId": "abt_features_grid",
+            "dstId": "abt_feat6",
+            "data": {
+                "rootId": "html_abt",
+                "order": 5,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3173",
+            "srcId": "abt_feat6",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3174",
+            "srcId": "abt_feat6",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3175",
+            "srcId": "abt_feat6",
+            "dstId": "abt_feat6_icon",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3176",
+            "srcId": "abt_feat6",
+            "dstId": "abt_feat6_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3177",
+            "srcId": "abt_feat6",
+            "dstId": "abt_feat6_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3178",
+            "srcId": "abt_root",
+            "dstId": "abt_how",
+            "data": {
+                "rootId": "html_abt",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3179",
+            "srcId": "abt_how",
+            "dstId": "abt_how_title",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3180",
+            "srcId": "abt_how",
+            "dstId": "abt_steps_wrap",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3181",
+            "srcId": "abt_steps_wrap",
+            "dstId": "abt_step1",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3182",
+            "srcId": "abt_step1",
+            "dstId": "abt_step1_num",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3183",
+            "srcId": "abt_step1",
+            "dstId": "abt_step1_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3184",
+            "srcId": "abt_step1",
+            "dstId": "abt_step1_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3185",
+            "srcId": "abt_steps_wrap",
+            "dstId": "abt_step2",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3186",
+            "srcId": "abt_step2",
+            "dstId": "abt_step2_num",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3187",
+            "srcId": "abt_step2",
+            "dstId": "abt_step2_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3188",
+            "srcId": "abt_step2",
+            "dstId": "abt_step2_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3189",
+            "srcId": "abt_steps_wrap",
+            "dstId": "abt_step3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3190",
+            "srcId": "abt_step3",
+            "dstId": "abt_step3_num",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3191",
+            "srcId": "abt_step3",
+            "dstId": "abt_step3_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3192",
+            "srcId": "abt_step3",
+            "dstId": "abt_step3_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3193",
+            "srcId": "abt_steps_wrap",
+            "dstId": "abt_step4",
+            "data": {
+                "rootId": "html_abt",
+                "order": 3,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3194",
+            "srcId": "abt_step4",
+            "dstId": "abt_step4_num",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3195",
+            "srcId": "abt_step4",
+            "dstId": "abt_step4_h3",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3196",
+            "srcId": "abt_step4",
+            "dstId": "abt_step4_p",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3197",
+            "srcId": "abt_root",
+            "dstId": "abt_tech",
+            "data": {
+                "rootId": "html_abt",
+                "order": 4,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3198",
+            "srcId": "abt_tech",
+            "dstId": "abt_tech_h2",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3199",
+            "srcId": "abt_tech",
+            "dstId": "abt_tech_p1",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3200",
+            "srcId": "abt_tech",
+            "dstId": "abt_tech_p2",
+            "data": {
+                "rootId": "html_abt",
+                "order": 2,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3201",
+            "srcId": "abt_root",
+            "dstId": "abt_cta",
+            "data": {
+                "rootId": "html_abt",
+                "order": 5,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3202",
+            "srcId": "abt_cta",
+            "dstId": "abt_cta_h2",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3203",
+            "srcId": "abt_cta",
+            "dstId": "abt_cta_btn",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3204",
+            "srcId": "abt_cta_btn",
+            "dstId": "j_glow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3205",
+            "srcId": "abt_cta_btn",
+            "dstId": "j_unglow",
+            "data": {
+                "rootId": "html_abt",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3206",
+            "srcId": "abt_root",
+            "dstId": "abt_footer",
+            "data": {
+                "rootId": "html_abt",
+                "order": 6,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_3207",
+            "srcId": "abt_footer",
+            "dstId": "abt_footer_p",
+            "data": {
+                "rootId": "html_abt",
                 "order": 0,
                 "enabled": true
             }
