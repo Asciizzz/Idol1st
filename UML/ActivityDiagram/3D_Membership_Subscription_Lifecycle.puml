@@ -1,0 +1,87 @@
+@startuml 3D_Membership_Subscription_Lifecycle
+title 3-D · Membership Tier & Fan Subscription Lifecycle (UC-T23 to UC-T26, UC-F24 to UC-F29, UC-S01 to UC-S04)
+
+start
+|Tenant Admin (Owner)|
+:Open Membership Management;
+
+if (Admin action?) then (Create Tier)
+  :Enter tier name, price,\nbilling cycle and optional member cap;
+  :Add one or more tier perks;
+  |System|
+  :Validate tenant plan supports membership;
+  :Create MembershipTier and TierPerk records;
+elseif (Admin action?) then (Update Tier)
+  :Edit tier details or perks;
+  |System|
+  :Validate and save tier changes;
+elseif (Admin action?) then (Add Tier Perks)
+  :Add perk type and description;
+  |System|
+  :Create TierPerk record;
+else (Deactivate Tier)
+  :Confirm tier deactivation;
+  |System|
+  :Set tier inactive;\nprevent new subscriptions;
+endif
+
+|Registered Fan|
+:Open Membership page;
+:View active membership tiers;
+if (Fan action?) then (Subscribe)
+  :Select tier and payment method;
+elseif (Fan action?) then (Upgrade)
+  :Select higher tier;
+elseif (Fan action?) then (Downgrade)
+  :Select lower tier for next period;
+elseif (Fan action?) then (Cancel)
+  :Confirm cancellation;
+else (View Status)
+  |System|
+  :Load current subscription status;
+  stop
+endif
+
+|System|
+:Validate fan eligibility, tier active,\nmember cap and current subscription;
+if (Payment needed?) then (Yes)
+  :Process payment via selected PaymentStrategy;
+  if (Payment successful?) then (No)
+    :Do not change subscription;\nshow retry message;
+    stop
+  else (Yes)
+    :Continue subscription update;
+  endif
+else (No)
+  :Skip payment for free tier or scheduled change;
+endif
+
+if (Subscription action?) then (Subscribe/Upgrade)
+  :Create or update FanSubscription\nstatus = ACTIVE;
+  :Grant gated content access;
+elseif (Subscription action?) then (Downgrade)
+  :Schedule tier change for next billing period;
+else (Cancel)
+  :Set status = CANCELLED or cancel at period end;
+  :Set auto_renew = false;
+endif
+:Send subscription confirmation notification;
+
+|Scheduled Job Runner|
+:Run daily subscription lifecycle jobs;
+|System|
+:Check subscriptions expiring within 7 days;
+:Set status = EXPIRING and send reminders;
+if (auto_renew = true?) then (Yes)
+  :Attempt Auto-Renew Subscription;
+  if (Renewal payment succeeds?) then (Yes)
+    :Extend subscription end_date;
+  else (No)
+    :Handle failed payment and notify fan;
+  endif
+else (No)
+  :Expire overdue subscriptions when end_date passes;
+endif
+
+stop
+@enduml

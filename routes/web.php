@@ -70,7 +70,7 @@ Route::domain('{tenant}.idol1st.test')
                     '/checkout',
                     [FanSiteController::class,'checkout']
                 )->name('fan.checkout');
-                
+
                 Route::post(
                     '/checkout',
                     [FanSiteController::class,'placeOrder']

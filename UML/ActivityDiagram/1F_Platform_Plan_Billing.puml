@@ -1,0 +1,48 @@
+@startuml 1F_Platform_Plan_Billing
+title 1-F · Platform Plan & Billing Management (UC-P10 to UC-P13)
+
+start
+|Service Admin (Super Admin/Billing Admin)|
+:Log in to Platform Admin;
+:Open Plan & Billing Management;
+
+if (Admin action?) then (Create Plan)
+  :Enter plan name, price, billing cycle,\nfeature limits and active flag;
+  |System|
+  :Validate plan data;
+  if (Plan valid?) then (No)
+    :Return 422 validation error;
+    stop
+  else (Yes)
+    :Create Plan record;
+    :Write audit log;
+  endif
+elseif (Admin action?) then (Assign Plan to Tenant)
+  :Select tenant and active plan;
+  |System|
+  :Check MANAGE_PLANS permission;
+  :Validate tenant ACTIVE and plan active;
+  if (Assignment allowed?) then (No)
+    :Return 422/403 error;
+    stop
+  else (Yes)
+    :Store previous plan for rollback;
+    :Update TenantSubscription.plan_id;
+    :Refresh tenant feature entitlement;
+    :Write audit log;
+  endif
+elseif (Admin action?) then (Change Tenant Plan)
+  :Select target tenant subscription and new plan;
+  |System|
+  :Run PlanEligibilityPolicy;
+  :Update subscription and billing metadata;
+  :Write audit log;
+else (View Platform Invoices)
+  |System|
+  :Load platform invoices by tenant,\nstatus, date and provider reference;
+  |Service Admin (Super Admin/Billing Admin)|
+  :Filter, view invoice detail or export list;
+endif
+
+stop
+@enduml

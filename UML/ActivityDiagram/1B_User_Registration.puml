@@ -1,0 +1,38 @@
+@startuml 1B_User_Registration
+title 1-B · Fan Account Registration (UC-F01)
+
+start
+|Anonymous Visitor|
+:Open the tenant fansite sign-up page;
+:Enter email, username, password,\npassword confirmation and display name;
+
+|System|
+:Resolve tenant from domain / X-Tenant-ID;
+if (Tenant is ACTIVE?) then (No)
+  :Return 403 or maintenance page;
+  stop
+else (Yes)
+  :Validate registration fields;
+endif
+
+if (Email or username already used in this tenant?) then (Yes)
+  :Return 422 and prompt visitor to log in;
+  stop
+else (No)
+  if (Password meets policy?) then (No)
+    :Return password validation message;
+    stop
+  else (Yes)
+    :Hash password;
+    :Create Fan record scoped to tenant;
+    :Issue bearer token for Free fan;
+    :Send verification email if enabled;
+  endif
+endif
+
+|Registered Fan (Free)|
+:Open verification email if required;
+:Access fan profile page;
+:Can like, comment, RSVP,\nmanage addresses and buy merch;
+stop
+@enduml

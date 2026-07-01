@@ -1,0 +1,86 @@
+@startuml 3A_Blog_Post_Lifecycle
+title 3-A · Blog Post Lifecycle (UC-T10 to UC-T15, UC-F12 to UC-F17, UC-S10)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open Blog > New Post;
+:Enter title, rich-text content,\ncategory, tags and visibility;
+:Optionally upload cover image;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Validate title, content and visibility;
+if (Validation passed?) then (No)
+  :Return 422 validation error;
+  stop
+else (Yes)
+  :Create BlogPost record;
+endif
+
+|Tenant Admin (Owner/Admin)|
+if (Post action?) then (Save Draft)
+  |System|
+  :Set status = DRAFT;
+  stop
+elseif (Post action?) then (Publish Now)
+  |System|
+  :Set status = PUBLISHED;
+  :Set published_at = now();
+  :Notify eligible fans by in-app/email preferences;
+elseif (Post action?) then (Schedule)
+  |System|
+  :Set status = SCHEDULED;
+  :Store publish_at datetime;
+  |Scheduled Job Runner|
+  :Run Publish Scheduled Posts job;
+  |System|
+  :Set status = PUBLISHED when publish_at is due;
+  :Notify eligible fans;
+else (Archive)
+  |System|
+  :Set status = ARCHIVED;
+  stop
+endif
+
+|Anonymous Visitor / Registered Fan|
+:Browse blog list or open post detail;
+
+|System|
+:Apply content visibility strategy\n(PUBLIC / SUBSCRIBERS_ONLY / PAID_ONLY);
+if (Fan can access post?) then (No)
+  :Show preview and subscription/upgrade prompt;
+  stop
+else (Yes)
+  :Render post content;
+endif
+
+|Registered Fan|
+if (Interaction?) then (Like)
+  |System|
+  :Require logged-in fan;
+  :Create or update like record;
+elseif (Interaction?) then (Comment)
+  :Write comment;
+  |System|
+  :Require logged-in fan;
+  :Create BlogComment record;
+  if (Moderation required?) then (Yes)
+    :Mark comment pending/hidden until review;
+    |Tenant Admin (Owner/Admin)|
+    :Review comment;
+    if (Decision?) then (Restore/Approve)
+      |System|
+      :Set is_hidden = false;
+    else (Hide)
+      |System|
+      :Set is_hidden = true\nand preserve record for audit;
+    endif
+  else (No)
+    :Display comment immediately;
+  endif
+else (Read only)
+  :No interaction;
+endif
+
+stop
+@enduml

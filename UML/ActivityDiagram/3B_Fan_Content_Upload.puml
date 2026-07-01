@@ -1,0 +1,43 @@
+@startuml 3B_Fan_Content_Upload
+title 3-B · Media Gallery Upload & Fan Access (UC-T16, UC-F18, UC-F19)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open Media Gallery manager;
+:Choose media files and enter\nalbum/item title, description and visibility;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Validate file size, type and storage quota;
+if (Validation passed?) then (No)
+  :Return validation or plan error;
+  stop
+else (Yes)
+  :Upload media to storage;
+  :Create MediaGallery / MediaItem records;
+  :Save visibility level\n(PUBLIC / SUBSCRIBERS_ONLY / PAID_ONLY);
+  :Invalidate fansite cache;
+endif
+
+|Anonymous Visitor / Registered Fan|
+:Browse media galleries;
+
+|System|
+:Load visible galleries for tenant;
+if (Gallery requires subscription?) then (Yes)
+  if (Fan has active subscription/tier?) then (No)
+    :Show locked preview and subscription prompt;
+    stop
+  else (Yes)
+    :Allow gallery access;
+  endif
+else (No)
+  :Allow public gallery access;
+endif
+
+|Anonymous Visitor / Registered Fan|
+:Open a media item;
+|System|
+:Render media item and metadata;
+stop
+@enduml

@@ -1,0 +1,56 @@
+@startuml 1E_Platform_Landing_Discovery_Access
+title 1-E · Platform Landing Discovery & Returning Access (UC-L01 to UC-L04, UC-L10, UC-L11)
+
+start
+|Visitor (Prospective Tenant)|
+:Open Platform Landing Page;
+
+|System|
+:Render public marketing page;
+:Load active feature highlights,\npricing plans and demo/screenshots;
+
+|Visitor (Prospective Tenant)|
+if (Visitor action?) then (Browse Features)
+  :Browse feature sections;
+  |System|
+  :Display SaaS capabilities and module list;
+elseif (Visitor action?) then (View Pricing)
+  :Open pricing page;
+  |System|
+  :Fetch active public plans;
+  if (Plans available?) then (No)
+    :Display contact form or maintenance message;
+  else (Yes)
+    :Render plan comparison and CTA;
+  endif
+elseif (Visitor action?) then (View Demo)
+  :Open demo or screenshots page;
+  |System|
+  :Render demo assets and screenshots;
+else (Register)
+  :Proceed to Tenant Registration;
+endif
+
+|Returning Tenant Admin|
+if (Returning action?) then (Login)
+  :Click Login to Tenant Admin;
+  |System|
+  :Redirect to tenant admin login;
+elseif (Returning action?) then (Reset Password)
+  :Enter email for password reset;
+  |System|
+  :Validate tenant admin email;
+  if (Email exists?) then (Yes)
+    :Create password reset token;
+    :Send reset email;
+    |Returning Tenant Admin|
+    :Open reset link and submit new password;
+    |System|
+    :Validate token and update password hash;
+  else (No)
+    :Return generic reset response;
+  endif
+endif
+
+stop
+@enduml

@@ -21,7 +21,7 @@ export class VsbUI {
             pointerEvents: "none"
         });
 
-        document.body.appendChild(this.container);
+        document.getElementById('app').appendChild(this.container);
 
         // Temp edge SVG for drag-and-drop
         this.tempEdgeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -36,7 +36,7 @@ export class VsbUI {
         this.tempEdgePath.setAttribute("fill", "none");
         this.tempEdgePath.setAttribute("stroke-dasharray", "6 6");
         this.tempEdgeSvg.append(this.tempEdgePath);
-        document.body.appendChild(this.tempEdgeSvg);
+        document.getElementById('app').appendChild(this.tempEdgeSvg);
 
         this.ctx.mode = "CURSOR";
         this.ctx.edgeSrcId = null;
@@ -52,7 +52,7 @@ export class VsbUI {
 
         this.previewPanel = document.createElement("div");
         Object.assign(this.previewPanel.style, {
-            position: "absolute", top: "0", right: "0", bottom: "0", width: `${this.previewPanelWidth}%`,
+            position: "relative", width: `${this.previewPanelWidth}%`,
             background: "#1e1e21", borderLeft: "2px solid #3a3b40",
             display: "flex", flexDirection: "column", zIndex: "900",
             pointerEvents: "auto", boxShadow: "-4px 0 16px rgba(0,0,0,0.5)",
@@ -77,7 +77,7 @@ export class VsbUI {
         });
 
         this.previewPanel.append(this.previewTabs, this.previewContent);
-        document.body.appendChild(this.previewPanel);
+        document.getElementById('main-layout').appendChild(this.previewPanel);
 
         this.previewActiveTab = "preview";
         this.previewActiveTab = "preview";
@@ -186,7 +186,11 @@ export class VsbUI {
                                 }
                             }
                         }
-                        this.vsgraph.graph.addEdge(resolvedSrc, resolvedDst, { data: new nodetypes.VsbEdgeData() });
+                        const newEdgeData = new nodetypes.VsbEdgeData();
+                        if (this.ctx.selectedFileNodeId) {
+                            newEdgeData.rootId = this.ctx.selectedFileNodeId;
+                        }
+                        this.vsgraph.graph.addEdge(resolvedSrc, resolvedDst, { data: newEdgeData });
                         this.vsgraph.render();
                         this.triggerCompile();
                     }
@@ -681,7 +685,7 @@ export class VsbUI {
         }
         
         const selText = document.createElement("div");
-        selText.innerHTML = `Selected Node: ${selName}`;
+        selText.innerHTML = `Selected File: ${selName}`;
         headerRow.append(selText);
 
         const breadcrumbSep = document.createElement("div");
@@ -709,7 +713,8 @@ export class VsbUI {
             display: "flex",
             alignItems: "flex-start",
             gap: "10px",
-            pointerEvents: "none"
+            pointerEvents: "none",
+            position: "relative"
         });
 
         const mainCol = document.createElement("div");
@@ -969,33 +974,36 @@ export class VsbUI {
         if (this.activeSubMenu) {
             const subRow = document.createElement("div");
             Object.assign(subRow.style, {
+                position: "absolute",
+                left: "52px",
                 display: "flex",
                 gap: "8px",
-                background: "rgba(0, 0, 0, 0.95)",
-                padding: "8px",
-                borderRadius: "6px",
-                border: "2px solid #333",
                 pointerEvents: "auto",
-                boxShadow: "0 8px 16px rgba(0,0,0,0.4)",
-                backdropFilter: "blur(8px)",
-                marginTop: this.activeSubMenu === "ADD" ? "50px" : "100px"
+                top: this.activeSubMenu === "ADD" ? "50px" : "100px",
+                height: "42px",
+                alignItems: "center"
             });
             
             const createSubBtn = (label, hotkey, active, onClick) => {
                 const btn = document.createElement("div");
                 Object.assign(btn.style, {
                     boxSizing: "border-box",
-                    padding: "6px 10px",
-                    borderRadius: "4px",
+                    height: "42px",
+                    padding: "0 16px",
+                    borderRadius: "6px",
                     cursor: "pointer",
                     background: active ? "#ffffff" : "#0a0a0a",
                     color: active ? "#000000" : "#ffffff",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: "8px",
                     fontWeight: "bold",
                     transition: "background 0.1s, color 0.1s",
-                    border: active ? "2px solid #ffffff" : "2px solid #333"
+                    border: active ? "2px solid #ffffff" : "2px solid #333",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+                    backdropFilter: "blur(8px)",
+                    whiteSpace: "nowrap"
                 });
                 
                 btn.addEventListener("pointerenter", () => {

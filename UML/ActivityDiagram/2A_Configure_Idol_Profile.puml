@@ -1,0 +1,47 @@
+@startuml 2A_Configure_Idol_Profile
+title 2-A · Configure Idol Profile (UC-T03 to UC-T09)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Log in to Tenant Admin;
+:Open Idol Profile Management;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Load current idol profile, social links,\ngroup members and latest comeback data;
+
+|Tenant Admin (Owner/Admin)|
+if (Admin action?) then (Update Profile)
+  :Edit idol name, stage name, bio,\ndebut date and profile metadata;
+  |System|
+  :Validate required fields;
+  :Save IdolProfile changes;
+elseif (Admin action?) then (Upload Profile Images)
+  :Choose avatar, cover or gallery image;
+  |System|
+  :Validate size, type and tenant storage;
+  :Store image and link it to IdolProfile;
+elseif (Admin action?) then (Manage Social Links)
+  :Add, reorder, hide/show or remove social links;
+  |System|
+  :Validate URLs and save link order;
+elseif (Admin action?) then (Create Idol Group)
+  :Enter group name and description;
+  |System|
+  :Create IdolGroup for tenant;
+elseif (Admin action?) then (Manage Group Members)
+  :Add or edit member profile and role;
+  |System|
+  :Save group member list;
+else (Announce Comeback)
+  :Enter comeback title, date and announcement text;
+  |System|
+  :Save comeback announcement;
+  :Notify eligible fans if notification enabled;
+endif
+
+|System|
+:Update fansite cache/search data;
+:Fans can view the updated idol profile;
+stop
+@enduml

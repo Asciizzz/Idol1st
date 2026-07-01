@@ -1,0 +1,42 @@
+@startuml 5B_Module_Toggles
+title 5-B · Feature Flag & Module Access Toggles (UC-P14 to UC-P17)
+
+start
+|Service Admin (Super Admin/Ops)|
+:Open Feature Flag Management;
+if (Admin action?) then (Create Flag)
+  :Enter flag key, description and default value;
+  |System|
+  :Validate unique flag key;
+  :Create FeatureFlag record;
+elseif (Admin action?) then (Enable For Tenant)
+  :Select flag and tenant;
+  |System|
+  :Create or update TenantFeatureOverride\nis_enabled = true;
+elseif (Admin action?) then (Disable For Tenant)
+  :Select flag and tenant;
+  |System|
+  :Create or update TenantFeatureOverride\nis_enabled = false;
+else (Rollout Globally)
+  :Select flag and global value;
+  |System|
+  :Update global rollout state;
+endif
+
+|System|
+:Write audit log for feature change;
+:FeatureFlagManagementService.evaluateFlag()\nreturns value by global default + tenant override;
+
+|Tenant Admin / Fan|
+:Request module or API protected by feature flag;
+
+|System|
+:Run EnforceFeatureFlag middleware;
+if (Feature enabled for tenant?) then (Yes)
+  :Allow module access;
+else (No)
+  :Hide module or return 403/upgrade prompt;
+endif
+
+stop
+@enduml

@@ -1,0 +1,61 @@
+@startuml 1C_User_Login
+title 1-C · User Login & Token Issuance (UC-P01, UC-P02, UC-T01, UC-F02)
+
+start
+|User|
+:Open the correct login page\n(Platform Admin / Tenant Admin / Fan);
+:Enter email and password;
+
+|System|
+:Identify authentication context;
+:Validate credentials and account status;
+if (Credentials valid?) then (No)
+  :Return 401 authentication error;
+  stop
+else (Yes)
+  if (Tenant-scoped login?) then (Yes)
+    :Resolve tenant and check status;
+    if (Tenant ACTIVE?) then (No)
+      :Return 403 tenant unavailable;
+      stop
+    else (Yes)
+      :Continue authentication;
+    endif
+  else (No)
+    :Continue platform admin login;
+  endif
+endif
+
+if (Platform Admin with MFA enabled?) then (Yes)
+  :Issue partial token\nmfa_required = true;
+  |Service Admin|
+  :Enter 6-digit TOTP token;
+  |System|
+  :Verify MFA token;
+  if (MFA token valid?) then (No)
+    :Return 422 and require retry;
+    stop
+  else (Yes)
+    :Issue full bearer token;
+  endif
+else (No)
+  :Issue bearer token;
+endif
+
+|System|
+:Attach role, tenant scope and permissions to token;
+:Update last_login_at;
+
+if (Resolved role?) then (Service Admin)
+  |Service Admin|
+  :Open Platform Admin dashboard;
+elseif (Resolved role?) then (Tenant Admin)
+  |Tenant Admin|
+  :Open Tenant Admin dashboard;
+else (Registered Fan)
+  |Registered Fan|
+  :Return to fansite as logged-in fan;
+endif
+
+stop
+@enduml

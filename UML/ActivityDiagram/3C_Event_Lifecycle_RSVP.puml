@@ -1,0 +1,67 @@
+@startuml 3C_Event_Lifecycle_RSVP
+title 3-C · Event Lifecycle, RSVP & Reminders (UC-T19 to UC-T22, UC-F20 to UC-F23, UC-S11)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open Events > New Event;
+:Enter title, description, event type,\nstart/end time, location, ticket URL and visibility;
+
+|System|
+:Validate tenant ACTIVE and event data;
+if (Event valid?) then (No)
+  :Return 422 validation error;
+  stop
+else (Yes)
+  :Create IdolEvent status = UPCOMING;
+  :Notify eligible fans if enabled;
+endif
+
+|Tenant Admin (Owner/Admin)|
+if (Admin action?) then (Update Event)
+  :Edit event details or visibility;
+  |System|
+  :Validate and save event changes;
+elseif (Admin action?) then (Cancel Event)
+  :Confirm cancellation reason;
+  |System|
+  :Set event status = CANCELLED;
+  :Notify fans with RSVP if enabled;
+else (View Attendance Report)
+  |System|
+  :Aggregate RSVP counts and fan list;
+  |Tenant Admin (Owner/Admin)|
+  :View attendance report;
+endif
+
+|Anonymous Visitor / Registered Fan|
+:Browse public or subscriber events;
+
+|System|
+:Apply event visibility rules;
+if (Fan can view event?) then (No)
+  :Show locked preview or upgrade prompt;
+  stop
+else (Yes)
+  :Render event detail;
+endif
+
+|Registered Fan|
+if (Fan action?) then (RSVP)
+  :Select GOING, INTERESTED or NOT_GOING;
+elseif (Fan action?) then (Change RSVP)
+  :Choose a new RSVP status;
+else (No RSVP)
+  stop
+endif
+
+|System|
+:Require logged-in fan;
+:Create or update EventRsvp\n(unique event_id + fan_id);
+:Return updated RSVP counts;
+
+|Scheduled Job Runner|
+:Run Send Event Reminders job before event time;
+|System|
+:Deliver in-app/email reminders to eligible fans;
+stop
+@enduml
