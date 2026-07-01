@@ -52,7 +52,7 @@ export class VsbUI {
 
         this.previewPanel = document.createElement("div");
         Object.assign(this.previewPanel.style, {
-            position: "absolute", top: "0", right: "0", bottom: "0", width: `${this.previewPanelWidth}%`,
+            position: "relative", width: `${this.previewPanelWidth}%`,
             background: "#1e1e21", borderLeft: "2px solid #3a3b40",
             display: "flex", flexDirection: "column", zIndex: "900",
             pointerEvents: "auto", boxShadow: "-4px 0 16px rgba(0,0,0,0.5)",
@@ -77,7 +77,7 @@ export class VsbUI {
         });
 
         this.previewPanel.append(this.previewTabs, this.previewContent);
-        document.getElementById('app').appendChild(this.previewPanel);
+        document.getElementById('main-layout').appendChild(this.previewPanel);
 
         this.previewActiveTab = "preview";
         this.previewActiveTab = "preview";

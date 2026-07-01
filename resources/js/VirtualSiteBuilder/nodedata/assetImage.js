@@ -38,12 +38,17 @@ export class VsbAssetImageData extends VsbElementData {
         });
 
         const urlLabel = createLabel("Asset URL");
-        const urlDisplay = document.createElement("div");
-        Object.assign(urlDisplay.style, {
+        const urlInput = document.createElement("input");
+        Object.assign(urlInput.style, {
             ...inputStyle,
-            wordBreak: "break-all",
             fontSize: "10px",
             color: "#8b93a7"
+        });
+        urlInput.addEventListener("pointerdown", e => e.stopPropagation());
+        urlInput.addEventListener("keydown", e => e.stopPropagation());
+        urlInput.addEventListener("change", (e) => {
+            node.data.url = e.target.value;
+            if (vsgraph) vsgraph.render();
         });
 
         const previewContainer = document.createElement("div");
@@ -67,10 +72,10 @@ export class VsbAssetImageData extends VsbElementData {
         });
         previewContainer.appendChild(imgPreview);
 
-        cache.body.append(fileLabel, fileInput, urlLabel, urlDisplay, previewContainer);
+        cache.body.append(fileLabel, fileInput, urlLabel, urlInput, previewContainer);
 
         cache.fileInput = fileInput;
-        cache.urlDisplay = urlDisplay;
+        cache.urlInput = urlInput;
         cache.imgPreview = imgPreview;
         cache.previewContainer = previewContainer;
 
@@ -103,10 +108,21 @@ export class VsbAssetImageData extends VsbElementData {
                 assetData = vsgraph.ctx.getAsset(data.assetId);
             }
             
-            // Fallback for pre-existing json without assetId but with url
-            const url = assetData ? assetData.url : data.url;
+            if (assetData) {
+                if (document.activeElement !== cache.urlInput) {
+                    cache.urlInput.value = assetData.url;
+                }
+                cache.urlInput.disabled = true;
+                cache.urlInput.style.opacity = "0.5";
+            } else {
+                if (document.activeElement !== cache.urlInput) {
+                    cache.urlInput.value = data.url || "";
+                }
+                cache.urlInput.disabled = false;
+                cache.urlInput.style.opacity = "1";
+            }
             
-            cache.urlDisplay.textContent = url || "No Asset Selected";
+            const url = assetData ? assetData.url : data.url;
             
             if (url) {
                 cache.imgPreview.src = url;

@@ -1,2120 +1,2154 @@
 {
-    "label": "VTuber Pro Site",
-    "_nextNodeId": 1001,
-    "_nextEdgeId": 1091,
+    "label": "VTuber Multi-Page Site",
+    "_nextNodeId": 9999,
+    "_nextEdgeId": 9999,
     "nodes": [
         {
-            "id": "css_main",
+            "id": "n_html_index",
             "data": {
+                "type": "HTML",
+                "name": "index",
                 "vsgdata": {
-                    "x": -400,
-                    "y": -200,
+                    "x": -1200,
+                    "y": 0,
                     "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS",
-                "name": "main",
-                "collapsed": true
+                    "collapsed": false
+                }
             }
         },
         {
-            "id": "js_app",
+            "id": "n_html_about",
             "data": {
+                "type": "HTML",
+                "name": "about",
                 "vsgdata": {
-                    "x": -400,
-                    "y": -400,
+                    "x": -1200,
+                    "y": 1000,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "n_html_stream",
+            "data": {
+                "type": "HTML",
+                "name": "stream",
+                "vsgdata": {
+                    "x": -1200,
+                    "y": 2000,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "n_css",
+            "data": {
+                "type": "CSS",
+                "name": "main_styles",
+                "vsgdata": {
+                    "x": -1200,
+                    "y": 3000,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "n_js",
+            "data": {
+                "type": "JS",
+                "name": "app_logic",
+                "vsgdata": {
+                    "x": -1200,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                }
+            }
+        },
+        {
+            "id": "c_reset",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Reset",
+                "vsgdata": {
+                    "x": -800,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "JS",
-                "name": "app",
-                "collapsed": true
+                "selector": "*",
+                "code": "margin: 0;\npadding: 0;\nbox-sizing: border-box;"
             }
         },
         {
             "id": "c_body",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Body",
                 "vsgdata": {
-                    "x": -700,
-                    "y": -200,
+                    "x": -500,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "body",
                 "selector": "body",
-                "code": "margin: 0;\nfont-family: 'Quicksand', sans-serif;\nbackground: #fff0f5;\ncolor: #4a4a4a;\noverflow-x: hidden;",
-                "collapsed": true
+                "code": "background-color: #0b0c10;\ncolor: #c5c6c7;\nfont-family: 'Inter', sans-serif;\noverflow-x: hidden;\ntransition: background 0.5s ease;"
             }
         },
         {
-            "id": "c_nav",
+            "id": "c_body_disco",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Disco Class",
                 "vsgdata": {
-                    "x": -1000,
-                    "y": -200,
+                    "x": -200,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
+                "selector": "body.disco-mode",
+                "code": "background: linear-gradient(45deg, #1f0033, #33001b);"
+            }
+        },
+        {
+            "id": "c_header",
+            "data": {
                 "type": "CSS_RULE",
-                "name": "nav",
-                "selector": "nav",
-                "code": "display: flex;\njustify-content: space-around;\nalign-items: center;\npadding: 15px 30px;\nbackground: #ff69b4;\nbox-shadow: 0 4px 15px rgba(255,105,180,0.4);\nposition: sticky;\ntop: 0;\nz-index: 100;",
-                "collapsed": true
+                "name": "Header",
+                "vsgdata": {
+                    "x": 100,
+                    "y": 3000,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".header",
+                "code": "position: fixed;\ntop: 0;\nwidth: 100%;\npadding: 20px 50px;\ndisplay: flex;\njustify-content: space-between;\nalign-items: center;\nbackground: rgba(11, 12, 16, 0.8);\nbackdrop-filter: blur(15px);\nz-index: 100;\nborder-bottom: 1px solid rgba(102, 252, 241, 0.2);\nbox-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);"
             }
         },
         {
             "id": "c_logo",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Logo",
                 "vsgdata": {
-                    "x": -1300,
-                    "y": -200,
+                    "x": 400,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".logo",
                 "selector": ".logo",
-                "code": "font-size: 2rem;\nfont-weight: 800;\ncolor: #fff;\ntext-shadow: 2px 2px 0px #ff1493;",
-                "collapsed": true
+                "code": "font-size: 28px;\nfont-weight: 900;\ncolor: #66fcf1;\ntext-shadow: 0 0 10px rgba(102, 252, 241, 0.5);\ncursor: pointer;"
             }
         },
         {
-            "id": "c_nav_link",
+            "id": "c_nav",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Nav",
                 "vsgdata": {
-                    "x": -1300,
-                    "y": -100,
+                    "x": 700,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".nav-link",
-                "selector": ".nav-link",
-                "code": "color: #fff;\ntext-decoration: none;\nfont-weight: bold;\nfont-size: 1.1rem;\ncursor: pointer;\ntransition: transform 0.2s, color 0.2s;",
-                "collapsed": true
+                "selector": ".nav-links",
+                "code": "display: flex;\ngap: 40px;"
             }
         },
         {
-            "id": "c_nav_link_hov",
+            "id": "c_nav_item",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Nav Item",
                 "vsgdata": {
-                    "x": -1000,
-                    "y": -100,
+                    "x": 1000,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".nav-link:hover",
-                "selector": ".nav-link:hover",
-                "code": "color: #ffe4e1;\ntransform: scale(1.1);",
-                "collapsed": true
+                "selector": ".nav-item",
+                "code": "cursor: pointer;\nfont-weight: 600;\ncolor: #45a29e;\ntransition: all 0.3s;\ntext-transform: uppercase;\nletter-spacing: 2px;"
             }
         },
         {
-            "id": "c_hero",
+            "id": "c_nav_item_hover",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Nav Hover",
                 "vsgdata": {
-                    "x": -700,
-                    "y": -100,
+                    "x": 1300,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".hero",
-                "selector": ".hero",
-                "code": "display: flex;\nflex-direction: column;\nalign-items: center;\njustify-content: center;\nmin-height: 80vh;\ntext-align: center;\npadding: 40px;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_hero_title",
-            "data": {
-                "vsgdata": {
-                    "x": -700,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": ".hero h1",
-                "selector": ".hero h1",
-                "code": "font-size: 4rem;\ncolor: #ff1493;\nmargin-bottom: 20px;\ntext-transform: uppercase;\nletter-spacing: 2px;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_hero_subtitle",
-            "data": {
-                "vsgdata": {
-                    "x": -1000,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": ".hero p",
-                "selector": ".hero p",
-                "code": "font-size: 1.5rem;\ncolor: #ff69b4;\nmax-width: 600px;",
-                "collapsed": true
+                "selector": ".nav-item:hover",
+                "code": "color: #66fcf1;\ntext-shadow: 0 0 15px rgba(102, 252, 241, 0.8);\ntransform: translateY(-2px);"
             }
         },
         {
             "id": "c_section",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Section Base",
                 "vsgdata": {
-                    "x": -1300,
-                    "y": 0,
+                    "x": 1600,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "section",
-                "selector": "section",
-                "code": "padding: 60px 20px;\nmax-width: 1000px;\nmargin: 0 auto;",
-                "collapsed": true
+                "selector": ".section",
+                "code": "padding: 120px 50px 50px;\nmin-height: 100vh;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;"
             }
         },
         {
-            "id": "c_card_grid",
+            "id": "c_hero",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Hero Container",
                 "vsgdata": {
-                    "x": -1300,
-                    "y": 100,
+                    "x": 1900,
+                    "y": 3000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".card-grid",
-                "selector": ".card-grid",
-                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\ngap: 30px;\nmargin-top: 40px;",
-                "collapsed": true
+                "selector": ".hero",
+                "code": "justify-content: center;\ntext-align: center;\nbackground: radial-gradient(circle at center, #1f2833 0%, #0b0c10 70%);"
             }
         },
         {
-            "id": "c_card",
+            "id": "c_title",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Hero Title",
                 "vsgdata": {
-                    "x": -1000,
-                    "y": 100,
+                    "x": -800,
+                    "y": 3150,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": ".card",
-                "selector": ".card",
-                "code": "background: #fff;\nborder-radius: 20px;\npadding: 20px;\nbox-shadow: 0 10px 30px rgba(255,105,180,0.15);\ntransition: transform 0.3s ease;\nborder: 2px solid #ffe4e1;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_card_hov",
-            "data": {
-                "vsgdata": {
-                    "x": -700,
-                    "y": 100,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": ".card:hover",
-                "selector": ".card:hover",
-                "code": "transform: translateY(-10px);\nborder-color: #ff69b4;",
-                "collapsed": true
+                "selector": ".hero-title",
+                "code": "font-size: 90px;\nfont-weight: 900;\nline-height: 1;\nbackground: linear-gradient(to right, #66fcf1, #45a29e);\n-webkit-background-clip: text;\n-webkit-text-fill-color: transparent;\nanimation: pulse 2s infinite;"
             }
         },
         {
             "id": "c_btn",
             "data": {
-                "vsgdata": {
-                    "x": -700,
-                    "y": 200,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "CSS_RULE",
-                "name": ".btn",
-                "selector": ".btn",
-                "code": "background: linear-gradient(45deg, #ff69b4, #ff1493);\ncolor: #fff;\npadding: 15px 40px;\nborder: none;\nborder-radius: 30px;\nfont-size: 1.2rem;\nfont-weight: bold;\ncursor: pointer;\nbox-shadow: 0 5px 15px rgba(255,20,147,0.3);\ntransition: all 0.3s ease;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_btn_hov",
-            "data": {
-                "vsgdata": {
-                    "x": -1000,
-                    "y": 200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": ".btn:hover",
-                "selector": ".btn:hover",
-                "code": "transform: scale(1.05);\nbox-shadow: 0 8px 20px rgba(255,20,147,0.5);",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_gallery_img",
-            "data": {
-                "vsgdata": {
-                    "x": -1300,
-                    "y": 200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": "Gallery Image",
-                "selector": ".gallery-img",
-                "code": "width: 100%;\nheight: 200px;\nobject-fit: cover;\nborder-radius: 10px;\nmargin-bottom: 15px;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "in_nav_links",
-            "data": {
+                "name": "Primary Button",
                 "vsgdata": {
                     "x": -500,
-                    "y": 700,
+                    "y": 3150,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "Nav Flex",
-                "selector": "",
-                "code": "display:flex;\ngap: 20px;",
-                "collapsed": true
+                "selector": ".btn",
+                "code": "margin-top: 30px;\npadding: 15px 40px;\nbackground: transparent;\nborder: 2px solid #66fcf1;\nborder-radius: 5px;\ncolor: #66fcf1;\nfont-size: 18px;\nfont-weight: bold;\ncursor: pointer;\ntransition: 0.3s;\ntext-transform: uppercase;\nletter-spacing: 3px;"
             }
         },
         {
-            "id": "in_sec_title",
+            "id": "c_btn_hover",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Btn Hover",
                 "vsgdata": {
-                    "x": -750,
-                    "y": 750,
+                    "x": -200,
+                    "y": 3150,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "Sec Title",
-                "selector": "",
-                "code": "color: #ff1493;\ntext-align: center;",
-                "collapsed": true
+                "selector": ".btn:hover",
+                "code": "background: #66fcf1;\ncolor: #0b0c10;\nbox-shadow: 0 0 20px rgba(102, 252, 241, 0.6);\ntransform: scale(1.05);"
             }
         },
         {
-            "id": "in_lore_grid",
+            "id": "c_grid",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Grid",
                 "vsgdata": {
-                    "x": -550,
-                    "y": 850,
+                    "x": 100,
+                    "y": 3150,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "Lore Grid",
-                "selector": "",
-                "code": "display: flex;\ngap: 30px;\nalign-items: center;\njustify-content: center;",
-                "collapsed": true
+                "selector": ".grid",
+                "code": "display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\ngap: 30px;\nwidth: 100%;\nmax-width: 1200px;\nmargin-top: 50px;"
             }
         },
         {
-            "id": "in_lore_img",
+            "id": "c_card",
             "data": {
+                "type": "CSS_RULE",
+                "name": "Card",
+                "vsgdata": {
+                    "x": 400,
+                    "y": 3150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".card",
+                "code": "background: #1f2833;\nborder-radius: 15px;\npadding: 30px;\ntext-align: center;\nborder: 1px solid rgba(255,255,255,0.05);\ntransition: 0.3s;"
+            }
+        },
+        {
+            "id": "c_card_hover",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Card Hover",
+                "vsgdata": {
+                    "x": 700,
+                    "y": 3150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".card:hover",
+                "code": "transform: translateY(-10px);\nborder-color: #45a29e;\nbox-shadow: 0 15px 30px rgba(0,0,0,0.5);"
+            }
+        },
+        {
+            "id": "c_stream_layout",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Stream Layout",
+                "vsgdata": {
+                    "x": 1000,
+                    "y": 3150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".stream-layout",
+                "code": "display: flex;\nwidth: 100%;\nmax-width: 1600px;\ngap: 20px;\nheight: 70vh;\nmargin-top: 40px;"
+            }
+        },
+        {
+            "id": "c_video_player",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Video Player",
+                "vsgdata": {
+                    "x": 1300,
+                    "y": 3150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".video-player",
+                "code": "flex: 3;\nbackground: #000;\nborder-radius: 10px;\ndisplay: flex;\nalign-items: center;\njustify-content: center;\nfont-size: 24px;\ncolor: #45a29e;\nborder: 1px solid #1f2833;"
+            }
+        },
+        {
+            "id": "c_chat_box",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Chat Box",
+                "vsgdata": {
+                    "x": 1600,
+                    "y": 3150,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "selector": ".chat-box",
+                "code": "flex: 1;\nbackground: #1f2833;\nborder-radius: 10px;\npadding: 20px;\ndisplay: flex;\nflex-direction: column;\ngap: 15px;\nborder: 1px solid rgba(102, 252, 241, 0.2);"
+            }
+        },
+        {
+            "id": "j_nav_home",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Go Home",
                 "vsgdata": {
                     "x": -800,
-                    "y": 900,
+                    "y": 4000,
                     "z": 0,
-                    "collapsed": true
+                    "collapsed": false
                 },
-                "type": "CSS_RULE",
-                "name": "Lore Img",
-                "selector": "",
-                "code": "border-radius: 20px;\nmax-width: 300px;\nbox-shadow: 0 10px 30px rgba(0,0,0,0.2);",
-                "collapsed": true
+                "event": "click",
+                "code": "alert('Routing to Home (index.html)');"
             }
         },
         {
-            "id": "in_lore_txt",
+            "id": "j_nav_about",
             "data": {
+                "type": "JS_EVENT",
+                "name": "Go About",
                 "vsgdata": {
-                    "x": -450,
+                    "x": -350,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "event": "click",
+                "code": "alert('Routing to About Lore (about.html)');"
+            }
+        },
+        {
+            "id": "j_nav_stream",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Go Stream",
+                "vsgdata": {
+                    "x": 100,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "event": "click",
+                "code": "alert('Loading Live Stream Interface (stream.html)');"
+            }
+        },
+        {
+            "id": "j_disco",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Toggle Disco Mode",
+                "vsgdata": {
+                    "x": 550,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "event": "click",
+                "code": "document.body.classList.toggle('disco-mode');\nalert('DISCO MODE INITIATED!');"
+            }
+        },
+        {
+            "id": "j_color_shift",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Hacker Color Shift",
+                "vsgdata": {
+                    "x": 1000,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "event": "pointerenter",
+                "code": "event.target.style.filter = `hue-rotate(${Math.random() * 360}deg)`;"
+            }
+        },
+        {
+            "id": "j_chat_spam",
+            "data": {
+                "type": "JS_EVENT",
+                "name": "Simulate Chat",
+                "vsgdata": {
+                    "x": 1450,
+                    "y": 4000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "event": "click",
+                "code": "alert('Chat: POGCHAMP!\\nChat: LOL\\nChat: KUSA');"
+            }
+        },
+        {
+            "id": "e_index_wrap",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Body Wrap",
+                "vsgdata": {
+                    "x": -800,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div"
+            }
+        },
+        {
+            "id": "e_header_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Header",
+                "vsgdata": {
+                    "x": -500,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "header",
+                "attrsText": "class='header'"
+            }
+        },
+        {
+            "id": "e_logo_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Logo",
+                "vsgdata": {
+                    "x": -200,
+                    "y": -300,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='logo'",
+                "text": "ASTRAL.VT"
+            }
+        },
+        {
+            "id": "e_nav_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav",
+                "vsgdata": {
+                    "x": -200,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "nav",
+                "attrsText": "class='nav-links'"
+            }
+        },
+        {
+            "id": "e_nav1_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav Home",
+                "vsgdata": {
+                    "x": 100,
+                    "y": -200,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "HOME"
+            }
+        },
+        {
+            "id": "e_nav2_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav About",
+                "vsgdata": {
+                    "x": 100,
+                    "y": -100,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "LORE"
+            }
+        },
+        {
+            "id": "e_nav3_n_html_index",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav Stream",
+                "vsgdata": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "LIVE"
+            }
+        },
+        {
+            "id": "e_index_hero",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Section",
+                "vsgdata": {
+                    "x": -500,
+                    "y": 200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "section",
+                "attrsText": "class='section hero'"
+            }
+        },
+        {
+            "id": "e_hero_title",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Title",
+                "vsgdata": {
+                    "x": -200,
+                    "y": 100,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "h1",
+                "attrsText": "class='hero-title'",
+                "text": "VIRTUAL REALITY"
+            }
+        },
+        {
+            "id": "c_inline_glow",
+            "data": {
+                "type": "CSS_RULE",
+                "name": "Inline Text Glow",
+                "vsgdata": {
+                    "x": 200,
+                    "y": 50,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "code": "text-shadow: 0 0 50px rgba(102, 252, 241, 0.9);\ntransition: filter 0.3s;"
+            }
+        },
+        {
+            "id": "e_hero_sub",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Hero Subtitle",
+                "vsgdata": {
+                    "x": -200,
+                    "y": 250,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "p",
+                "attrsText": "style='font-size: 24px; color: #45a29e; margin-top: 20px;'",
+                "text": "The next generation idol is live."
+            }
+        },
+        {
+            "id": "e_hero_btn",
+            "data": {
+                "type": "ELEMENT",
+                "name": "CTA Button",
+                "vsgdata": {
+                    "x": -200,
+                    "y": 400,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "button",
+                "attrsText": "class='btn'",
+                "text": "INITIATE DISCO PROTOCOL"
+            }
+        },
+        {
+            "id": "e_about_wrap",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Body Wrap",
+                "vsgdata": {
+                    "x": -800,
                     "y": 1000,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "CSS_RULE",
-                "name": "Lore Txt",
-                "selector": "",
-                "code": "font-size: 1.2rem;\nline-height: 1.8;",
-                "collapsed": true
+                "tag": "div"
             }
         },
         {
-            "id": "in_card_txt",
+            "id": "e_header_n_html_about",
             "data": {
-                "vsgdata": {
-                    "x": -750,
-                    "y": 1050,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": "Card Txt",
-                "selector": "",
-                "code": "text-align:center;\nfont-weight:bold;\ncolor: #ff69b4;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "c_inline_img",
-            "data": {
+                "type": "ELEMENT",
+                "name": "Header",
                 "vsgdata": {
                     "x": -500,
-                    "y": 1150,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "CSS_RULE",
-                "name": "Hero Img",
-                "selector": "",
-                "code": "width: 100%;\nmax-width: 400px;\nborder-radius: 50%;\nborder: 8px solid #ffe4e1;\nbox-shadow: 0 10px 30px rgba(255,105,180,0.3);\nmargin-top: 30px;\nobject-fit: cover;",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "j_nav_alert",
-            "data": {
-                "vsgdata": {
-                    "x": 400,
-                    "y": -400,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "JS_EVENT",
-                "name": "Nav Link Click",
-                "event": "click",
-                "code": "alert('Navigating to: ' + event.currentTarget.innerText.trim().toLowerCase() + '.html');",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "j_btn_alert",
-            "data": {
-                "vsgdata": {
-                    "x": 800,
-                    "y": -400,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "JS_EVENT",
-                "name": "Subscribe Click",
-                "event": "click",
-                "code": "alert('Thank you for supporting!');\nevent.currentTarget.innerText = 'Subscribed! 💖';",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "html_index",
-            "data": {
-                "vsgdata": {
-                    "x": 0,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "HTML",
-                "name": "index",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_nav",
-            "data": {
-                "vsgdata": {
-                    "x": 300,
-                    "y": -200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Navbar",
-                "tag": "nav",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_logo",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": -300,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Logo",
-                "tag": "div",
-                "attrsText": "class='logo'",
-                "text": "🌟 VTuber Site",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_links",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": -100,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Nav Links",
-                "tag": "div",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_l1",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": -200,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Home Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Home",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_l2",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": -100,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "About Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "About",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_l3",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 0,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Gallery Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Gallery",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_hero",
-            "data": {
-                "vsgdata": {
-                    "x": 300,
-                    "y": 300,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Hero Section",
-                "tag": "section",
-                "attrsText": "class='hero'",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_h1",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 200,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ELEMENT",
-                "name": "Hero Title",
-                "tag": "h1",
-                "attrsText": "",
-                "text": "Welcome to my Virtual World! ✨",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "idx_hp",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 300,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ELEMENT",
-                "name": "Hero Text",
-                "tag": "p",
-                "attrsText": "",
-                "text": "I'm a virtual idol streaming games, songs, and comfy chats. Join the family!",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "idx_hero_img",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 400,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Hero Image",
-                "tag": "img",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "idx_btn",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 500,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ELEMENT",
-                "name": "Subscribe Btn",
-                "tag": "button",
-                "attrsText": "class='btn'",
-                "text": "Become a Member!",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "idx_hero_asset",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 400,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ASSET_IMAGE",
-                "name": "Hero Character Art",
-                "url": "",
-                "filename": "Select Character Art",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "html_about",
-            "data": {
-                "vsgdata": {
-                    "x": 0,
                     "y": 800,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "HTML",
-                "name": "about",
-                "collapsed": true
+                "tag": "header",
+                "attrsText": "class='header'"
             }
         },
         {
-            "id": "abt_nav",
+            "id": "e_logo_n_html_about",
             "data": {
-                "vsgdata": {
-                    "x": 300,
-                    "y": 600,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Navbar",
-                "tag": "nav",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "abt_logo",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 550,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "ELEMENT",
                 "name": "Logo",
+                "vsgdata": {
+                    "x": -200,
+                    "y": 700,
+                    "z": 0,
+                    "collapsed": false
+                },
                 "tag": "div",
                 "attrsText": "class='logo'",
-                "text": "🌟 VTuber Site",
-                "collapsed": true
+                "text": "ASTRAL.VT"
             }
         },
         {
-            "id": "abt_links",
+            "id": "e_nav_n_html_about",
             "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 650,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "ELEMENT",
-                "name": "Nav Links",
-                "tag": "div",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "abt_l1",
-            "data": {
+                "name": "Nav",
                 "vsgdata": {
-                    "x": 900,
-                    "y": 550,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Home Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Home",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "abt_l2",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 650,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "About Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "About",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "abt_l3",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 750,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Gallery Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Gallery",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "abt_sec",
-            "data": {
-                "vsgdata": {
-                    "x": 300,
+                    "x": -200,
                     "y": 900,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "About Section",
-                "tag": "section",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
+                "tag": "nav",
+                "attrsText": "class='nav-links'"
             }
         },
         {
-            "id": "abt_h1",
+            "id": "e_nav1_n_html_about",
             "data": {
+                "type": "ELEMENT",
+                "name": "Nav Home",
                 "vsgdata": {
-                    "x": 600,
+                    "x": 100,
                     "y": 800,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "About Title",
-                "tag": "h1",
-                "attrsText": "",
-                "text": "About Me",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "abt_grid",
-            "data": {
-                "vsgdata": {
-                    "x": 600,
-                    "y": 950,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Lore Grid",
                 "tag": "div",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
+                "attrsText": "class='nav-item'",
+                "text": "HOME"
             }
         },
         {
-            "id": "abt_img_el",
+            "id": "e_nav2_n_html_about",
             "data": {
+                "type": "ELEMENT",
+                "name": "Nav About",
                 "vsgdata": {
-                    "x": 900,
-                    "y": 850,
+                    "x": 100,
+                    "y": 900,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "LORE"
+            }
+        },
+        {
+            "id": "e_nav3_n_html_about",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav Stream",
+                "vsgdata": {
+                    "x": 100,
+                    "y": 1000,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "LIVE"
+            }
+        },
+        {
+            "id": "e_about_sec",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Lore Section",
+                "vsgdata": {
+                    "x": -500,
+                    "y": 1200,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Lore Image",
-                "tag": "img",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
+                "tag": "section",
+                "attrsText": "class='section'"
             }
         },
         {
-            "id": "abt_txt",
+            "id": "e_about_title",
             "data": {
+                "type": "ELEMENT",
+                "name": "Title",
                 "vsgdata": {
-                    "x": 900,
+                    "x": -200,
                     "y": 1050,
                     "z": 0,
                     "collapsed": false
                 },
+                "tag": "h2",
+                "attrsText": "style='font-size: 50px; color: #66fcf1;'",
+                "text": "ARCHIVE // LORE"
+            }
+        },
+        {
+            "id": "e_grid",
+            "data": {
                 "type": "ELEMENT",
-                "name": "Lore Text",
-                "tag": "p",
-                "attrsText": "",
-                "text": "[Replace this text with your VTuber lore. Tell your fans about your backstory, your goals, and what makes your streams unique!]",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "abt_asset",
-            "data": {
+                "name": "Stats Grid",
                 "vsgdata": {
-                    "x": 1200,
-                    "y": 850,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ASSET_IMAGE",
-                "name": "Full Body Art",
-                "url": "",
-                "filename": "Select Full Body Art",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "html_gallery",
-            "data": {
-                "vsgdata": {
-                    "x": 0,
-                    "y": 1600,
+                    "x": -200,
+                    "y": 1200,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "HTML",
-                "name": "gallery",
-                "collapsed": true
+                "tag": "div",
+                "attrsText": "class='grid'"
             }
         },
         {
-            "id": "gal_nav",
+            "id": "e_card1",
             "data": {
+                "type": "ELEMENT",
+                "name": "Card 1",
                 "vsgdata": {
-                    "x": 300,
+                    "x": 200,
+                    "y": 1250,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div",
+                "attrsText": "class='card'"
+            }
+        },
+        {
+            "id": "e_card_t1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Title",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 1200,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "h3",
+                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
+                "text": "ORIGIN"
+            }
+        },
+        {
+            "id": "e_card_p1",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Text",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 1270,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "p",
+                "text": "Constructed in Sector 7."
+            }
+        },
+        {
+            "id": "e_card2",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Card 2",
+                "vsgdata": {
+                    "x": 200,
                     "y": 1400,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Navbar",
-                "tag": "nav",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
+                "tag": "div",
+                "attrsText": "class='card'"
             }
         },
         {
-            "id": "gal_logo",
+            "id": "e_card_t2",
             "data": {
+                "type": "ELEMENT",
+                "name": "Title",
                 "vsgdata": {
-                    "x": 600,
+                    "x": 500,
                     "y": 1350,
                     "z": 0,
-                    "collapsed": true
+                    "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "Logo",
-                "tag": "div",
-                "attrsText": "class='logo'",
-                "text": "🌟 VTuber Site",
-                "collapsed": true
+                "tag": "h3",
+                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
+                "text": "SPECS"
             }
         },
         {
-            "id": "gal_links",
+            "id": "e_card_p2",
             "data": {
+                "type": "ELEMENT",
+                "name": "Text",
                 "vsgdata": {
-                    "x": 600,
-                    "y": 1450,
+                    "x": 500,
+                    "y": 1420,
                     "z": 0,
-                    "collapsed": true
+                    "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "Nav Links",
-                "tag": "div",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
+                "tag": "p",
+                "text": "Height: 165cm | Weight: N/A"
             }
         },
         {
-            "id": "gal_l1",
+            "id": "e_card3",
             "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 1350,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "ELEMENT",
-                "name": "Home Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Home",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "gal_l2",
-            "data": {
+                "name": "Card 3",
                 "vsgdata": {
-                    "x": 900,
-                    "y": 1450,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "About Link",
-                "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "About",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "gal_l3",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
+                    "x": 200,
                     "y": 1550,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Gallery Link",
                 "tag": "div",
-                "attrsText": "class='nav-link'",
-                "text": "Gallery",
-                "collapsed": true
+                "attrsText": "class='card'"
             }
         },
         {
-            "id": "gal_sec",
+            "id": "e_card_t3",
             "data": {
-                "vsgdata": {
-                    "x": 300,
-                    "y": 1700,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "ELEMENT",
-                "name": "Gallery Section",
-                "tag": "section",
-                "attrsText": "",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "gal_h1",
-            "data": {
+                "name": "Title",
                 "vsgdata": {
-                    "x": 600,
-                    "y": 1600,
+                    "x": 500,
+                    "y": 1500,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "Gallery Title",
-                "tag": "h1",
-                "attrsText": "",
-                "text": "Media Gallery",
-                "collapsed": false
+                "tag": "h3",
+                "attrsText": "style='color: #66fcf1; margin-bottom: 10px;'",
+                "text": "CAPABILITIES"
             }
         },
         {
-            "id": "gal_grid",
+            "id": "e_card_p3",
             "data": {
+                "type": "ELEMENT",
+                "name": "Text",
                 "vsgdata": {
-                    "x": 600,
+                    "x": 500,
+                    "y": 1570,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "p",
+                "text": "Vocal Synthesis, Reality Distortion"
+            }
+        },
+        {
+            "id": "e_stream_wrap",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Body Wrap",
+                "vsgdata": {
+                    "x": -800,
+                    "y": 2000,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div"
+            }
+        },
+        {
+            "id": "e_header_n_html_stream",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Header",
+                "vsgdata": {
+                    "x": -500,
                     "y": 1800,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Card Grid",
-                "tag": "div",
-                "attrsText": "class='card-grid'",
-                "text": "",
-                "collapsed": true
+                "tag": "header",
+                "attrsText": "class='header'"
             }
         },
         {
-            "id": "gal_card1",
+            "id": "e_logo_n_html_stream",
             "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 1700,
-                    "z": 0,
-                    "collapsed": true
-                },
                 "type": "ELEMENT",
-                "name": "Card 1",
-                "tag": "div",
-                "attrsText": "class='card'",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "gal_cimg1",
-            "data": {
+                "name": "Logo",
                 "vsgdata": {
-                    "x": 1200,
-                    "y": 1700,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Card Img 1",
-                "tag": "img",
-                "attrsText": "class='gallery-img'",
-                "text": "",
-                "collapsed": true
-            }
-        },
-        {
-            "id": "gal_cp1",
-            "data": {
-                "vsgdata": {
-                    "x": 1200,
-                    "y": 1750,
-                    "z": 0,
-                    "collapsed": false
-                },
-                "type": "ELEMENT",
-                "name": "Card Text 1",
-                "tag": "p",
-                "attrsText": "",
-                "text": "Stream Highlight 1",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "gal_asset1",
-            "data": {
-                "vsgdata": {
-                    "x": 1500,
+                    "x": -200,
                     "y": 1700,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ASSET_IMAGE",
-                "name": "Screenshot 1",
-                "url": "",
-                "filename": "Select Screenshot",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "gal_card2",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 1850,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Card 2",
                 "tag": "div",
-                "attrsText": "class='card'",
-                "text": "",
-                "collapsed": true
+                "attrsText": "class='logo'",
+                "text": "ASTRAL.VT"
             }
         },
         {
-            "id": "gal_cimg2",
+            "id": "e_nav_n_html_stream",
             "data": {
+                "type": "ELEMENT",
+                "name": "Nav",
                 "vsgdata": {
-                    "x": 1200,
-                    "y": 1850,
+                    "x": -200,
+                    "y": 1900,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Card Img 2",
-                "tag": "img",
-                "attrsText": "class='gallery-img'",
-                "text": "",
-                "collapsed": true
+                "tag": "nav",
+                "attrsText": "class='nav-links'"
             }
         },
         {
-            "id": "gal_cp2",
+            "id": "e_nav1_n_html_stream",
             "data": {
+                "type": "ELEMENT",
+                "name": "Nav Home",
                 "vsgdata": {
-                    "x": 1200,
+                    "x": 100,
+                    "y": 1800,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "HOME"
+            }
+        },
+        {
+            "id": "e_nav2_n_html_stream",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Nav About",
+                "vsgdata": {
+                    "x": 100,
                     "y": 1900,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "Card Text 2",
-                "tag": "p",
-                "attrsText": "",
-                "text": "Stream Highlight 2",
-                "collapsed": false
+                "tag": "div",
+                "attrsText": "class='nav-item'",
+                "text": "LORE"
             }
         },
         {
-            "id": "gal_asset2",
+            "id": "e_nav3_n_html_stream",
             "data": {
+                "type": "ELEMENT",
+                "name": "Nav Stream",
                 "vsgdata": {
-                    "x": 1500,
-                    "y": 1850,
+                    "x": 100,
+                    "y": 2000,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ASSET_IMAGE",
-                "name": "Screenshot 2",
-                "url": "",
-                "filename": "Select Screenshot",
-                "collapsed": false
-            }
-        },
-        {
-            "id": "gal_card3",
-            "data": {
-                "vsgdata": {
-                    "x": 900,
-                    "y": 2000,
-                    "z": 0,
-                    "collapsed": true
-                },
-                "type": "ELEMENT",
-                "name": "Card 3",
                 "tag": "div",
-                "attrsText": "class='card'",
-                "text": "",
-                "collapsed": true
+                "attrsText": "class='nav-item'",
+                "text": "LIVE"
             }
         },
         {
-            "id": "gal_cimg3",
+            "id": "e_stream_sec",
             "data": {
+                "type": "ELEMENT",
+                "name": "Stream Interface",
                 "vsgdata": {
-                    "x": 1200,
-                    "y": 2000,
+                    "x": -500,
+                    "y": 2200,
                     "z": 0,
                     "collapsed": true
                 },
-                "type": "ELEMENT",
-                "name": "Card Img 3",
-                "tag": "img",
-                "attrsText": "class='gallery-img'",
-                "text": "",
-                "collapsed": true
+                "tag": "section",
+                "attrsText": "class='section'"
             }
         },
         {
-            "id": "gal_cp3",
+            "id": "e_stream_title",
             "data": {
+                "type": "ELEMENT",
+                "name": "Status",
                 "vsgdata": {
-                    "x": 1200,
+                    "x": -200,
                     "y": 2050,
                     "z": 0,
                     "collapsed": false
                 },
-                "type": "ELEMENT",
-                "name": "Card Text 3",
-                "tag": "p",
-                "attrsText": "",
-                "text": "Stream Highlight 3",
-                "collapsed": false
+                "tag": "div",
+                "attrsText": "style='color: #ff003c; font-weight: bold; font-size: 24px; letter-spacing: 5px; animation: pulse 1s infinite;'",
+                "text": "● LIVE NOW"
             }
         },
         {
-            "id": "gal_asset3",
+            "id": "e_s_layout",
             "data": {
+                "type": "ELEMENT",
+                "name": "Layout",
                 "vsgdata": {
-                    "x": 1500,
-                    "y": 2000,
+                    "x": -200,
+                    "y": 2200,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div",
+                "attrsText": "class='stream-layout'"
+            }
+        },
+        {
+            "id": "e_vid",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Video Player",
+                "vsgdata": {
+                    "x": 200,
+                    "y": 2100,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div",
+                "attrsText": "class='video-player'"
+            }
+        },
+        {
+            "id": "e_vid_img",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Stream Thumb",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 2100,
                     "z": 0,
                     "collapsed": false
                 },
+                "tag": "img",
+                "attrsText": "style='width: 100%; height: 100%; object-fit: cover; border-radius: 10px; opacity: 0.8;'"
+            }
+        },
+        {
+            "id": "a_thumb",
+            "data": {
                 "type": "ASSET_IMAGE",
-                "name": "Screenshot 3",
-                "url": "",
-                "filename": "Select Screenshot",
-                "collapsed": false
+                "name": "Game Thumbnail",
+                "vsgdata": {
+                    "x": 800,
+                    "y": 2100,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "url": "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop",
+                "filename": "Cyberpunk.png"
+            }
+        },
+        {
+            "id": "e_chat",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Chat Box",
+                "vsgdata": {
+                    "x": 200,
+                    "y": 2400,
+                    "z": 0,
+                    "collapsed": true
+                },
+                "tag": "div",
+                "attrsText": "class='chat-box'"
+            }
+        },
+        {
+            "id": "e_chat_h",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Header",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 2300,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "h3",
+                "attrsText": "style='color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px;'",
+                "text": "SUPER CHAT"
+            }
+        },
+        {
+            "id": "e_chat_msgs",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Messages",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 2400,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "div",
+                "attrsText": "style='flex: 1; display: flex; flex-direction: column; gap: 10px;'"
+            }
+        },
+        {
+            "id": "e_chat_btn",
+            "data": {
+                "type": "ELEMENT",
+                "name": "Donate Btn",
+                "vsgdata": {
+                    "x": 500,
+                    "y": 2500,
+                    "z": 0,
+                    "collapsed": false
+                },
+                "tag": "button",
+                "attrsText": "class='btn'",
+                "text": "SEND MESSAGE"
             }
         }
     ],
     "edges": [
         {
-            "id": "e1",
-            "srcId": "css_main",
+            "id": "e_1000",
+            "srcId": "n_html_index",
+            "dstId": "n_css",
+            "data": {
+                "rootId": "n_html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1001",
+            "srcId": "n_html_index",
+            "dstId": "n_js",
+            "data": {
+                "rootId": "n_html_index",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1002",
+            "srcId": "n_html_about",
+            "dstId": "n_css",
+            "data": {
+                "rootId": "n_html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1003",
+            "srcId": "n_html_about",
+            "dstId": "n_js",
+            "data": {
+                "rootId": "n_html_about",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1004",
+            "srcId": "n_html_stream",
+            "dstId": "n_css",
+            "data": {
+                "rootId": "n_html_stream",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1005",
+            "srcId": "n_html_stream",
+            "dstId": "n_js",
+            "data": {
+                "rootId": "n_html_stream",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1006",
+            "srcId": "n_css",
+            "dstId": "c_reset",
+            "data": {
+                "rootId": "n_css",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1007",
+            "srcId": "c_reset",
             "dstId": "c_body",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e2",
+            "id": "e_1008",
             "srcId": "c_body",
-            "dstId": "c_nav",
+            "dstId": "c_body_disco",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e3",
-            "srcId": "c_nav",
+            "id": "e_1009",
+            "srcId": "c_body_disco",
+            "dstId": "c_header",
+            "data": {
+                "rootId": "n_css",
+                "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1010",
+            "srcId": "c_header",
             "dstId": "c_logo",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e4",
+            "id": "e_1011",
             "srcId": "c_logo",
-            "dstId": "c_nav_link",
+            "dstId": "c_nav",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e5",
-            "srcId": "c_nav_link",
-            "dstId": "c_nav_link_hov",
+            "id": "e_1012",
+            "srcId": "c_nav",
+            "dstId": "c_nav_item",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e6",
-            "srcId": "c_nav_link_hov",
-            "dstId": "c_hero",
+            "id": "e_1013",
+            "srcId": "c_nav_item",
+            "dstId": "c_nav_item_hover",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e7",
-            "srcId": "c_hero",
-            "dstId": "c_hero_title",
-            "data": {
-                "rootId": "css_main",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e8",
-            "srcId": "c_hero_title",
-            "dstId": "c_hero_subtitle",
-            "data": {
-                "rootId": "css_main",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e9",
-            "srcId": "c_hero_subtitle",
+            "id": "e_1014",
+            "srcId": "c_nav_item_hover",
             "dstId": "c_section",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e10",
+            "id": "e_1015",
             "srcId": "c_section",
-            "dstId": "c_card_grid",
+            "dstId": "c_hero",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e11",
-            "srcId": "c_card_grid",
-            "dstId": "c_card",
+            "id": "e_1016",
+            "srcId": "c_hero",
+            "dstId": "c_title",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e12",
-            "srcId": "c_card",
-            "dstId": "c_card_hov",
-            "data": {
-                "rootId": "css_main",
-                "order": 0,
-                "enabled": true
-            }
-        },
-        {
-            "id": "e13",
-            "srcId": "c_card_hov",
+            "id": "e_1017",
+            "srcId": "c_title",
             "dstId": "c_btn",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e14",
+            "id": "e_1018",
             "srcId": "c_btn",
-            "dstId": "c_btn_hov",
+            "dstId": "c_btn_hover",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e15",
-            "srcId": "c_btn_hov",
-            "dstId": "c_gallery_img",
+            "id": "e_1019",
+            "srcId": "c_btn_hover",
+            "dstId": "c_grid",
             "data": {
-                "rootId": "css_main",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e16",
-            "srcId": "js_app",
-            "dstId": "j_nav_alert",
+            "id": "e_1020",
+            "srcId": "c_grid",
+            "dstId": "c_card",
             "data": {
-                "rootId": "js_app",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e17",
-            "srcId": "js_app",
-            "dstId": "j_btn_alert",
+            "id": "e_1021",
+            "srcId": "c_card",
+            "dstId": "c_card_hover",
             "data": {
-                "rootId": "js_app",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e18",
-            "srcId": "html_index",
-            "dstId": "css_main",
+            "id": "e_1022",
+            "srcId": "c_card_hover",
+            "dstId": "c_stream_layout",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e19",
-            "srcId": "html_index",
-            "dstId": "js_app",
+            "id": "e_1023",
+            "srcId": "c_stream_layout",
+            "dstId": "c_video_player",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e20",
-            "srcId": "html_index",
-            "dstId": "idx_nav",
+            "id": "e_1024",
+            "srcId": "c_video_player",
+            "dstId": "c_chat_box",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_css",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e21",
-            "srcId": "idx_nav",
-            "dstId": "idx_logo",
+            "id": "e_1025",
+            "srcId": "n_js",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e22",
-            "srcId": "idx_nav",
-            "dstId": "idx_links",
+            "id": "e_1026",
+            "srcId": "n_js",
+            "dstId": "j_nav_about",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e23",
-            "srcId": "idx_links",
-            "dstId": "in_nav_links",
+            "id": "e_1027",
+            "srcId": "n_js",
+            "dstId": "j_nav_stream",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e24",
-            "srcId": "idx_links",
-            "dstId": "idx_l1",
+            "id": "e_1028",
+            "srcId": "n_js",
+            "dstId": "j_disco",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e25",
-            "srcId": "idx_links",
-            "dstId": "idx_l2",
+            "id": "e_1029",
+            "srcId": "n_js",
+            "dstId": "j_color_shift",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e26",
-            "srcId": "idx_links",
-            "dstId": "idx_l3",
+            "id": "e_1030",
+            "srcId": "n_js",
+            "dstId": "j_chat_spam",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_js",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e27",
-            "srcId": "idx_l1",
-            "dstId": "j_nav_alert",
+            "id": "e_1031",
+            "srcId": "n_html_index",
+            "dstId": "e_index_wrap",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e28",
-            "srcId": "idx_l2",
-            "dstId": "j_nav_alert",
+            "id": "e_1032",
+            "srcId": "e_index_wrap",
+            "dstId": "e_header_n_html_index",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e29",
-            "srcId": "idx_l3",
-            "dstId": "j_nav_alert",
+            "id": "e_1033",
+            "srcId": "e_header_n_html_index",
+            "dstId": "e_logo_n_html_index",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e30",
-            "srcId": "html_index",
-            "dstId": "idx_hero",
+            "id": "e_1034",
+            "srcId": "e_logo_n_html_index",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e31",
-            "srcId": "idx_hero",
-            "dstId": "idx_h1",
+            "id": "e_1035",
+            "srcId": "e_header_n_html_index",
+            "dstId": "e_nav_n_html_index",
             "data": {
-                "rootId": "html_index",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e32",
-            "srcId": "idx_hero",
-            "dstId": "idx_hp",
+            "id": "e_1036",
+            "srcId": "e_nav_n_html_index",
+            "dstId": "e_nav1_n_html_index",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e33",
-            "srcId": "idx_hero",
-            "dstId": "idx_hero_img",
+            "id": "e_1037",
+            "srcId": "e_nav_n_html_index",
+            "dstId": "e_nav2_n_html_index",
             "data": {
-                "rootId": "html_index",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e34",
-            "srcId": "idx_hero",
-            "dstId": "idx_btn",
+            "id": "e_1038",
+            "srcId": "e_nav_n_html_index",
+            "dstId": "e_nav3_n_html_index",
             "data": {
-                "rootId": "html_index",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e35",
-            "srcId": "idx_btn",
-            "dstId": "j_btn_alert",
+            "id": "e_1039",
+            "srcId": "e_nav1_n_html_index",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e36",
-            "srcId": "idx_hero_img",
-            "dstId": "c_inline_img",
+            "id": "e_1040",
+            "srcId": "e_nav2_n_html_index",
+            "dstId": "j_nav_about",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e37",
-            "srcId": "idx_hero_img",
-            "dstId": "idx_hero_asset",
+            "id": "e_1041",
+            "srcId": "e_nav3_n_html_index",
+            "dstId": "j_nav_stream",
             "data": {
-                "rootId": "html_index",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e38",
-            "srcId": "html_about",
-            "dstId": "css_main",
+            "id": "e_1042",
+            "srcId": "e_index_wrap",
+            "dstId": "e_index_hero",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e39",
-            "srcId": "html_about",
-            "dstId": "js_app",
+            "id": "e_1043",
+            "srcId": "e_index_hero",
+            "dstId": "e_hero_title",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e40",
-            "srcId": "html_about",
-            "dstId": "abt_nav",
+            "id": "e_1044",
+            "srcId": "e_hero_title",
+            "dstId": "c_inline_glow",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e41",
-            "srcId": "abt_nav",
-            "dstId": "abt_logo",
+            "id": "e_1045",
+            "srcId": "e_hero_title",
+            "dstId": "j_color_shift",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e42",
-            "srcId": "abt_nav",
-            "dstId": "abt_links",
+            "id": "e_1046",
+            "srcId": "e_index_hero",
+            "dstId": "e_hero_sub",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e43",
-            "srcId": "abt_links",
-            "dstId": "in_nav_links",
+            "id": "e_1047",
+            "srcId": "e_index_hero",
+            "dstId": "e_hero_btn",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_index",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e44",
-            "srcId": "abt_links",
-            "dstId": "abt_l1",
+            "id": "e_1048",
+            "srcId": "e_hero_btn",
+            "dstId": "j_disco",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_index",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e45",
-            "srcId": "abt_links",
-            "dstId": "abt_l2",
+            "id": "e_1049",
+            "srcId": "n_html_about",
+            "dstId": "e_about_wrap",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e46",
-            "srcId": "abt_links",
-            "dstId": "abt_l3",
+            "id": "e_1050",
+            "srcId": "e_about_wrap",
+            "dstId": "e_header_n_html_about",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e47",
-            "srcId": "abt_l1",
-            "dstId": "j_nav_alert",
+            "id": "e_1051",
+            "srcId": "e_header_n_html_about",
+            "dstId": "e_logo_n_html_about",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e48",
-            "srcId": "abt_l2",
-            "dstId": "j_nav_alert",
+            "id": "e_1052",
+            "srcId": "e_logo_n_html_about",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e49",
-            "srcId": "abt_l3",
-            "dstId": "j_nav_alert",
+            "id": "e_1053",
+            "srcId": "e_header_n_html_about",
+            "dstId": "e_nav_n_html_about",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e50",
-            "srcId": "html_about",
-            "dstId": "abt_sec",
+            "id": "e_1054",
+            "srcId": "e_nav_n_html_about",
+            "dstId": "e_nav1_n_html_about",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e51",
-            "srcId": "abt_h1",
-            "dstId": "in_sec_title",
+            "id": "e_1055",
+            "srcId": "e_nav_n_html_about",
+            "dstId": "e_nav2_n_html_about",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e52",
-            "srcId": "abt_grid",
-            "dstId": "in_lore_grid",
+            "id": "e_1056",
+            "srcId": "e_nav_n_html_about",
+            "dstId": "e_nav3_n_html_about",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e53",
-            "srcId": "abt_sec",
-            "dstId": "abt_h1",
+            "id": "e_1057",
+            "srcId": "e_nav1_n_html_about",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e54",
-            "srcId": "abt_sec",
-            "dstId": "abt_grid",
+            "id": "e_1058",
+            "srcId": "e_nav2_n_html_about",
+            "dstId": "j_nav_about",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e55",
-            "srcId": "abt_img_el",
-            "dstId": "in_lore_img",
+            "id": "e_1059",
+            "srcId": "e_nav3_n_html_about",
+            "dstId": "j_nav_stream",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e56",
-            "srcId": "abt_txt",
-            "dstId": "in_lore_txt",
+            "id": "e_1060",
+            "srcId": "e_about_wrap",
+            "dstId": "e_about_sec",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e57",
-            "srcId": "abt_grid",
-            "dstId": "abt_img_el",
+            "id": "e_1061",
+            "srcId": "e_about_sec",
+            "dstId": "e_about_title",
             "data": {
-                "rootId": "html_about",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e58",
-            "srcId": "abt_grid",
-            "dstId": "abt_txt",
+            "id": "e_1062",
+            "srcId": "e_about_sec",
+            "dstId": "e_grid",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e59",
-            "srcId": "abt_img_el",
-            "dstId": "abt_asset",
+            "id": "e_1063",
+            "srcId": "e_grid",
+            "dstId": "e_card1",
             "data": {
-                "rootId": "html_about",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e60",
-            "srcId": "html_gallery",
-            "dstId": "css_main",
+            "id": "e_1064",
+            "srcId": "e_card1",
+            "dstId": "e_card_t1",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e61",
-            "srcId": "html_gallery",
-            "dstId": "js_app",
+            "id": "e_1065",
+            "srcId": "e_card1",
+            "dstId": "e_card_p1",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e62",
-            "srcId": "html_gallery",
-            "dstId": "gal_nav",
+            "id": "e_1066",
+            "srcId": "e_card1",
+            "dstId": "j_color_shift",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e63",
-            "srcId": "gal_nav",
-            "dstId": "gal_logo",
+            "id": "e_1067",
+            "srcId": "e_grid",
+            "dstId": "e_card2",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e64",
-            "srcId": "gal_nav",
-            "dstId": "gal_links",
+            "id": "e_1068",
+            "srcId": "e_card2",
+            "dstId": "e_card_t2",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e65",
-            "srcId": "gal_links",
-            "dstId": "in_nav_links",
+            "id": "e_1069",
+            "srcId": "e_card2",
+            "dstId": "e_card_p2",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e66",
-            "srcId": "gal_links",
-            "dstId": "gal_l1",
+            "id": "e_1070",
+            "srcId": "e_card2",
+            "dstId": "j_color_shift",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e67",
-            "srcId": "gal_links",
-            "dstId": "gal_l2",
+            "id": "e_1071",
+            "srcId": "e_grid",
+            "dstId": "e_card3",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 3,
                 "enabled": true
             }
         },
         {
-            "id": "e68",
-            "srcId": "gal_links",
-            "dstId": "gal_l3",
+            "id": "e_1072",
+            "srcId": "e_card3",
+            "dstId": "e_card_t3",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e69",
-            "srcId": "gal_l1",
-            "dstId": "j_nav_alert",
+            "id": "e_1073",
+            "srcId": "e_card3",
+            "dstId": "e_card_p3",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_about",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e70",
-            "srcId": "gal_l2",
-            "dstId": "j_nav_alert",
+            "id": "e_1074",
+            "srcId": "e_card3",
+            "dstId": "j_color_shift",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_about",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e71",
-            "srcId": "gal_l3",
-            "dstId": "j_nav_alert",
+            "id": "e_1075",
+            "srcId": "n_html_stream",
+            "dstId": "e_stream_wrap",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e72",
-            "srcId": "html_gallery",
-            "dstId": "gal_sec",
+            "id": "e_1076",
+            "srcId": "e_stream_wrap",
+            "dstId": "e_header_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e73",
-            "srcId": "gal_h1",
-            "dstId": "in_sec_title",
+            "id": "e_1077",
+            "srcId": "e_header_n_html_stream",
+            "dstId": "e_logo_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e74",
-            "srcId": "gal_sec",
-            "dstId": "gal_h1",
+            "id": "e_1078",
+            "srcId": "e_logo_n_html_stream",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e75",
-            "srcId": "gal_sec",
-            "dstId": "gal_grid",
+            "id": "e_1079",
+            "srcId": "e_header_n_html_stream",
+            "dstId": "e_nav_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e76",
-            "srcId": "gal_grid",
-            "dstId": "gal_card1",
+            "id": "e_1080",
+            "srcId": "e_nav_n_html_stream",
+            "dstId": "e_nav1_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e77",
-            "srcId": "gal_cp1",
-            "dstId": "in_card_txt",
+            "id": "e_1081",
+            "srcId": "e_nav_n_html_stream",
+            "dstId": "e_nav2_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e78",
-            "srcId": "gal_card1",
-            "dstId": "gal_cimg1",
+            "id": "e_1082",
+            "srcId": "e_nav_n_html_stream",
+            "dstId": "e_nav3_n_html_stream",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e79",
-            "srcId": "gal_card1",
-            "dstId": "gal_cp1",
+            "id": "e_1083",
+            "srcId": "e_nav1_n_html_stream",
+            "dstId": "j_nav_home",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e80",
-            "srcId": "gal_cimg1",
-            "dstId": "gal_asset1",
+            "id": "e_1084",
+            "srcId": "e_nav2_n_html_stream",
+            "dstId": "j_nav_about",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e81",
-            "srcId": "gal_grid",
-            "dstId": "gal_card2",
+            "id": "e_1085",
+            "srcId": "e_nav3_n_html_stream",
+            "dstId": "j_nav_stream",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e82",
-            "srcId": "gal_cp2",
-            "dstId": "in_card_txt",
+            "id": "e_1086",
+            "srcId": "e_stream_wrap",
+            "dstId": "e_stream_sec",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e83",
-            "srcId": "gal_card2",
-            "dstId": "gal_cimg2",
+            "id": "e_1087",
+            "srcId": "e_stream_sec",
+            "dstId": "e_stream_title",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e84",
-            "srcId": "gal_card2",
-            "dstId": "gal_cp2",
+            "id": "e_1088",
+            "srcId": "e_stream_sec",
+            "dstId": "e_s_layout",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e85",
-            "srcId": "gal_cimg2",
-            "dstId": "gal_asset2",
+            "id": "e_1089",
+            "srcId": "e_s_layout",
+            "dstId": "e_vid",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e86",
-            "srcId": "gal_grid",
-            "dstId": "gal_card3",
+            "id": "e_1090",
+            "srcId": "e_vid",
+            "dstId": "e_vid_img",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e87",
-            "srcId": "gal_cp3",
-            "dstId": "in_card_txt",
+            "id": "e_1091",
+            "srcId": "e_vid_img",
+            "dstId": "a_thumb",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }
         },
         {
-            "id": "e88",
-            "srcId": "gal_card3",
-            "dstId": "gal_cimg3",
+            "id": "e_1092",
+            "srcId": "e_s_layout",
+            "dstId": "e_chat",
             "data": {
-                "rootId": "html_gallery",
-                "order": 0,
+                "rootId": "n_html_stream",
+                "order": 1,
                 "enabled": true
             }
         },
         {
-            "id": "e89",
-            "srcId": "gal_card3",
-            "dstId": "gal_cp3",
+            "id": "e_1093",
+            "srcId": "e_chat",
+            "dstId": "e_chat_h",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1094",
+            "srcId": "e_chat",
+            "dstId": "e_chat_msgs",
+            "data": {
+                "rootId": "n_html_stream",
+                "order": 1,
+                "enabled": true
+            }
+        },
+        {
+            "id": "e_1095",
+            "srcId": "e_chat",
+            "dstId": "e_chat_btn",
+            "data": {
+                "rootId": "n_html_stream",
+                "order": 2,
                 "enabled": true
             }
         },
         {
-            "id": "e90",
-            "srcId": "gal_cimg3",
-            "dstId": "gal_asset3",
+            "id": "e_1096",
+            "srcId": "e_chat_btn",
+            "dstId": "j_chat_spam",
             "data": {
-                "rootId": "html_gallery",
+                "rootId": "n_html_stream",
                 "order": 0,
                 "enabled": true
             }

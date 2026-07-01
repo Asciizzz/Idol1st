@@ -12,11 +12,16 @@
             font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        #app {
-            position: fixed;
-            inset: 0;
+        #main-layout {
+            display: flex;
             width: 100vw;
             height: 100vh;
+            overflow: hidden;
+        }
+
+        #app {
+            flex: 1;
+            position: relative;
             overflow: hidden;
         }
     </style>
@@ -24,7 +29,9 @@
 </head>
 
 <body>
-    <div id="app"></div>
+    <div id="main-layout">
+        <div id="app"></div>
+    </div>
 
     {{-- Seed VSB canvas with graph state and draft metadata --}}
     <script>
