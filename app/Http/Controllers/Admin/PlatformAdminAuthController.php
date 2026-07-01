@@ -43,6 +43,10 @@ class PlatformAdminAuthController extends Controller
 
         $token = $admin->createToken('platform-admin-token')->plainTextToken;
 
+        if ($request->hasSession()) {
+            $request->session()->put('service_admin_sanctum_token', $token);
+        }
+
         AuditLog::record('ADMIN_LOGIN', 'ServiceAdmin', $admin->id, null, $admin->id);
 
         return response()->json([
@@ -102,6 +106,10 @@ class PlatformAdminAuthController extends Controller
         AuditLog::record('ADMIN_LOGOUT', 'ServiceAdmin', $admin?->id, null, $admin?->id);
 
         $request->user('sanctum')?->currentAccessToken()->delete();
+
+        if ($request->hasSession()) {
+            $request->session()->forget('service_admin_sanctum_token');
+        }
 
         return response()->json([
             'success' => true,

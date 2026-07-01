@@ -72,7 +72,6 @@
     <div class="nav-section">Editor</div>
     <div class="nav-item" onclick="sw('editor')">Editor</div>
     <div class="nav-section">Tenant Admin</div>
-    <div class="nav-item active" onclick="sw('ta-auth')">Tenant Auth</div>
     <div class="nav-item" onclick="sw('idol-profile')">Idol Profile</div>
     <div class="nav-item" onclick="sw('blog-mgmt')">Blog</div>
     <div class="nav-item" onclick="sw('merch-mgmt')">Merch</div>
@@ -84,7 +83,7 @@
 </nav>
 <div class="main">
     <div class="topbar">
-        <h1 id="ptitle">Tenant Auth</h1>
+        <h1 id="ptitle">Editor</h1>
         <div class="token-badge" id="tbadge">No token</div>
     </div>
 
@@ -139,18 +138,6 @@
     <!-- ── REQ/RESP PANEL LAYOUT (everything except Editor) ── -->
     <div class="panels" id="std-panels">
         <div class="req-panel">
-
-            <!-- TENANT AUTH -->
-            <div id="p-ta-auth" class="panel active">
-                <div class="box"><div class="box-title">Tenant Admin Login</div>
-                    <label>Email</label><input id="ta-em" value="admin@sakura.com">
-                    <label>Password</label><input id="ta-pw" type="password" value="password">
-                    <div class="row">
-                        <button class="btn bp" onclick="tenantLogin()">Login</button>
-                        <button class="btn bd" onclick="api('POST', '/api/auth/logout', {}, tok())">Logout</button>
-                    </div>
-                </div>
-            </div>
 
             <!-- IDOL PROFILE -->
             <div id="p-idol-profile" class="panel">
@@ -248,7 +235,6 @@
 // ── State ──────────────────────────────────────────────────────────
 let _tok = @json($sanctumToken ?? null);
 let _vsbLoaded = false;
-let _vsbLoaded = false;
 
 const g  = id => document.getElementById(id)?.value ?? '';
 const el = id => document.getElementById(id);
@@ -331,59 +317,6 @@ async function tm(method,path,body){
 
 
         const d=await r.json();
-
-
-        el('rs').textContent=r.status;
-        el('rs').className=r.ok?'ok':'err';
-
-        el('rt').textContent=(Date.now()-t0)+'ms';
-
-        el('rb').textContent=
-            JSON.stringify(d,null,2);
-
-
-    }catch(e){
-
-        el('rb').textContent=String(e);
-
-    }
-}
-
-async function tenantLogin(){
-
-    const t0=Date.now();
-
-    const url='/api/auth/login';
-
-
-    const h={
-        'Content-Type':'application/json',
-        'Accept':'application/json'
-    };
-
-
-    try{
-
-        const r=await fetch(url,{
-            method:'POST',
-            headers:h,
-            body:JSON.stringify({
-                email:g('ta-em'),
-                password:g('ta-pw')
-            })
-        });
-
-
-        const d=await r.json();
-
-
-        if(d.token){
-
-            _tok=d.token;
-
-            saveToken(d);
-
-        }
 
 
         el('rs').textContent=r.status;
@@ -491,6 +424,8 @@ function mountVsb(graph, draft){
         window.VSB.remount(graph, draft);
     }
 }
+
+sw('editor');
 </script>
 </body>
 </html>

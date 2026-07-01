@@ -89,72 +89,71 @@ Route::domain('{tenant}.idol1st.test')
 // MAIN EDITOR LOGIN
 // =====================================================
 
-Route::redirect('/', '/login');
-
-
-Route::get(
-    '/login',
-    [AuthEditorController::class,'showLogin']
-)
-->name('login');
-
-
-Route::post(
-    '/login',
-    [AuthEditorController::class,'handleLogin']
-)
-->name('login.submit');
-
-
-
-
-// =====================================================
-// EDITOR
-// =====================================================
-
-Route::middleware('require.auth')
-->group(function(){
-
+Route::domain('127.0.0.1')->group(function () {
+    Route::redirect('/', '/login');
 
     Route::get(
-        '/editor',
-        [AuthEditorController::class,'showEditor']
+        '/login',
+        [AuthEditorController::class,'showLogin']
     )
-    ->name('editor');
-
-
+    ->name('login');
 
     Route::post(
-        '/editor/save',
-        [AuthEditorController::class,'saveEditor']
+        '/login',
+        [AuthEditorController::class,'handleLogin']
     )
-    ->name('editor.save');
-
-
-
-    Route::post(
-        '/logout',
-        [AuthEditorController::class,'webLogout']
-    )
-    ->name('logout');
-
-
-});
+    ->name('login.submit');
 
 
 
 
-// =====================================================
-// PLATFORM ADMIN
-// =====================================================
+    // =====================================================
+    // EDITOR
+    // =====================================================
 
-Route::middleware('require.auth:admin')
-->group(function(){
+    Route::middleware('require.auth')
+    ->group(function(){
 
-    Route::get(
-        '/admin',
-        [AuthEditorController::class,'showAdmin']
-    )
-    ->name('admin');
 
+        Route::get(
+            '/editor',
+            [AuthEditorController::class,'showEditor']
+        )
+        ->name('editor');
+
+
+
+        Route::post(
+            '/editor/save',
+            [AuthEditorController::class,'saveEditor']
+        )
+        ->name('editor.save');
+
+
+
+        Route::post(
+            '/logout',
+            [AuthEditorController::class,'webLogout']
+        )
+        ->name('logout');
+
+
+    });
+
+
+
+    // =====================================================
+    // PLATFORM ADMIN
+    // =====================================================
+
+    Route::middleware('require.auth:admin')
+    ->group(function(){
+
+        Route::get(
+            '/admin',
+            [AuthEditorController::class,'showAdmin']
+        )
+        ->name('admin');
+
+    });
 });

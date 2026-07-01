@@ -55,7 +55,6 @@
 <nav class="sidebar">
     <div class="logo">Idol1st Admin</div>
     <div class="nav-section">Platform Admin</div>
-    <div class="nav-item active" onclick="sw('svc-auth')">Service Admin Auth</div>
     <div class="nav-item" onclick="sw('plans')">Plans</div>
     <div class="nav-item" onclick="sw('tenants')">Tenants</div>
     <div class="nav-item" onclick="sw('flags')">Feature Flags</div>
@@ -72,18 +71,6 @@
     </div>
     <div class="panels">
         <div class="req-panel">
-
-            <!-- SERVICE ADMIN AUTH -->
-            <div id="p-svc-auth" class="panel active">
-                <div class="box"><div class="box-title">Service Admin Login</div>
-                    <label>Email</label><input id="sa-em" value="superadmin@idol1st.com">
-                    <label>Password</label><input id="sa-pw" type="password" value="password">
-                    <div class="row">
-                        <button class="btn bp" onclick="api('POST','/api/admin/auth/login',{email:g('sa-em'),password:g('sa-pw')},null,saveToken)">Login</button>
-                        <button class="btn bd" onclick="api('POST','/api/admin/auth/logout',null,tok())">Logout</button>
-                    </div>
-                </div>
-            </div>
 
             <!-- PLANS -->
             <div id="p-plans" class="panel">

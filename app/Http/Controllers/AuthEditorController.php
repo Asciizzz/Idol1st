@@ -10,7 +10,10 @@ use Illuminate\View\View;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
+use App\Models\ServiceAdmin;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 
 use Illuminate\Http\RedirectResponse;
 
@@ -22,6 +25,7 @@ class AuthEditorController extends Controller
         $initialGraph = $this->resolveInitialGraph();
 
         return view('editor', [
+            'sanctumToken' => session('sanctum_token'),
             'draft'        => $draft,
             'initialGraph' => $initialGraph,
         ]);
@@ -186,6 +190,18 @@ class AuthEditorController extends Controller
      */
     public function showLogin(): View|RedirectResponse
     {
+        $serviceAdminToken = session('service_admin_sanctum_token');
+        if ($serviceAdminToken) {
+            $accessToken = PersonalAccessToken::findToken($serviceAdminToken);
+            $tokenable = $accessToken?->tokenable;
+
+            if ($tokenable instanceof ServiceAdmin && $tokenable->is_active) {
+                return redirect()->route('admin');
+            }
+
+            session()->forget('service_admin_sanctum_token');
+        }
+
         if (Auth::check()) {
             return redirect()->route('editor');
         }
@@ -207,9 +223,27 @@ class AuthEditorController extends Controller
         ]);
 
         if (! Auth::attempt($request->only('email', 'password'), remember: true)) {
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Invalid credentials.']);
+            $serviceAdmin = ServiceAdmin::where('email', $request->email)->first();
+
+            if (! $serviceAdmin || ! Hash::check($request->password, $serviceAdmin->password)) {
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'Invalid credentials.']);
+            }
+
+            if (! $serviceAdmin->is_active) {
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'This service admin account has been deactivated.']);
+            }
+
+            $request->session()->regenerate();
+
+            $token = $serviceAdmin->createToken('platform-admin-web-session')->plainTextToken;
+            $request->session()->put('service_admin_sanctum_token', $token);
+            $request->session()->forget('sanctum_token');
+
+            return redirect()->route('admin');
         }
 
         $request->session()->regenerate();
@@ -219,9 +253,11 @@ class AuthEditorController extends Controller
         $user  = Auth::user();
         $token = $user->createToken('web-session')->plainTextToken;
         $request->session()->put('sanctum_token', $token);
+        $request->session()->forget('service_admin_sanctum_token');
 
-        // Admins go to the admin panel, editors go to the editor
-        return $user->is_tenant_admin
+        // Tenant admins use the editor workspace.
+        // Reserve /admin for non-tenant admin users only.
+        return ($user->role === 'admin' && ! $user->is_tenant_admin)
             ? redirect()->route('admin')
             : redirect()->route('editor');
     }
@@ -232,6 +268,12 @@ class AuthEditorController extends Controller
      */
     public function webLogout(Request $request): RedirectResponse
     {
+        $serviceAdminToken = $request->session()->get('service_admin_sanctum_token');
+        if ($serviceAdminToken) {
+            PersonalAccessToken::findToken($serviceAdminToken)?->delete();
+            $request->session()->forget('service_admin_sanctum_token');
+        }
+
         // Revoke the session-stored Sanctum token if it exists
         $user = Auth::user();
         if ($user) {
@@ -252,7 +294,7 @@ class AuthEditorController extends Controller
     public function showAdmin(): View
     {
         return view('admin', [
-            'sanctumToken' => session('sanctum_token'),
+            'sanctumToken' => session('service_admin_sanctum_token') ?? session('sanctum_token'),
         ]);
     }
 }
