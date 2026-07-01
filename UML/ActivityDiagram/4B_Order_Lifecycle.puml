@@ -1,0 +1,82 @@
+@startuml 4B_Order_Lifecycle
+title 4-B · Order Placement & Lifecycle (UC-F30 to UC-F42, UC-T30 to UC-T32, UC-S05 to UC-S09)
+
+start
+|Registered Fan|
+:Browse merch products;
+:View product details and variants;
+:Add selected variant to cart;
+:Update or remove cart items if needed;
+:Click Checkout;
+
+|System|
+:Verify fan is logged in;
+if (Fan authenticated?) then (No)
+  :Redirect to Login;
+  stop
+else (Yes)
+  :Validate cart, stock and delivery address;
+endif
+
+if (Cart valid and stock available?) then (No)
+  :Return out_of_stock / address error;
+  stop
+else (Yes)
+  :Create MerchOrder status = PENDING;
+  :Snapshot cart items into order items;
+  :Reserve stock and clear cart;
+endif
+
+|Registered Fan|
+:Select payment method\n(Credit Card / PayPal / Stripe / QR Bank Transfer);
+
+|System|
+:Create Payment status = PENDING;
+if (Payment method is QR Bank Transfer?) then (Yes)
+  :Generate QR code and expiry time;
+  |Registered Fan|
+  :Scan QR and complete bank transfer;
+else (No)
+  :Redirect or initialize provider payment flow;
+endif
+
+|Payment Gateway|
+:Send payment webhook callback;
+
+|System|
+:Verify webhook signature;
+if (Webhook/payment valid?) then (No)
+  :Mark payment FAILED or keep order PENDING;
+  :Log failure / invalid signature;
+  stop
+else (Yes)
+  :Set Payment status = COMPLETED;
+  :Transition order PENDING -> PAID;
+  :Create Shipment status = PREPARING;
+  :Notify fan and Tenant Admin;
+endif
+
+|Tenant Admin (Owner/Admin)|
+:View paid orders;
+:Enter carrier, tracking number and ETA;
+
+|System|
+:Transition order PAID -> SHIPPED;
+:Notify fan shipment update;
+
+|Registered Fan|
+if (Fan action?) then (Track Order)
+  |System|
+  :Return latest shipment status;
+elseif (Fan action?) then (Cancel Pending Order)
+  |System|
+  :Cancel only if order policy allows;
+else (Return Request)
+  |Tenant Admin (Owner/Admin)|
+  :Review return request;
+  |System|
+  :Record return processing result;
+endif
+
+stop
+@enduml

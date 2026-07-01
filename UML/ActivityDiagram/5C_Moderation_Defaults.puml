@@ -1,0 +1,46 @@
+@startuml 5C_Moderation_Defaults
+title 5-C · Comment Moderation Workflow (UC-F17, UC-T14)
+
+start
+|Registered Fan|
+:Open published blog post;
+:Write a comment;
+
+|System|
+:Require logged-in fan\n(include UC-F02 Login if needed);
+if (Fan authenticated?) then (No)
+  :Redirect to login;
+  stop
+else (Yes)
+  :Validate comment body and tenant scope;
+endif
+
+if (Comment valid?) then (No)
+  :Return 422 validation error;
+  stop
+else (Yes)
+  :Create BlogComment record;
+  :Display comment if not hidden;
+endif
+
+|Tenant Admin (Owner/Admin)|
+:Open Blog > Comments;
+:Review reported or inappropriate comments;
+if (Moderation action?) then (Hide)
+  |System|
+  :Set BlogComment.is_hidden = true;
+  :Remove comment from public listings;
+  :Preserve original record for audit;
+elseif (Moderation action?) then (Restore)
+  |System|
+  :Set BlogComment.is_hidden = false;
+  :Show comment again;
+else (Delete)
+  |System|
+  :Reject deletion;\ncomments are hidden, not hard-deleted;
+endif
+
+|System|
+:Return updated comment status to admin UI;
+stop
+@enduml

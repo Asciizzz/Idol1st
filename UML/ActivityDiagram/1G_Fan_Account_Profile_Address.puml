@@ -1,0 +1,33 @@
+@startuml 1G_Fan_Account_Profile_Address
+title 1-G · Fan Account, Profile & Address Management (UC-F03 to UC-F06)
+
+start
+|Registered Fan|
+if (Fan action?) then (Logout)
+  :Click Logout;
+  |System|
+  :Revoke or expire bearer token;
+  :Return to public fansite;
+elseif (Fan action?) then (Reset Password)
+  :Request password reset by email;
+  |System|
+  :Validate email within tenant scope;
+  :Create reset token and send email;
+  |Registered Fan|
+  :Open reset link and enter new password;
+  |System|
+  :Validate token and update password hash;
+elseif (Fan action?) then (Update Profile)
+  :Edit username, display name,\navatar or profile information;
+  |System|
+  :Validate fields and uniqueness within tenant;
+  :Save Fan profile changes;
+else (Manage Addresses)
+  :Add, edit, delete or set default address;
+  |System|
+  :Validate receiver name, phone,\naddress fields and tenant ownership;
+  :Save FanAddress record;
+endif
+
+stop
+@enduml

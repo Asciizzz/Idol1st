@@ -1,0 +1,47 @@
+@startuml 5A_Configure_Visibility
+title 5-A · Configure Content Visibility & Access Rules (UC-T10, UC-T19, UC-F14, UC-F15)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open content editor\n(blog post / event / media item);
+:Choose visibility level;
+
+if (Visibility selected?) then (PUBLIC)
+  :Content is available to anonymous visitors and fans;
+elseif (Visibility selected?) then (SUBSCRIBERS_ONLY)
+  :Content requires active subscription;
+else (PAID_ONLY)
+  :Content requires a specific paid tier;
+endif
+
+|System|
+:Validate selected visibility against tenant plan;
+if (Visibility allowed?) then (No)
+  :Return 403 with upgrade prompt;
+  stop
+else (Yes)
+  :Save visibility on content record;
+  :Invalidate content cache;
+endif
+
+|Anonymous Visitor / Registered Fan|
+:Open content URL;
+
+|System|
+:Run VisibilityCheckDecorator;
+if (Content is PUBLIC?) then (Yes)
+  :Render full content;
+elseif (Fan has required subscription/tier?) then (Yes)
+  :Render gated content;
+else (No)
+  if (Required access is subscriber?) then (Yes)
+    :Return preview and Subscribe to Tier prompt;
+  else (No)
+    :Return preview and Upgrade Subscription prompt;
+  endif
+  stop
+endif
+
+:Log gated content access event;
+stop
+@enduml

@@ -1,0 +1,51 @@
+@startuml 4A_Product_Management
+title 4-A · Merch Product Management (UC-T27 to UC-T29)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open Merch > New Product;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Check plan includes merchandise feature;
+if (Merch feature allowed?) then (No)
+  :Return 403 with upgrade prompt;
+  stop
+else (Yes)
+  |Tenant Admin (Owner/Admin)|
+  :Enter product name, description,\nbase price, currency and category;
+  :Upload cover/gallery images;
+  :Add one or more variants\n(SKU, price, stock, attributes);
+endif
+
+|System|
+:Validate required fields and unique SKUs;
+if (Validation passed?) then (No)
+  :Return 422 with field/SKU errors;
+  stop
+else (Yes)
+  :Create MerchProduct status = DRAFT;
+  :Create MerchVariant records;
+endif
+
+|Tenant Admin (Owner/Admin)|
+if (Admin action?) then (Publish)
+  |System|
+  :Set product status = ACTIVE;
+  :Product appears in Merch Store;
+elseif (Admin action?) then (Update Stock)
+  :Enter stock changes per variant;
+  |System|
+  :Update stock levels;
+  if (Stock available?) then (Yes)
+    :Keep product purchasable;
+  else (No)
+    :Show out-of-stock state to fans;
+  endif
+else (Keep Draft)
+  |System|
+  :Product remains hidden from fans;
+endif
+
+stop
+@enduml

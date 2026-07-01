@@ -1,0 +1,55 @@
+@startuml 2D_Tenant_Billing_Branding_Domain
+title 2-D · Tenant Billing, Branding & Domain Settings (UC-T33 to UC-T38)
+
+start
+|Tenant Admin (Owner/Billing)|
+:Open Billing & Settings;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Check role permission\n(Owner or Billing for billing actions);
+
+|Tenant Admin (Owner/Billing)|
+if (Admin action?) then (View Current Plan)
+  |System|
+  :Load current TenantSubscription,\nplan features and renewal date;
+elseif (Admin action?) then (Request Plan Upgrade)
+  :Select target plan;
+  |System|
+  :Validate plan eligibility;
+  :Create upgrade request or payment session;
+  :Notify platform billing workflow if approval needed;
+elseif (Admin action?) then (Update Payment Method)
+  :Enter or choose payment method;
+  |System|
+  :Tokenize payment method through provider;
+  :Update tenant billing profile;
+elseif (Admin action?) then (View Invoices)
+  |System|
+  :Load tenant invoices and payment status;
+else (Configure Branding / Custom Domain)
+  |Tenant Admin (Owner)|
+  :Update logo, brand colors,\nfavicon or custom domain;
+  |System|
+  :Validate branding assets and domain format;
+  if (Custom domain provided?) then (Yes)
+    :Generate DNS verification record;
+    |Tenant Admin (Owner)|
+    :Configure DNS at domain provider;
+    |System|
+    :Verify DNS and SSL readiness;
+    if (Verification passed?) then (No)
+      :Keep domain pending verification;
+      stop
+    else (Yes)
+      :Activate custom domain for tenant;
+    endif
+  else (No)
+    :Save tenant branding configuration;
+  endif
+endif
+
+|System|
+:Invalidate tenant branding/settings cache;
+stop
+@enduml

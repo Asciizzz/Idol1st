@@ -1,0 +1,57 @@
+@startuml 1D_Platform_Admin_Monitoring
+title 1-D · Platform Admin Monitoring & Control (UC-P07, UC-P08, UC-P05, UC-P06, UC-P09, UC-P18, UC-P20)
+
+start
+|Service Admin|
+:Log in to Platform Admin;
+:Open tenant monitoring dashboard;
+
+|System|
+:List all tenants with status,\nplan, domain and latest activity;
+:Load system health summary;
+
+|Service Admin|
+if (Admin action?) then (View Tenant Details)
+  |System|
+  :Load tenant detail, subscription,\nfeature flags and recent activity;
+elseif (Admin action?) then (Suspend Tenant)
+  |Service Admin|
+  :Enter mandatory suspension reason;
+  |System|
+  :Check MANAGE_TENANTS permission and MFA;
+  if (Allowed and tenant ACTIVE?) then (No)
+    :Reject with 403/422;
+    stop
+  else (Yes)
+    :Set tenant status = SUSPENDED;
+    :Set suspended_at = now();
+    :Write audit log with reason and admin ID;
+    :Block tenant admin and fan API calls;
+  endif
+elseif (Admin action?) then (Reactivate Tenant)
+  |System|
+  :Check MANAGE_TENANTS permission;
+  if (Tenant can be reactivated?) then (No)
+    :Reject with 422;
+    stop
+  else (Yes)
+    :Set tenant status = ACTIVE;
+    :Clear suspension flags if applicable;
+    :Write audit log;
+  endif
+elseif (Admin action?) then (Impersonate Tenant User)
+  |System|
+  :Check IMPERSONATE permission;
+  :Create short-lived ImpersonationSession;
+  :Issue impersonation token;
+  :Write audit log for session start/end;
+elseif (Admin action?) then (View Audit Logs)
+  |System|
+  :Filter and display audit logs\nby tenant, admin, action and date;
+else (View System Health)
+  |System|
+  :Display service status, job health,\nqueue state and webhook health;
+endif
+
+stop
+@enduml

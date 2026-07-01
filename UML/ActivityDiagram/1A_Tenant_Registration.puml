@@ -1,0 +1,50 @@
+@startuml 1A_Tenant_Registration
+title 1-A · Tenant Registration & Activation (UC-L05 to UC-L09)
+
+start
+|Visitor (Prospective Tenant)|
+:Open pricing page and select a subscription plan;
+:Fill tenant registration form\n(tenant name, slug, admin email, password);
+if (Selected plan is paid?) then (Yes)
+  :Provide payment details;
+else (No)
+  :Continue with free plan;
+endif
+
+|System|
+:Validate tenant name, slug, email,\npassword and selected plan;
+if (Validation passed?) then (No)
+  :Return 422 validation error\n(email/slug/plan/password);
+  stop
+else (Yes)
+  if (Payment required?) then (Yes)
+    :Process payment through selected PaymentStrategy;
+    if (Payment successful?) then (No)
+      :Create Tenant with status = PENDING;
+      :Prompt visitor to retry payment;
+      stop
+    else (Yes)
+      :Continue tenant provisioning;
+    endif
+  else (No)
+    :Skip payment step;
+  endif
+endif
+
+|System|
+:Create Tenant record\nstatus = ACTIVE;
+:Create TenantConfig with default settings;
+:Create TenantAdmin / User account;
+:Create TenantSubscription for selected plan;
+:Send verification email to admin email;
+:Return bearer token and redirect to Tenant Admin;
+
+|Tenant Admin (Owner)|
+:Verify email address;
+:Complete initial tenant setup\n(branding, idol profile, domain if needed);
+
+|System|
+:Save setup data and mark onboarding complete;
+:Tenant Admin can operate the idol fansite;
+stop
+@enduml

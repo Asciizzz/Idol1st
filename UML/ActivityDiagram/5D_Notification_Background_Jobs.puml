@@ -1,0 +1,51 @@
+@startuml 5D_Notification_Background_Jobs
+title 5-D · Notification Preferences, Delivery & Background Jobs (UC-F43 to UC-F45, UC-S12 to UC-S15)
+
+start
+|Registered Fan|
+:Open Notifications page;
+if (Fan action?) then (View Notifications)
+  |System|
+  :Load FanNotification list by tenant and fan;
+elseif (Fan action?) then (Mark Read)
+  :Select notification;
+  |System|
+  :Set notification read_at = now();
+else (Update Preferences)
+  :Choose in-app/email notification preferences;
+  |System|
+  :Save FanNotificationPreference record;
+endif
+
+|Fan Event Publisher|
+:Publish domain event\n(new post, event, shipment, subscription, payment);
+
+|System|
+:Resolve eligible fan audience by tenant,\nvisibility, subscription and preferences;
+if (In-app notification enabled?) then (Yes)
+  :Create FanNotification record;
+else (No)
+  :Skip in-app notification;
+endif
+
+if (Email notification enabled?) then (Yes)
+  :Queue email notification job;
+  :Send email through mail provider;
+else (No)
+  :Skip email;
+endif
+
+:Log Fan Activity Audit entry;
+
+|Scheduled Job Runner|
+:Run Sync Social Follower Stats job;
+|System|
+:Fetch follower stats from configured social links;
+if (Social sync succeeds?) then (Yes)
+  :Update social follower metrics;
+else (No)
+  :Log sync failure and retry later;
+endif
+
+stop
+@enduml

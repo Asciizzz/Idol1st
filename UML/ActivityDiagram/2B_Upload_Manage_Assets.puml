@@ -1,0 +1,51 @@
+@startuml 2B_Upload_Manage_Assets
+title 2-B · Upload & Manage Media Assets (UC-T05, UC-T16, UC-T17)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open media or profile asset manager;
+:Select asset target\n(profile image / media gallery / discography / merch image);
+:Choose file from device;
+
+|System|
+:Verify tenant status = ACTIVE;
+:Check plan entitlement and storage quota;
+:Validate file size, extension and MIME type;
+if (Validation passed?) then (No)
+  :Return 422 or 403 with clear error;
+  stop
+else (Yes)
+  :Upload file to object storage;
+  :Create media asset metadata record\nwith tenant scope;
+endif
+
+if (Asset target?) then (Profile Image)
+  :Link asset to IdolProfile;
+elseif (Asset target?) then (Media Gallery)
+  |Tenant Admin (Owner/Admin)|
+  :Enter title, description and visibility;
+  |System|
+  :Create or update MediaGallery item;
+elseif (Asset target?) then (Discography)
+  |Tenant Admin (Owner/Admin)|
+  :Enter release title, type, date and platform links;
+  |System|
+  :Create or update Discography record;
+else (Merch Image)
+  :Attach asset to MerchProduct or variant;
+endif
+
+|System|
+:Invalidate fansite cache;
+:Updated asset becomes available according to visibility;
+
+|Tenant Admin (Owner/Admin)|
+if (Replace or remove old asset?) then (Yes)
+  |System|
+  :Mark old asset inactive or detach it\nwithout breaking historical records;
+else (No)
+  :Keep current asset;
+endif
+
+stop
+@enduml

@@ -1,0 +1,46 @@
+@startuml 2C_Manage_Platform_Links
+title 2-C · Manage Social & External Links (UC-T06, UC-T18, UC-F10, UC-F11)
+
+start
+|Tenant Admin (Owner/Admin)|
+:Open Social Links / External Sites manager;
+if (Admin action?) then (Add Link)
+  :Enter URL, label, platform type and sort order;
+  |System|
+  :Validate URL format and tenant scope;
+  :Fetch optional metadata\n(preview title and thumbnail);
+  if (Fetch successful?) then (No)
+    |Tenant Admin (Owner/Admin)|
+    :Confirm saving without preview;
+  else (Yes)
+    |Tenant Admin (Owner/Admin)|
+    :Show preview title and thumbnail;
+  endif
+  |System|
+  :Save link as active;
+elseif (Admin action?) then (Reorder)
+  :Drag and drop link order;
+  |System|
+  :Update sort_order for tenant links;
+elseif (Admin action?) then (Hide / Show)
+  :Toggle selected link visibility;
+  |System|
+  :Update is_active flag;
+else (Delete)
+  :Delete selected link;
+  |System|
+  :Remove or soft-delete link record;
+endif
+
+|System|
+:Invalidate fansite cache;
+
+|Anonymous Visitor / Registered Fan|
+:View external link list on idol profile;
+:Click external link;
+
+|System|
+:Record click analytics if enabled;
+:Redirect to external platform;
+stop
+@enduml
