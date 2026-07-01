@@ -42,6 +42,11 @@ class Fan extends Authenticatable
             ->where('status', 'ACTIVE')
             ->latestOfMany();
     }
+    
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
 
     // ── Helpers ───────────────────────────────────────────────
 

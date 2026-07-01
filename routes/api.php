@@ -31,7 +31,7 @@ use App\Http\Controllers\Manage\MembershipTierController;
 
 // Public auth routes (no Sanctum guard required)
 Route::prefix('auth')->group(function () {
-    Route::post('login', [AuthEditorController::class, 'login']);
+    Route::post('editor/login', [AuthEditorController::class, 'login']);
 });
 
 // Protected auth routes (requires valid Sanctum token)
@@ -103,11 +103,6 @@ Route::middleware(['auth:sanctum', 'ensure.service.admin'])->prefix('admin')->gr
 
     Route::get('audit-logs', [AuditLogController::class, 'index']);
 
-});
-
-// Tenant admin login — only needs resolve.tenant, no admin auth yet
-Route::prefix('manage')->group(function () {
-    Route::post('auth/login', [AuthEditorController::class, 'login']);
 });
 
 // Authenticated tenant admin routes
@@ -283,13 +278,12 @@ Route::middleware(['auth:sanctum'])
 use Illuminate\Http\Request;
 
 // temp (for testing routes)
-Route::get('/manage/test', function(){
-    return "tenant routes work";
-});
-
 Route::middleware('resolve.tenant')
 ->get('/tenant-test', function(Request $request){
 
-    return $request->tenant()->toArray();
+    return [
+        'host'=>request()->getHost(),
+        'tenant'=>$request->tenant()->toArray()
+    ];
 
 });

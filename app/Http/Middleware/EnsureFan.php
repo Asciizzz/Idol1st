@@ -6,19 +6,27 @@ use App\Models\Fan;
 use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureFan
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        $user = Auth::guard('fan')->user();
 
         if (! $user || ! ($user instanceof Fan)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Fan login required.',
-            ], 401);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. Fan login required.',
+                ], 401);
+            }
+
+            return redirect()->route('fan.login', [
+                'tenant' => $request->tenant()->slug,
+            ]);
         }
 
         // Ensure the fan belongs to the resolved tenant
