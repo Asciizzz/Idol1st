@@ -24,7 +24,7 @@ class AuthEditorController extends Controller
         $draft        = $this->resolveDraft($request);
         $initialGraph = $this->resolveInitialGraph();
 
-        return view('editor', [
+        return view('tenant-panel', [
             'sanctumToken' => session('sanctum_token'),
             'draft'        => $draft,
             'initialGraph' => $initialGraph,

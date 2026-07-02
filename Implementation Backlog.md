@@ -22,6 +22,7 @@ This backlog follows the implementation order derived from [project.md](project.
 
 - [x] Extract an admin facade or application service layer for tenant, billing, feature flag, and audit workflows.
 - [x] Introduce a dedicated fan-service layer for blog, event, merch, and membership actions.
+- [x] Normalize the tenant workspace shell naming (`tenant-panel.blade.php`, workspace labels, docs).
 - [ ] Centralize tenant-aware query helpers or repositories only where repetition is already a problem.
 - [ ] Keep controllers thin and limit them to request/response handling.
 

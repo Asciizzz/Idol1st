@@ -4,7 +4,7 @@
 | File | Destination |
 |---|---|
 | `Views/login.blade.php` | `resources/views/login.blade.php` |
-| `Views/editor.blade.php` | `resources/views/editor.blade.php` (replace existing) |
+| `Views/tenant-panel.blade.php` | `resources/views/tenant-panel.blade.php` (replace existing) |
 | `Middleware/RequireAuth.php` | `app/Http/Middleware/RequireAuth.php` |
 | `Routes/web.php` | `routes/web.php` (replace existing) |
 
@@ -32,7 +32,7 @@ In `bootstrap/app.php`, register the alias inside `withMiddleware()`:
 ```
 
 ## 4. Expose the Sanctum token to vsb.js
-The updated `editor.blade.php` sets `window.__VSB_TOKEN__` from the session.
+The updated `tenant-panel.blade.php` sets `window.__VSB_TOKEN__` from the session.
 In your `vsb.js`, use it for all API calls:
 ```js
 const token = window.__VSB_TOKEN__;

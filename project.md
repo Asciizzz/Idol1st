@@ -64,7 +64,7 @@ Full generated route table lives in `ROUTES.md` (109 routes, from `php artisan r
 ## 6. Views (Blade)
 
 Two rendering surfaces:
-- **App shell views** (`admin.blade.php`, `editor.blade.php`, `login.blade.php`) — thin Blade wrappers that boot the JS apps (`AdminPanel`, `VirtualSiteBuilder`) via Vite.
+- **App shell views** (`admin.blade.php`, `tenant-panel.blade.php`, `login.blade.php`) — thin Blade wrappers that boot the JS apps (`AdminPanel`, `VirtualSiteBuilder`) via Vite.
 - **Fan site** (`resources/views/fan/*`) — server-rendered per-tenant pages: `layout`, `home`, `news`, `events`, `membership`, `merch`, `cart`, `checkout`, `order-success`, `login`. These are classic Blade views (not SPA), rendered by `FanSiteController`, while the same data is also exposed via the `Fan\*` JSON API — so there are effectively two front-ends for the fan experience.
 
 ## 7. Database (40 migrations)

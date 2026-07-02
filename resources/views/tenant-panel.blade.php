@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Idol1st — Tenant Panel</title>
+    <title>Idol1st — Tenant Workspace</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -69,8 +69,8 @@
 <div class="layout">
 <nav class="sidebar">
     <div class="logo">Idol1st Tenant</div>
-    <div class="nav-section">Editor</div>
-    <div class="nav-item" onclick="sw('editor')">Editor</div>
+    <div class="nav-section">Workspace</div>
+    <div class="nav-item" onclick="sw('editor')">Workspace</div>
     <div class="nav-section">Tenant Admin</div>
     <div class="nav-item" onclick="sw('idol-profile')">Idol Profile</div>
     <div class="nav-item" onclick="sw('blog-mgmt')">Blog</div>
@@ -83,11 +83,11 @@
 </nav>
 <div class="main">
     <div class="topbar">
-        <h1 id="ptitle">Editor</h1>
+        <h1 id="ptitle">Workspace</h1>
         <div class="token-badge" id="tbadge">No token</div>
     </div>
 
-    <!-- ── EDITOR (full layout, separate from the req/resp panel pattern) ── -->
+    <!-- ── WORKSPACE (full layout, separate from the req/resp panel pattern) ── -->
     <div class="editor-layout" id="editor-layout">
         <div class="editor-toolbar">
             <label style="margin:0;display:inline">Project</label>
@@ -135,7 +135,7 @@
         </div>
     </div>
 
-    <!-- ── REQ/RESP PANEL LAYOUT (everything except Editor) ── -->
+    <!-- ── REQ/RESP PANEL LAYOUT (everything except Workspace) ── -->
     <div class="panels" id="std-panels">
         <div class="req-panel">
 

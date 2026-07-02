@@ -94,7 +94,7 @@
 <body>
     <div class="card">
         <h1>Idol1st</h1>
-        <p>Sign in to continue to the editor</p>
+        <p>Sign in to continue to the workspace</p>
 
         @if ($errors->any())
             <div class="error-bag">
