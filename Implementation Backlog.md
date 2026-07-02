@@ -25,6 +25,8 @@ This backlog follows the implementation order derived from [project.md](project.
 - [x] Normalize the tenant workspace shell naming (`tenant-panel.blade.php`, workspace labels, docs).
 - [x] Centralize tenant-aware query helpers or repositories only where repetition is already a problem.
 - [ ] Keep controllers thin and limit them to request/response handling.
+- [x] Extract merch workflow logic out of the manage controller.
+- [x] Extract blog publish/comment workflow logic out of the manage controller.
 
 ## Phase 2. Events And Observer
 

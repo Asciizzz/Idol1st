@@ -10,18 +10,17 @@ use App\Http\Resources\MerchOrderResource;
 use App\Http\Resources\MerchProductResource;
 use App\Models\MerchOrder;
 use App\Models\MerchProduct;
-use App\Models\MerchVariant;
-use App\Models\Shipment;
 use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-
-use App\Services\NotificationService;
+use App\Services\Manage\MerchWorkflowService;
 
 class MerchController extends Controller
 {
+    public function __construct(private MerchWorkflowService $merchWorkflowService)
+    {
+    }
+
     /**
      * GET /api/manage/merch/products
      */
@@ -56,42 +55,10 @@ class MerchController extends Controller
     public function store(StoreMerchProductRequest $request): JsonResponse
     {
         $tenant = app(Tenant::class);
-
-        $product = DB::transaction(function () use ($request, $tenant) {
-            $product = MerchProduct::create([
-                'id'                 => Str::uuid(),
-                'tenant_id'          => $tenant->id,
-                'category_id'        => $request->category_id,
-                'name'               => $request->name,
-                'description'        => $request->description,
-                'base_price'         => $request->base_price,
-                'currency'           => $request->currency,
-                'is_limited_edition' => $request->input('is_limited_edition', false),
-                'available_from'     => $request->available_from,
-                'available_until'    => $request->available_until,
-            ]);
-
-            foreach ($request->variants as $v) {
-                MerchVariant::create([
-                    'id'            => Str::uuid(),
-                    'product_id'    => $product->id,
-                    'sku'           => $v['sku'],
-                    'attributes'    => $v['attributes'],
-                    'price'         => $v['price'],
-                    'stock_qty'     => $v['stock_qty'],
-                    'available_qty' => $v['stock_qty'], // available starts equal to stock
-                ]);
-            }
-
-            return $product->load('category', 'variants');
-        });
-
-        app(NotificationService::class)->broadcast(
+        $product = $this->merchWorkflowService->createProduct(
             $tenant,
-            'NEW_MERCH',
-            "New merch available: {$product->name}",
-            $product->id,
-            'MerchProduct',
+            $request->validated(),
+            $request->variants,
         );
 
         return response()->json([
@@ -106,19 +73,15 @@ class MerchController extends Controller
     public function updateStock(UpdateVariantStockRequest $request, string $variantId): JsonResponse
     {
         $tenant  = app(Tenant::class);
-        $variant = MerchVariant::whereHas('product', fn ($q) => $q->forTenant($tenant))
-            ->findOrFail($variantId);
-
-        $diff = $request->stock_qty - $variant->stock_qty;
-
-        $variant->update([
-            'stock_qty'     => $request->stock_qty,
-            'available_qty' => max(0, $variant->available_qty + $diff),
-        ]);
+        $variant = $this->merchWorkflowService->adjustVariantStock(
+            $tenant,
+            $variantId,
+            $request->stock_qty,
+        );
 
         return response()->json([
             'success' => true,
-            'data'    => $variant->fresh(),
+            'data'    => $variant,
         ]);
     }
 
@@ -156,38 +119,22 @@ class MerchController extends Controller
     public function ship(ShipOrderRequest $request, string $orderId): JsonResponse
     {
         $tenant = app(Tenant::class);
-        $order  = MerchOrder::forTenant($tenant)->findOrFail($orderId);
-
-        if (! in_array($order->status, ['PAID'])) {
+        try {
+            $order = $this->merchWorkflowService->shipOrder(
+                $tenant,
+                $orderId,
+                $request->validated(),
+            );
+        } catch (\RuntimeException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only PAID orders can be shipped.',
+                'message' => $exception->getMessage(),
             ], 422);
         }
 
-        DB::transaction(function () use ($request, $order) {
-            Shipment::create([
-                'id'                 => Str::uuid(),
-                'order_id'           => $order->id,
-                'tracking_number'    => $request->tracking_number,
-                'carrier'            => $request->carrier,
-                'status'             => 'SHIPPED',
-                'shipped_at'         => now(),
-                'estimated_delivery' => $request->estimated_delivery,
-            ]);
-
-            $order->update(['status' => 'SHIPPED']);
-
-            // Also confirm stock deduction on shipment
-            foreach ($order->items as $item) {
-                MerchVariant::where('sku', $item->sku)
-                    ->decrement('stock_qty', $item->quantity);
-            }
-        });
-
         return response()->json([
             'success' => true,
-            'data'    => new MerchOrderResource($order->fresh('items', 'payment', 'shipment')),
+            'data'    => new MerchOrderResource($order),
         ]);
     }
 }

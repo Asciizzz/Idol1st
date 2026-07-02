@@ -11,12 +11,14 @@ use App\Models\BlogPost;
 use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-
-use App\Services\NotificationService;
+use App\Services\Manage\BlogWorkflowService;
 
 class BlogController extends Controller
 {
+    public function __construct(private BlogWorkflowService $blogWorkflowService)
+    {
+    }
+
     /**
      * GET /api/manage/blog/posts
      */
@@ -51,31 +53,11 @@ class BlogController extends Controller
     public function store(StoreBlogPostRequest $request): JsonResponse
     {
         $tenant = app(Tenant::class);
-
-        $status      = $request->input('status', 'DRAFT');
-        $publishedAt = null;
-
-        if ($status === 'PUBLISHED') {
-            $publishedAt = $request->filled('publish_at')
-                ? $request->publish_at
-                : now();
-        }
-
-        $post = BlogPost::create([
-            'id'          => Str::uuid(),
-            'tenant_id'   => $tenant->id,
-            'category_id' => $request->category_id,
-            'title'       => $request->title,
-            'content'     => $request->input('content'),
-            'tags'        => $request->input('tags', []),
-            'visibility'  => $request->input('visibility', 'PUBLIC'),
-            'status'      => $status,
-            'published_at'=> $publishedAt,
-        ]);
+        $post = $this->blogWorkflowService->createPost($tenant, $request->validated());
 
         return response()->json([
             'success' => true,
-            'data'    => new BlogPostResource($post->load('category')),
+            'data'    => new BlogPostResource($post),
         ], 201);
     }
 
@@ -85,27 +67,11 @@ class BlogController extends Controller
     public function publish(string $postId): JsonResponse
     {
         $tenant = app(Tenant::class);
-
-        $post = BlogPost::forTenant($tenant)
-            ->findOrFail($postId);
-
-        $post->update([
-            'status'       => 'PUBLISHED',
-            'published_at' => $post->published_at ?? now(),
-        ]);
-
-        $tenant = app(Tenant::class);
-        app(NotificationService::class)->broadcast(
-            $tenant,
-            'NEW_POST',
-            "New post: {$post->title}",
-            $post->id,
-            'BlogPost',
-        );
+        $post = $this->blogWorkflowService->publishPost($tenant, $postId);
 
         return response()->json([
             'success' => true,
-            'data'    => new BlogPostResource($post->fresh('category')),
+            'data'    => new BlogPostResource($post),
         ]);
     }
 
@@ -115,16 +81,11 @@ class BlogController extends Controller
     public function hideComment(string $commentId): JsonResponse
     {
         $tenant = app(Tenant::class);
-
-        // Ensure the comment belongs to a post in this tenant
-        $comment = BlogComment::whereHas('post', fn ($q) => $q->forTenant($tenant))
-            ->findOrFail($commentId);
-
-        $comment->update(['is_hidden' => true]);
+        $comment = $this->blogWorkflowService->hideComment($tenant, $commentId);
 
         return response()->json([
             'success' => true,
-            'data'    => new BlogCommentResource($comment->fresh()),
+            'data'    => new BlogCommentResource($comment),
         ]);
     }
 }
