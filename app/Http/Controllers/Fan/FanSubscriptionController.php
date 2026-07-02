@@ -13,13 +13,15 @@ use App\Models\MembershipTier;
 use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
-use App\Services\NotificationService;
+use App\Services\Fan\SubscriptionWorkflowService;
 
 class FanSubscriptionController extends Controller
 {
+    public function __construct(private SubscriptionWorkflowService $subscriptionWorkflowService)
+    {
+    }
+
     /**
      * GET /api/membership/tiers
      *
@@ -51,46 +53,23 @@ class FanSubscriptionController extends Controller
     {
         /** @var Fan $fan */
         $fan  = $request->user('sanctum');
-        $tier = MembershipTier::findOrFail($request->tier_id);
-
-        // Validate tier belongs to this tenant
         $tenant = app(Tenant::class);
-        if ($tier->tenant_id !== $tenant->id) {
+
+        try {
+            $subscription = $this->subscriptionWorkflowService->subscribe(
+                $fan,
+                $tenant,
+                $request->tier_id,
+                $request->input('auto_renew', true)
+            );
+        } catch (\RuntimeException $exception) {
+            $status = $exception->getMessage() === 'Tier not found.' ? 404 : 422;
+
             return response()->json([
                 'success' => false,
-                'message' => 'Tier not found.',
-            ], 404);
+                'message' => $exception->getMessage(),
+            ], $status);
         }
-
-        // Check capacity
-        if (! $tier->hasCapacity()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This membership tier is full.',
-            ], 422);
-        }
-
-        // Check for existing active subscription
-        $existing = FanSubscription::where('fan_id', $fan->id)
-            ->where('status', 'ACTIVE')
-            ->first();
-
-        if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You already have an active subscription. Use the upgrade endpoint to change tiers.',
-            ], 422);
-        }
-
-        $subscription = DB::transaction(function () use ($fan, $tier, $request) {
-            return FanSubscription::create([
-                'id'         => Str::uuid(),
-                'fan_id'     => $fan->id,
-                'tier_id'    => $tier->id,
-                'status'     => 'ACTIVE', // confirmed by webhook in Step 14
-                'auto_renew' => $request->input('auto_renew', true),
-            ]);
-        });
 
         return response()->json([
             'success' => true,
@@ -132,28 +111,12 @@ class FanSubscriptionController extends Controller
     {
         /** @var Fan $fan */
         $fan = $request->user('sanctum');
-
-        $subscription = FanSubscription::where('fan_id', $fan->id)
-            ->where('status', 'ACTIVE')
-            ->firstOrFail();
-
-        $subscription->update([
-            'status'     => 'CANCELLED',
-            'auto_renew' => false,
-        ]);
-
-        app(NotificationService::class)->notify(
-            $fan,
-            'SUBSCRIPTION_EXPIRY',
-            'Your membership has been cancelled.',
-            $subscription->id,
-            'FanSubscription',
-        );
+        $subscription = $this->subscriptionWorkflowService->cancel($fan);
 
         return response()->json([
             'success' => true,
             'message' => 'Subscription cancelled.',
-            'data'    => new FanSubscriptionResource($subscription->fresh('tier.perks')),
+            'data'    => new FanSubscriptionResource($subscription),
         ]);
     }
 
@@ -169,32 +132,16 @@ class FanSubscriptionController extends Controller
         $fan    = $request->user('sanctum');
         $tenant = app(Tenant::class);
 
-        $newTier = MembershipTier::where('tenant_id', $tenant->id)
-            ->where('is_active', true)
-            ->findOrFail($request->tier_id);
+        try {
+            $subscription = $this->subscriptionWorkflowService->upgrade($fan, $tenant, $request->tier_id);
+        } catch (\RuntimeException $exception) {
+            $status = $exception->getMessage() === 'Tier not found.' ? 404 : 422;
 
-        if (! $newTier->hasCapacity()) {
             return response()->json([
                 'success' => false,
-                'message' => 'This membership tier is full.',
-            ], 422);
+                'message' => $exception->getMessage(),
+            ], $status);
         }
-
-        $subscription = DB::transaction(function () use ($fan, $newTier) {
-            // Cancel current subscription
-            FanSubscription::where('fan_id', $fan->id)
-                ->where('status', 'ACTIVE')
-                ->update(['status' => 'CANCELLED']);
-
-            // Create new subscription on upgraded tier
-            return FanSubscription::create([
-                'id'         => Str::uuid(),
-                'fan_id'     => $fan->id,
-                'tier_id'    => $newTier->id,
-                'status'     => 'ACTIVE',
-                'auto_renew' => true,
-            ]);
-        });
 
         return response()->json([
             'success' => true,

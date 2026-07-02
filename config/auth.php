@@ -60,7 +60,6 @@ return [
     'providers' => [
         'users'          => ['driver' => 'eloquent', 'model' => App\Models\User::class],
         'service_admins' => ['driver' => 'eloquent', 'model' => App\Models\ServiceAdmin::class],
-        'tenant_admins' => ['driver' => 'eloquent', 'model' => App\Models\TenantAdmin::class],
         'fans' => ['driver' => 'eloquent', 'model' => App\Models\Fan::class],
     ],
     /*

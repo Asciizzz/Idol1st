@@ -7,16 +7,17 @@ use App\Http\Requests\Admin\AssignPlanRequest;
 use App\Http\Requests\Admin\StoreTenantRequest;
 use App\Http\Requests\Admin\SuspendTenantRequest;
 use App\Http\Resources\TenantResource;
-use App\Models\Plan;
 use App\Models\Tenant;
-use App\Models\TenantSubscription;
+use App\Services\Admin\TenantManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class TenantController extends Controller
 {
+    public function __construct(private TenantManagementService $tenantManagementService)
+    {
+    }
+
     /**
      * GET /api/admin/tenants
      */
@@ -51,29 +52,11 @@ class TenantController extends Controller
      */
     public function store(StoreTenantRequest $request): JsonResponse
     {
-        $tenant = DB::transaction(function () use ($request) {
-            $tenant = Tenant::create([
-                'id'         => Str::uuid(),
-                'name'       => $request->name,
-                'status'     => 'ACTIVE',
-                'created_by' => $request->user()?->id,
-                'config'     => [
-                    'branding_logo'   => null,
-                    'branding_colors' => null,
-                    'custom_domain'   => null,
-                    'settings'        => [],
-                ],
-            ]);
-
-            TenantSubscription::create([
-                'id'        => Str::uuid(),
-                'tenant_id' => $tenant->id,
-                'plan_id'   => $request->plan_id,
-                'status'    => 'ACTIVE',
-            ]);
-
-            return $tenant->load('subscription.plan');
-        });
+        $tenant = $this->tenantManagementService->createTenant(
+            $request->name,
+            $request->plan_id,
+            $request->user()?->id,
+        );
 
         return response()->json([
             'success' => true,
@@ -104,12 +87,14 @@ class TenantController extends Controller
             'config' => ['sometimes', 'array'],
         ]);
 
-        $tenant = Tenant::findOrFail($tenantId);
-        $tenant->update($request->only(['name', 'config']));
+        $tenant = $this->tenantManagementService->updateTenant(
+            $tenantId,
+            $request->only(['name', 'config'])
+        );
 
         return response()->json([
             'success' => true,
-            'data'    => new TenantResource($tenant->fresh('subscription.plan')),
+            'data'    => new TenantResource($tenant),
         ]);
     }
 
@@ -118,20 +103,14 @@ class TenantController extends Controller
      */
     public function suspend(SuspendTenantRequest $request, string $tenantId): JsonResponse
     {
-        $tenant = Tenant::findOrFail($tenantId);
-
-        if ($tenant->isSuspended()) {
+        try {
+            $tenant = $this->tenantManagementService->suspendTenant($tenantId, $request->reason);
+        } catch (\RuntimeException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tenant is already suspended.',
+                'message' => $exception->getMessage(),
             ], 422);
         }
-
-        $tenant->update([
-            'status'             => 'SUSPENDED',
-            'suspended_at'       => now(),
-            'suspension_reason'  => $request->reason,
-        ]);
 
         return response()->json([
             'success' => true,
@@ -144,20 +123,14 @@ class TenantController extends Controller
      */
     public function reactivate(string $tenantId): JsonResponse
     {
-        $tenant = Tenant::findOrFail($tenantId);
-
-        if ($tenant->isActive()) {
+        try {
+            $this->tenantManagementService->reactivateTenant($tenantId);
+        } catch (\RuntimeException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tenant is already active.',
+                'message' => $exception->getMessage(),
             ], 422);
         }
-
-        $tenant->update([
-            'status'             => 'ACTIVE',
-            'suspended_at'       => null,
-            'suspension_reason'  => null,
-        ]);
 
         return response()->json([
             'success' => true,
@@ -213,23 +186,7 @@ class TenantController extends Controller
      */
     public function assignPlan(AssignPlanRequest $request, string $tenantId): JsonResponse
     {
-        $tenant = Tenant::findOrFail($tenantId);
-        $plan   = Plan::findOrFail($request->plan_id);
-
-        DB::transaction(function () use ($tenant, $plan) {
-            // Cancel existing active subscription
-            $tenant->subscriptions()
-                ->where('status', 'ACTIVE')
-                ->update(['status' => 'CANCELLED']);
-
-            // Create new subscription
-            TenantSubscription::create([
-                'id'        => Str::uuid(),
-                'tenant_id' => $tenant->id,
-                'plan_id'   => $plan->id,
-                'status'    => 'ACTIVE',
-            ]);
-        });
+        $plan = $this->tenantManagementService->assignPlan($tenantId, $request->plan_id);
 
         return response()->json([
             'success' => true,

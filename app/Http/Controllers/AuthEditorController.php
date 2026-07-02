@@ -155,7 +155,7 @@ class AuthEditorController extends Controller
     }
 
     /**
-     * POST /api/auth/logout
+     * POST /api/auth/editor/logout
      *
      * Revokes the current access token.
      */

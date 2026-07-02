@@ -1,0 +1,1852 @@
+@startuml Idol_SaaS_Full_System
+' ============================================================
+' IDOL SAAS PLATFORM - FULL CLASS DIAGRAM
+' Layers: Platform Admin | Tenant/Idol | Fan Domain
+' Patterns: Command, Facade, Strategy, Decorator,
+'           Chain of Responsibility, Observer, State,
+'           Repository
+' ============================================================
+
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam packageFontStyle bold
+skinparam packageBorderColor #555555
+skinparam packageBackgroundColor #FAFAFA
+skinparam ArrowColor #444444
+skinparam classBorderColor #444444
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #444444
+  HeaderBackgroundColor #E8EAF6
+}
+
+' ============================================================
+' ============================================================
+' SECTION 1: PLATFORM ADMIN LAYER
+' ============================================================
+' ============================================================
+
+' ============================================================
+' PACKAGE: PLATFORM IDENTITY LAYER
+' ============================================================
+package "Platform Identity Layer" #EDE7F6 {
+
+  class ServiceAdmin {
+    - id: UUID
+    - email: String
+    - passwordHash: String
+    - role: AdminRole
+    - permissions: List<AdminPermission>
+    - mfaEnabled: Boolean
+    - lastLoginAt: DateTime
+    - createdAt: DateTime
+    - isActive: Boolean
+    --
+    + getId(): UUID
+    + getRole(): AdminRole
+    + getPermissions(): List<AdminPermission>
+    + isMfaEnabled(): Boolean
+  }
+
+  enum AdminRole {
+    SUPER_ADMIN
+    SUPPORT
+    BILLING_ADMIN
+    OPS
+  }
+
+  enum AdminPermission {
+    MANAGE_TENANTS
+    MANAGE_PLANS
+    MANAGE_FEATURES
+    VIEW_AUDIT_LOGS
+    IMPERSONATE
+    SYSTEM_CONFIG
+  }
+
+  class TenantAdmin {
+    - id: UUID
+    - tenantId: UUID
+    - email: String
+    - passwordHash: String
+    - role: TenantRole
+    - permissions: List<TenantPermission>
+    - lastLoginAt: DateTime
+    - createdAt: DateTime
+    - isActive: Boolean
+    --
+    + getId(): UUID
+    + getTenantId(): UUID
+    + getRole(): TenantRole
+  }
+
+  enum TenantRole {
+    OWNER
+    ADMIN
+    BILLING
+  }
+
+  class User {
+    - id: UUID
+    - email: String
+    - passwordHash: String
+    - createdAt: DateTime
+    - isActive: Boolean
+    --
+    + getId(): UUID
+    + getEmail(): String
+  }
+
+  ServiceAdmin --> AdminRole
+  ServiceAdmin --> AdminPermission
+  TenantAdmin --> TenantRole
+  TenantAdmin --|> User
+}
+
+' ============================================================
+' PACKAGE: TENANT DOMAIN LAYER
+' ============================================================
+package "Tenant Domain Layer" #E8F5E9 {
+
+  class Tenant {
+    - id: UUID
+    - name: String
+    - status: TenantStatus
+    - createdBy: UUID
+    - createdAt: DateTime
+    - suspendedAt: DateTime
+    - deletedAt: DateTime
+    --
+    + getId(): UUID
+    + getName(): String
+    + getStatus(): TenantStatus
+    + isActive(): Boolean
+  }
+
+  enum TenantStatus {
+    ACTIVE
+    SUSPENDED
+    DELETED
+    PENDING
+  }
+
+  class TenantConfig {
+    - id: UUID
+    - tenantId: UUID
+    - brandingLogo: String
+    - brandingColors: String
+    - customDomain: String
+    - settings: Map<String, Object>
+    --
+    + getSetting(key): Object
+    + updateSetting(key, val): void
+  }
+
+  class TenantMembership {
+    - id: UUID
+    - tenantId: UUID
+    - userId: UUID
+    - roleId: UUID
+    - joinedAt: DateTime
+    - isActive: Boolean
+    --
+    + getRole(): Role
+    + deactivate(): void
+  }
+
+  class Role {
+    - id: UUID
+    - tenantId: UUID
+    - name: String
+    - permissions: List<TenantPermission>
+    --
+    + hasPermission(p): Boolean
+    + addPermission(p): void
+  }
+
+  class TenantSubscription {
+    - id: UUID
+    - tenantId: UUID
+    - planId: UUID
+    - startDate: DateTime
+    - endDate: DateTime
+    - status: SubscriptionStatus
+    --
+    + isActive(): Boolean
+    + getPlan(): Plan
+  }
+
+  class Plan {
+    - id: UUID
+    - name: String
+    - price: Decimal
+    - billingCycle: BillingCycle
+    - features: List<Feature>
+    --
+    + getFeatures(): List<Feature>
+    + hasFeature(f): Boolean
+  }
+
+  class Feature {
+    - id: UUID
+    - name: String
+    - description: String
+    - isEnabled: Boolean
+    --
+    + enable(): void
+    + disable(): void
+  }
+
+  class FeatureFlag {
+    - id: UUID
+    - name: String
+    - isGloballyEnabled: Boolean
+    - createdAt: DateTime
+    --
+    + isEnabled(): Boolean
+    + rolloutGlobally(): void
+  }
+
+  class TenantFeatureOverride {
+    - id: UUID
+    - tenantId: UUID
+    - flagId: UUID
+    - isEnabled: Boolean
+    - overriddenAt: DateTime
+    --
+    + apply(): void
+    + revert(): void
+  }
+
+  class AuditLog {
+    - id: UUID
+    - tenantId: UUID
+    - adminId: UUID
+    - action: String
+    - targetEntity: String
+    - targetId: UUID
+    - metadata: Map<String, Object>
+    - performedAt: DateTime
+    --
+    + getDetails(): String
+  }
+
+  class SystemConfig {
+    - id: UUID
+    - key: String
+    - value: Object
+    - updatedBy: UUID
+    - updatedAt: DateTime
+    --
+    + getValue(): Object
+    + setValue(val): void
+  }
+
+  class ImpersonationSession {
+    - id: UUID
+    - adminId: UUID
+    - targetTenantId: UUID
+    - targetUserId: UUID
+    - startedAt: DateTime
+    - expiresAt: DateTime
+    - isActive: Boolean
+    --
+    + start(): void
+    + end(): void
+    + isExpired(): Boolean
+  }
+
+  Tenant --> TenantStatus
+  Tenant "1" *-- "1" TenantConfig
+  Tenant "1" *-- "many" TenantMembership
+  Tenant "1" *-- "1" TenantSubscription
+  TenantSubscription --> Plan
+  Plan "1" *-- "many" Feature
+  TenantMembership --> Role
+  TenantMembership --> User
+  FeatureFlag "1" *-- "many" TenantFeatureOverride
+  TenantFeatureOverride --> Tenant
+  AuditLog --> Tenant
+  ImpersonationSession --> Tenant
+}
+
+' ============================================================
+' PACKAGE: STRATEGY PATTERN - ADMIN OPERATIONS
+' ============================================================
+package "Strategy Pattern - Admin Operations" #FFF8E1 {
+
+  class AdminOperationContext {
+    - strategy: AdminOperationStrategy
+    - admin: ServiceAdmin
+    --
+    + setStrategy(s: AdminOperationStrategy): void
+    + executeOperation(request: AdminRequest): void
+    + canExecute(request: AdminRequest): Boolean
+  }
+
+  interface AdminOperationStrategy {
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  class SuperAdminStrategy {
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  class SupportAdminStrategy {
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  class BillingAdminStrategy {
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  AdminOperationContext --> AdminOperationStrategy
+  AdminOperationContext --> ServiceAdmin
+  SuperAdminStrategy ..|> AdminOperationStrategy
+  SupportAdminStrategy ..|> AdminOperationStrategy
+  BillingAdminStrategy ..|> AdminOperationStrategy
+}
+
+' ============================================================
+' PACKAGE: COMMAND PATTERN
+' ============================================================
+package "Command Pattern" #E3F2FD {
+
+  class AdminCommandInvoker {
+    - history: List<AdminCommand>
+    - pendingQueue: Queue<AdminCommand>
+    --
+    + executeCommand(cmd: AdminCommand): void
+    + undoLast(): void
+    + getHistory(): List<AdminCommand>
+    + clearHistory(): void
+  }
+
+  interface AdminCommand {
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class AuditEntry {
+    - commandName: String
+    - adminId: UUID
+    - parameters: Map<String, Object>
+    - executedAt: DateTime
+    - result: String
+    --
+    + toLog(): AuditLog
+  }
+
+  class SuspendTenantCommand {
+    - tenantId: UUID
+    - reason: String
+    - receiver: TenantService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class CreateTenantCommand {
+    - tenantName: String
+    - planId: UUID
+    - receiver: TenantService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class DeleteTenantCommand {
+    - tenantId: UUID
+    - receiver: TenantService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class AssignPlanCommand {
+    - tenantId: UUID
+    - planId: UUID
+    - previousPlanId: UUID
+    - receiver: BillingService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class RevokePlanCommand {
+    - tenantId: UUID
+    - receiver: BillingService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class EnableFeatureCommand {
+    - tenantId: UUID
+    - flagId: UUID
+    - receiver: FeatureFlagService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class RolloutFeatureGloballyCommand {
+    - flagId: UUID
+    - receiver: FeatureFlagService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class SendPlatformNotificationCommand {
+    - message: String
+    - scope: NotificationScope
+    - receiver: NotificationService
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  AdminCommandInvoker "1" o-- "many" AdminCommand
+  SuspendTenantCommand ..|> AdminCommand
+  CreateTenantCommand ..|> AdminCommand
+  DeleteTenantCommand ..|> AdminCommand
+  AssignPlanCommand ..|> AdminCommand
+  RevokePlanCommand ..|> AdminCommand
+  EnableFeatureCommand ..|> AdminCommand
+  RolloutFeatureGloballyCommand ..|> AdminCommand
+  SendPlatformNotificationCommand ..|> AdminCommand
+  AdminCommand --> AuditEntry
+}
+
+' ============================================================
+' PACKAGE: RECEIVER LAYER - ADMIN SERVICES
+' ============================================================
+package "Receiver Layer - Admin Services" #FCE4EC {
+
+  class TenantService {
+    --
+    + createTenant(name, planId): Tenant
+    + suspendTenant(tenantId): void
+    + reactivateTenant(tenantId): void
+    + deleteTenant(tenantId): void
+    + getTenant(tenantId): Tenant
+    + listTenants(): List<Tenant>
+  }
+
+  class BillingService {
+    --
+    + assignPlan(tenantId, planId): void
+    + revokePlan(tenantId): void
+    + createPlan(details): Plan
+    + updatePlan(planId, details): Plan
+    + getInvoices(tenantId): List<Invoice>
+    + updatePaymentMethod(tenantId, details): void
+  }
+
+  class FeatureFlagService {
+    --
+    + createFlag(name, config): FeatureFlag
+    + enableFeature(tenantId, flagId): void
+    + disableFeature(tenantId, flagId): void
+    + rolloutGlobally(flagId): void
+    + getFlags(): List<FeatureFlag>
+  }
+
+  class NotificationService {
+    --
+    + sendPlatformNotification(msg, scope): void
+    + sendTenantNotification(tenantId, msg): void
+    + getNotifications(tenantId): List<Notification>
+  }
+
+  class AuditService {
+    --
+    + log(entry: AuditEntry): void
+    + getLogsForTenant(tenantId): List<AuditLog>
+    + getAllLogs(filters): List<AuditLog>
+    + exportLogs(dateRange): Report
+  }
+
+  SuspendTenantCommand --> TenantService
+  CreateTenantCommand --> TenantService
+  DeleteTenantCommand --> TenantService
+  AssignPlanCommand --> BillingService
+  RevokePlanCommand --> BillingService
+  EnableFeatureCommand --> FeatureFlagService
+  RolloutFeatureGloballyCommand --> FeatureFlagService
+  SendPlatformNotificationCommand --> NotificationService
+}
+
+' ============================================================
+' PACKAGE: FACADE PATTERN
+' ============================================================
+package "Facade Pattern" #F3E5F5 {
+
+  interface IAdminFacade {
+    + manageTenant(action, tenantId): void
+    + manageBilling(action, tenantId): void
+    + manageFeatures(action, flagId): void
+    + monitorSystem(): SystemHealthReport
+    + sendNotification(msg, scope): void
+  }
+
+  class AdminFacade {
+    - tenantService: TenantService
+    - billingService: BillingService
+    - featureFlagService: FeatureFlagService
+    - notificationService: NotificationService
+    - auditService: AuditService
+    --
+    + manageTenant(action, tenantId): void
+    + manageBilling(action, tenantId): void
+    + manageFeatures(action, flagId): void
+    + monitorSystem(): SystemHealthReport
+    + sendNotification(msg, scope): void
+  }
+
+  AdminFacade ..|> IAdminFacade
+  AdminFacade --> TenantService
+  AdminFacade --> BillingService
+  AdminFacade --> FeatureFlagService
+  AdminFacade --> NotificationService
+  AdminFacade --> AuditService
+}
+
+' ============================================================
+' PACKAGE: DECORATOR PATTERN - ADMIN LAYER
+' ============================================================
+package "Decorator Pattern - Admin Layer" #E0F7FA {
+
+  abstract class BaseCommandDecorator {
+    # wrappedCommand: AdminCommand
+    --
+    + execute(): void
+    + undo(): void
+    + getAuditEntry(): AuditEntry
+  }
+
+  class AuditCommandDecorator {
+    - auditService: AuditService
+    --
+    + execute(): void
+    + undo(): void
+  }
+
+  class PermissionCheckDecorator {
+    - admin: ServiceAdmin
+    --
+    + execute(): void
+    + undo(): void
+  }
+
+  class RateLimitDecorator {
+    - maxRequests: int
+    - windowSeconds: int
+    --
+    + execute(): void
+    + undo(): void
+  }
+
+  abstract class AdminFacadeDecorator {
+    # wrapped: IAdminFacade
+    --
+    + manageTenant(action, tenantId): void
+    + manageBilling(action, tenantId): void
+    + manageFeatures(action, flagId): void
+  }
+
+  class MFAVerificationDecorator {
+    - admin: ServiceAdmin
+    --
+    + manageTenant(action, tenantId): void
+    + manageBilling(action, tenantId): void
+    + manageFeatures(action, flagId): void
+  }
+
+  class LoggingFacadeDecorator {
+    --
+    + manageTenant(action, tenantId): void
+    + manageBilling(action, tenantId): void
+    + manageFeatures(action, flagId): void
+  }
+
+  abstract class StrategyDecorator {
+    # wrapped: AdminOperationStrategy
+    --
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  class AuditStrategyDecorator {
+    - auditService: AuditService
+    --
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  class ValidationStrategyDecorator {
+    --
+    + execute(context: AdminOperationContext): void
+    + canExecute(admin: ServiceAdmin): Boolean
+  }
+
+  BaseCommandDecorator ..|> AdminCommand
+  BaseCommandDecorator o--> AdminCommand
+  AuditCommandDecorator --|> BaseCommandDecorator
+  PermissionCheckDecorator --|> BaseCommandDecorator
+  RateLimitDecorator --|> BaseCommandDecorator
+
+  AdminFacadeDecorator ..|> IAdminFacade
+  AdminFacadeDecorator o--> IAdminFacade
+  MFAVerificationDecorator --|> AdminFacadeDecorator
+  LoggingFacadeDecorator --|> AdminFacadeDecorator
+
+  StrategyDecorator ..|> AdminOperationStrategy
+  StrategyDecorator o--> AdminOperationStrategy
+  AuditStrategyDecorator --|> StrategyDecorator
+  ValidationStrategyDecorator --|> StrategyDecorator
+}
+
+' ============================================================
+' PACKAGE: CHAIN OF RESPONSIBILITY
+' ============================================================
+package "Chain of Responsibility" #FFF3E0 {
+
+  abstract class AdminRequestHandler {
+    # next: AdminRequestHandler
+    --
+    + setNext(handler: AdminRequestHandler): void
+    + handle(request: AdminRequest): void
+  }
+
+  class AdminRequest {
+    - admin: ServiceAdmin
+    - commandType: String
+    - parameters: Map<String, Object>
+    - requestedAt: DateTime
+    --
+    + getAdmin(): ServiceAdmin
+    + getCommandType(): String
+  }
+
+  class AuthCheckHandler {
+    --
+    + handle(request: AdminRequest): void
+  }
+
+  class PermissionHandler {
+    --
+    + handle(request: AdminRequest): void
+  }
+
+  class MFACheckHandler {
+    --
+    + handle(request: AdminRequest): void
+  }
+
+  class ExecuteOperationHandler {
+    - invoker: AdminCommandInvoker
+    --
+    + handle(request: AdminRequest): void
+  }
+
+  AuthCheckHandler --|> AdminRequestHandler
+  PermissionHandler --|> AdminRequestHandler
+  MFACheckHandler --|> AdminRequestHandler
+  ExecuteOperationHandler --|> AdminRequestHandler
+  AdminRequestHandler --> AdminRequestHandler : next
+  ExecuteOperationHandler --> AdminCommandInvoker
+  AdminRequest --> ServiceAdmin
+}
+
+' ============================================================
+' ============================================================
+' SECTION 2: IDOL DOMAIN LAYER
+' ============================================================
+' ============================================================
+
+' ============================================================
+' PACKAGE: IDOL PROFILE DOMAIN
+' ============================================================
+package "Idol Profile Domain" #F9FBE7 {
+
+  class IdolProfile {
+    - id: UUID
+    - tenantId: UUID
+    - stageName: String
+    - realName: String
+    - debutDate: Date
+    - agency: String
+    - nationality: String
+    - profileImageUrl: String
+    - bannerImageUrl: String
+    - bio: String
+    - status: IdolStatus
+    --
+    + getStageName(): String
+    + getSocialLinks(): List<SocialLink>
+    + isActive(): Boolean
+  }
+
+  class IdolGroup {
+    - id: UUID
+    - tenantId: UUID
+    - groupName: String
+    - debutDate: Date
+    - agency: String
+    - profileImageUrl: String
+    - bio: String
+    --
+    + getMembers(): List<IdolProfile>
+    + addMember(idol): void
+    + removeMember(idolId): void
+  }
+
+  class SocialLink {
+    - id: UUID
+    - idolId: UUID
+    - platform: SocialPlatform
+    - url: String
+    - followerCount: Long
+    - lastSyncedAt: DateTime
+    --
+    + sync(): void
+    + getFollowerCount(): Long
+  }
+
+  enum IdolStatus {
+    ACTIVE
+    HIATUS
+    RETIRED
+  }
+
+  enum SocialPlatform {
+    TWITTER
+    INSTAGRAM
+    YOUTUBE
+    TIKTOK
+    WEIBO
+  }
+
+  IdolProfile --> IdolStatus
+  IdolProfile "1" *-- "many" SocialLink
+  SocialLink --> SocialPlatform
+  IdolGroup "1" o-- "many" IdolProfile
+  IdolProfile --> Tenant
+  IdolGroup --> Tenant
+}
+
+' ============================================================
+' PACKAGE: BLOG DOMAIN
+' ============================================================
+package "Blog Domain" #FFF9C4 {
+
+  class BlogPost {
+    - id: UUID
+    - tenantId: UUID
+    - authorId: UUID
+    - title: String
+    - content: String
+    - coverImageUrl: String
+    - tags: List<String>
+    - status: PostStatus
+    - visibility: Visibility
+    - publishedAt: DateTime
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    --
+    + publish(): void
+    + archive(): void
+    + isAccessibleBy(fan): Boolean
+  }
+
+  class BlogCategory {
+    - id: UUID
+    - tenantId: UUID
+    - name: String
+    --
+    + getPosts(): List<BlogPost>
+  }
+
+  class BlogComment {
+    - id: UUID
+    - postId: UUID
+    - fanId: UUID
+    - content: String
+    - createdAt: DateTime
+    - isHidden: Boolean
+    --
+    + hide(): void
+    + getAuthor(): Fan
+  }
+
+  class BlogLike {
+    - id: UUID
+    - postId: UUID
+    - fanId: UUID
+    - likedAt: DateTime
+  }
+
+  enum PostStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+  }
+
+  enum Visibility {
+    PUBLIC
+    SUBSCRIBERS_ONLY
+    PAID_ONLY
+  }
+
+  BlogPost --> PostStatus
+  BlogPost --> Visibility
+  BlogPost --> BlogCategory
+  BlogPost "1" *-- "many" BlogComment
+  BlogPost "1" *-- "many" BlogLike
+  BlogPost --> Tenant
+}
+
+' ============================================================
+' PACKAGE: FAN & MEMBERSHIP DOMAIN
+' ============================================================
+package "Fan and Membership Domain" #E8F5E9 {
+
+  class Fan {
+    - id: UUID
+    - tenantId: UUID
+    - email: String
+    - username: String
+    - passwordHash: String
+    - displayName: String
+    - avatarUrl: String
+    - createdAt: DateTime
+    - isActive: Boolean
+    --
+    + getId(): UUID
+    + getEmail(): String
+    + getActiveSubscription(): FanSubscription
+  }
+
+  class FanSubscription {
+    - id: UUID
+    - fanId: UUID
+    - tenantId: UUID
+    - tierId: UUID
+    - startDate: DateTime
+    - endDate: DateTime
+    - status: FanSubscriptionStatus
+    - autoRenew: Boolean
+    --
+    + isActive(): Boolean
+    + renew(): void
+    + cancel(): void
+    + getState(): SubscriptionState
+  }
+
+  class MembershipTier {
+    - id: UUID
+    - tenantId: UUID
+    - name: String
+    - price: Decimal
+    - billingCycle: BillingCycle
+    - maxMembers: Integer
+    --
+    + getPerks(): List<TierPerk>
+    + hasAvailableSlots(): Boolean
+  }
+
+  class TierPerk {
+    - id: UUID
+    - tierId: UUID
+    - description: String
+    - type: PerkType
+    --
+    + getType(): PerkType
+  }
+
+  enum FanSubscriptionStatus {
+    ACTIVE
+    EXPIRING
+    EXPIRED
+    CANCELLED
+  }
+
+  enum PerkType {
+    EXCLUSIVE_CONTENT
+    EARLY_ACCESS
+    MERCH_DISCOUNT
+    LIVE_ACCESS
+    BADGE
+  }
+
+  Fan --> Tenant
+  Fan "1" *-- "many" FanSubscription
+  FanSubscription --> MembershipTier
+  MembershipTier "1" *-- "many" TierPerk
+  TierPerk --> PerkType
+  FanSubscription --> FanSubscriptionStatus
+  MembershipTier --> Tenant
+}
+
+' ============================================================
+' PACKAGE: EXTERNAL SITES DOMAIN
+' ============================================================
+package "External Sites Domain" #EDE7F6 {
+
+  class ExternalSite {
+    - id: UUID
+    - tenantId: UUID
+    - label: String
+    - url: String
+    - type: ExternalSiteType
+    - iconUrl: String
+    - displayOrder: Integer
+    - isActive: Boolean
+    --
+    + activate(): void
+    + deactivate(): void
+    + reorder(order): void
+  }
+
+  class ExternalSiteClick {
+    - id: UUID
+    - siteId: UUID
+    - fanId: UUID
+    - clickedAt: DateTime
+    - ipAddress: String
+    --
+    + getSite(): ExternalSite
+  }
+
+  enum ExternalSiteType {
+    STREAMING
+    TICKETING
+    OFFICIAL_SITE
+    FANCLUB
+    MERCHANDISE
+    SOCIAL_MEDIA
+    YOUTUBE_CHANNEL
+    PODCAST
+  }
+
+  ExternalSite --> ExternalSiteType
+  ExternalSite "1" *-- "many" ExternalSiteClick
+  ExternalSite --> Tenant
+}
+
+' ============================================================
+' PACKAGE: MERCH DOMAIN
+' ============================================================
+package "Merch Domain" #FCE4EC {
+
+  class MerchProduct {
+    - id: UUID
+    - tenantId: UUID
+    - name: String
+    - description: String
+    - price: Decimal
+    - currency: String
+    - coverImageUrl: String
+    - images: List<String>
+    - status: MerchProductStatus
+    - isLimitedEdition: Boolean
+    - availableFrom: DateTime
+    - availableUntil: DateTime
+    --
+    + isAvailable(): Boolean
+    + getTotalStock(): Integer
+    + getVariants(): List<MerchVariant>
+  }
+
+  class MerchCategory {
+    - id: UUID
+    - tenantId: UUID
+    - name: String
+    --
+    + getProducts(): List<MerchProduct>
+  }
+
+  class MerchVariant {
+    - id: UUID
+    - productId: UUID
+    - sku: String
+    - attributes: Map<String, String>
+    - price: Decimal
+    - stockQty: Integer
+    - reservedQty: Integer
+    --
+    + getAvailableQty(): Integer
+    + reserve(qty): void
+    + release(qty): void
+  }
+
+  class MerchCart {
+    - id: UUID
+    - tenantId: UUID
+    - fanId: UUID
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    --
+    + addItem(productId, variantId, qty): void
+    + removeItem(itemId): void
+    + getTotal(): Decimal
+    + clear(): void
+  }
+
+  class MerchCartItem {
+    - id: UUID
+    - cartId: UUID
+    - productId: UUID
+    - variantId: UUID
+    - quantity: Integer
+    - unitPrice: Decimal
+    --
+    + getSubtotal(): Decimal
+    + updateQuantity(qty): void
+  }
+
+  class MerchOrder {
+    - id: UUID
+    - tenantId: UUID
+    - fanId: UUID
+    - totalAmount: Decimal
+    - currency: String
+    - status: OrderStatus
+    - placedAt: DateTime
+    --
+    + getState(): OrderState
+    + confirm(): void
+    + cancel(): void
+    + getItems(): List<MerchOrderItem>
+  }
+
+  class MerchOrderItem {
+    - id: UUID
+    - orderId: UUID
+    - productId: UUID
+    - variantId: UUID
+    - quantity: Integer
+    - unitPrice: Decimal
+    - subtotal: Decimal
+    --
+    + getSubtotal(): Decimal
+  }
+
+  class Address {
+    - id: UUID
+    - fanId: UUID
+    - street: String
+    - city: String
+    - state: String
+    - country: String
+    - postalCode: String
+    - isDefault: Boolean
+    --
+    + setAsDefault(): void
+    + format(): String
+  }
+
+  class Payment {
+    - id: UUID
+    - orderId: UUID
+    - tenantId: UUID
+    - amount: Decimal
+    - currency: String
+    - status: PaymentStatus
+    - method: PaymentMethod
+    - transactionId: String
+    - paidAt: DateTime
+    --
+    + isSuccessful(): Boolean
+    + refund(): void
+  }
+
+  class Shipment {
+    - id: UUID
+    - orderId: UUID
+    - trackingNumber: String
+    - carrier: String
+    - status: ShipmentStatus
+    - shippedAt: DateTime
+    - estimatedDelivery: DateTime
+    --
+    + track(): String
+    + markDelivered(): void
+  }
+
+  enum MerchProductStatus {
+    ACTIVE
+    DRAFT
+    SOLD_OUT
+    ARCHIVED
+  }
+
+  enum OrderStatus {
+    PENDING
+    PAID
+    SHIPPED
+    DELIVERED
+    CANCELLED
+  }
+
+  enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+  }
+
+  enum PaymentMethod {
+    CREDIT_CARD
+    PAYPAL
+    STRIPE
+    BANK_TRANSFER
+  }
+
+  enum ShipmentStatus {
+    PREPARING
+    SHIPPED
+    IN_TRANSIT
+    DELIVERED
+    RETURNED
+  }
+
+  MerchProduct --> MerchProductStatus
+  MerchProduct --> MerchCategory
+  MerchProduct "1" *-- "many" MerchVariant
+  MerchProduct --> Tenant
+  MerchCart --> Fan
+  MerchCart "1" *-- "many" MerchCartItem
+  MerchCartItem --> MerchProduct
+  MerchCartItem --> MerchVariant
+  MerchOrder --> Fan
+  MerchOrder --> Tenant
+  MerchOrder --> OrderStatus
+  MerchOrder "1" *-- "many" MerchOrderItem
+  MerchOrder "1" *-- "1" Payment
+  MerchOrder "1" *-- "1" Shipment
+  MerchOrder --> Address
+  MerchOrderItem --> MerchProduct
+  MerchOrderItem --> MerchVariant
+  Payment --> PaymentStatus
+  Payment --> PaymentMethod
+  Shipment --> ShipmentStatus
+  Address --> Fan
+}
+
+' ============================================================
+' PACKAGE: MEDIA & DISCOGRAPHY DOMAIN
+' ============================================================
+package "Media and Discography Domain" #E3F2FD {
+
+  class MediaGallery {
+    - id: UUID
+    - tenantId: UUID
+    - title: String
+    - description: String
+    - visibility: Visibility
+    - createdAt: DateTime
+    --
+    + getItems(): List<MediaItem>
+    + isAccessibleBy(fan): Boolean
+  }
+
+  class MediaItem {
+    - id: UUID
+    - galleryId: UUID
+    - tenantId: UUID
+    - type: MediaType
+    - url: String
+    - thumbnailUrl: String
+    - caption: String
+    - displayOrder: Integer
+    --
+    + getType(): MediaType
+    + reorder(order): void
+  }
+
+  class Discography {
+    - id: UUID
+    - tenantId: UUID
+    - title: String
+    - type: ReleaseType
+    - releaseDate: Date
+    - coverImageUrl: String
+    --
+    + getStreamingLinks(): List<ExternalSite>
+  }
+
+  enum MediaType {
+    IMAGE
+    VIDEO_LINK
+    AUDIO
+  }
+
+  enum ReleaseType {
+    SINGLE
+    EP
+    ALBUM
+    COLLABORATION
+  }
+
+  MediaGallery "1" *-- "many" MediaItem
+  MediaGallery --> Visibility
+  MediaItem --> MediaType
+  Discography --> ReleaseType
+  Discography --> Tenant
+  MediaGallery --> Tenant
+}
+
+' ============================================================
+' PACKAGE: EVENT & SCHEDULE DOMAIN
+' ============================================================
+package "Event and Schedule Domain" #FFF8E1 {
+
+  class IdolEvent {
+    - id: UUID
+    - tenantId: UUID
+    - title: String
+    - description: String
+    - type: EventType
+    - startDateTime: DateTime
+    - endDateTime: DateTime
+    - location: String
+    - ticketUrl: String
+    - visibility: Visibility
+    - status: EventStatus
+    --
+    + isUpcoming(): Boolean
+    + cancel(): void
+    + getRSVPs(): List<EventRSVP>
+  }
+
+  class EventRSVP {
+    - id: UUID
+    - eventId: UUID
+    - fanId: UUID
+    - rsvpAt: DateTime
+    - status: RSVPStatus
+    --
+    + update(status): void
+  }
+
+  enum EventType {
+    CONCERT
+    FANSIGN
+    LIVESTREAM
+    ANNIVERSARY
+    COMEBACK
+  }
+
+  enum EventStatus {
+    UPCOMING
+    ONGOING
+    COMPLETED
+    CANCELLED
+  }
+
+  enum RSVPStatus {
+    GOING
+    INTERESTED
+    NOT_GOING
+  }
+
+  IdolEvent --> EventType
+  IdolEvent --> EventStatus
+  IdolEvent --> Visibility
+  IdolEvent "1" *-- "many" EventRSVP
+  IdolEvent --> Tenant
+  EventRSVP --> Fan
+}
+
+' ============================================================
+' PACKAGE: NOTIFICATION DOMAIN
+' ============================================================
+package "Fan Notification Domain" #F3E5F5 {
+
+  class FanNotification {
+    - id: UUID
+    - fanId: UUID
+    - tenantId: UUID
+    - type: FanNotificationType
+    - message: String
+    - isRead: Boolean
+    - createdAt: DateTime
+    - referenceId: UUID
+    - referenceType: String
+    --
+    + markAsRead(): void
+    + getReference(): Object
+  }
+
+  class NotificationPreference {
+    - id: UUID
+    - fanId: UUID
+    - tenantId: UUID
+    - type: FanNotificationType
+    - isEnabled: Boolean
+    - channel: NotificationChannel
+    --
+    + enable(): void
+    + disable(): void
+  }
+
+  enum FanNotificationType {
+    NEW_POST
+    NEW_MERCH
+    EVENT_REMINDER
+    SUBSCRIPTION_EXPIRY
+    NEW_MEDIA
+    COMEBACK_ALERT
+  }
+
+  enum NotificationChannel {
+    EMAIL
+    PUSH
+    IN_APP
+  }
+
+  FanNotification --> Fan
+  FanNotification --> FanNotificationType
+  NotificationPreference --> Fan
+  NotificationPreference --> FanNotificationType
+  NotificationPreference --> NotificationChannel
+}
+
+' ============================================================
+' ============================================================
+' SECTION 3: DESIGN PATTERNS - FAN/IDOL DOMAIN
+' ============================================================
+' ============================================================
+
+' ============================================================
+' PACKAGE: STRATEGY PATTERN - PAYMENT
+' ============================================================
+package "Strategy Pattern - Payment" #FFFDE7 {
+
+  class PaymentContext {
+    - strategy: PaymentStrategy
+    - order: MerchOrder
+    --
+    + setStrategy(s: PaymentStrategy): void
+    + processPayment(): Payment
+    + refund(paymentId): void
+  }
+
+  interface PaymentStrategy {
+    + processPayment(amount, currency): Payment
+    + refund(paymentId): void
+    + validate(): Boolean
+  }
+
+  class CreditCardStrategy {
+    - cardNumber: String
+    - expiryDate: String
+    - cvv: String
+    --
+    + processPayment(amount, currency): Payment
+    + refund(paymentId): void
+    + validate(): Boolean
+  }
+
+  class PayPalStrategy {
+    - paypalEmail: String
+    - accessToken: String
+    --
+    + processPayment(amount, currency): Payment
+    + refund(paymentId): void
+    + validate(): Boolean
+  }
+
+  class StripeStrategy {
+    - stripeToken: String
+    - customerId: String
+    --
+    + processPayment(amount, currency): Payment
+    + refund(paymentId): void
+    + validate(): Boolean
+  }
+
+  PaymentContext --> PaymentStrategy
+  PaymentContext --> MerchOrder
+  CreditCardStrategy ..|> PaymentStrategy
+  PayPalStrategy ..|> PaymentStrategy
+  StripeStrategy ..|> PaymentStrategy
+}
+
+' ============================================================
+' PACKAGE: STRATEGY PATTERN - CONTENT VISIBILITY
+' ============================================================
+package "Strategy Pattern - Content Visibility" #FFF3E0 {
+
+  class ContentAccessContext {
+    - strategy: VisibilityStrategy
+    - fan: Fan
+    --
+    + setStrategy(s: VisibilityStrategy): void
+    + canAccess(content): Boolean
+  }
+
+  interface VisibilityStrategy {
+    + canAccess(fan: Fan, content): Boolean
+  }
+
+  class PublicVisibilityStrategy {
+    + canAccess(fan: Fan, content): Boolean
+  }
+
+  class SubscriberVisibilityStrategy {
+    + canAccess(fan: Fan, content): Boolean
+  }
+
+  class PaidTierVisibilityStrategy {
+    - requiredTierId: UUID
+    --
+    + canAccess(fan: Fan, content): Boolean
+  }
+
+  ContentAccessContext --> VisibilityStrategy
+  ContentAccessContext --> Fan
+  PublicVisibilityStrategy ..|> VisibilityStrategy
+  SubscriberVisibilityStrategy ..|> VisibilityStrategy
+  PaidTierVisibilityStrategy ..|> VisibilityStrategy
+}
+
+' ============================================================
+' PACKAGE: OBSERVER PATTERN - FAN EVENTS
+' ============================================================
+package "Observer Pattern - Fan Events" #E8F5E9 {
+
+  class FanEventPublisher {
+    - listeners: List<FanEventListener>
+    --
+    + subscribe(listener: FanEventListener): void
+    + unsubscribe(listener: FanEventListener): void
+    + notifyNewPost(post: BlogPost): void
+    + notifyNewMerch(product: MerchProduct): void
+    + notifyNewEvent(event: IdolEvent): void
+    + notifySubscriptionExpiring(sub: FanSubscription): void
+    + notifyNewMedia(item: MediaItem): void
+    + notifyComeback(idol: IdolProfile): void
+  }
+
+  interface FanEventListener {
+    + onNewPost(post: BlogPost): void
+    + onNewMerch(product: MerchProduct): void
+    + onNewEvent(event: IdolEvent): void
+    + onSubscriptionExpiring(sub: FanSubscription): void
+    + onNewMedia(item: MediaItem): void
+    + onComeback(idol: IdolProfile): void
+  }
+
+  class FanNotificationListener {
+    - notificationService: FanNotificationService
+    --
+    + onNewPost(post: BlogPost): void
+    + onNewMerch(product: MerchProduct): void
+    + onNewEvent(event: IdolEvent): void
+    + onSubscriptionExpiring(sub: FanSubscription): void
+    + onNewMedia(item: MediaItem): void
+    + onComeback(idol: IdolProfile): void
+  }
+
+  class EmailNotificationListener {
+    - emailService: EmailService
+    --
+    + onNewPost(post: BlogPost): void
+    + onNewMerch(product: MerchProduct): void
+    + onNewEvent(event: IdolEvent): void
+    + onSubscriptionExpiring(sub: FanSubscription): void
+    + onNewMedia(item: MediaItem): void
+    + onComeback(idol: IdolProfile): void
+  }
+
+  class FanActivityAuditListener {
+    - auditService: AuditService
+    --
+    + onNewPost(post: BlogPost): void
+    + onNewMerch(product: MerchProduct): void
+    + onNewEvent(event: IdolEvent): void
+    + onSubscriptionExpiring(sub: FanSubscription): void
+    + onNewMedia(item: MediaItem): void
+    + onComeback(idol: IdolProfile): void
+  }
+
+  FanEventPublisher "1" o-- "many" FanEventListener
+  FanNotificationListener ..|> FanEventListener
+  EmailNotificationListener ..|> FanEventListener
+  FanActivityAuditListener ..|> FanEventListener
+}
+
+' ============================================================
+' PACKAGE: STATE PATTERN - ORDER LIFECYCLE
+' ============================================================
+package "State Pattern - Order Lifecycle" #EDE7F6 {
+
+  interface OrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  class PendingOrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  class PaidOrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  class ShippedOrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  class DeliveredOrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  class CancelledOrderState {
+    + confirm(order: MerchOrder): void
+    + pay(order: MerchOrder): void
+    + ship(order: MerchOrder): void
+    + deliver(order: MerchOrder): void
+    + cancel(order: MerchOrder): void
+    + getStatus(): OrderStatus
+  }
+
+  PendingOrderState ..|> OrderState
+  PaidOrderState ..|> OrderState
+  ShippedOrderState ..|> OrderState
+  DeliveredOrderState ..|> OrderState
+  CancelledOrderState ..|> OrderState
+  MerchOrder --> OrderState
+}
+
+' ============================================================
+' PACKAGE: STATE PATTERN - SUBSCRIPTION LIFECYCLE
+' ============================================================
+package "State Pattern - Subscription Lifecycle" #E0F7FA {
+
+  interface SubscriptionState {
+    + activate(sub: FanSubscription): void
+    + renew(sub: FanSubscription): void
+    + expire(sub: FanSubscription): void
+    + cancel(sub: FanSubscription): void
+    + getStatus(): FanSubscriptionStatus
+  }
+
+  class ActiveSubscriptionState {
+    + activate(sub: FanSubscription): void
+    + renew(sub: FanSubscription): void
+    + expire(sub: FanSubscription): void
+    + cancel(sub: FanSubscription): void
+    + getStatus(): FanSubscriptionStatus
+  }
+
+  class ExpiringSubscriptionState {
+    + activate(sub: FanSubscription): void
+    + renew(sub: FanSubscription): void
+    + expire(sub: FanSubscription): void
+    + cancel(sub: FanSubscription): void
+    + getStatus(): FanSubscriptionStatus
+  }
+
+  class ExpiredSubscriptionState {
+    + activate(sub: FanSubscription): void
+    + renew(sub: FanSubscription): void
+    + expire(sub: FanSubscription): void
+    + cancel(sub: FanSubscription): void
+    + getStatus(): FanSubscriptionStatus
+  }
+
+  class CancelledSubscriptionState {
+    + activate(sub: FanSubscription): void
+    + renew(sub: FanSubscription): void
+    + expire(sub: FanSubscription): void
+    + cancel(sub: FanSubscription): void
+    + getStatus(): FanSubscriptionStatus
+  }
+
+  ActiveSubscriptionState ..|> SubscriptionState
+  ExpiringSubscriptionState ..|> SubscriptionState
+  ExpiredSubscriptionState ..|> SubscriptionState
+  CancelledSubscriptionState ..|> SubscriptionState
+  FanSubscription --> SubscriptionState
+}
+
+' ============================================================
+' PACKAGE: DECORATOR PATTERN - CONTENT ACCESS
+' ============================================================
+package "Decorator Pattern - Content Access" #FCE4EC {
+
+  interface ContentAccessor {
+    + getContent(id: UUID): Object
+  }
+
+  class BaseContentAccessor {
+    --
+    + getContent(id: UUID): Object
+  }
+
+  abstract class ContentAccessDecorator {
+    # wrapped: ContentAccessor
+    --
+    + getContent(id: UUID): Object
+  }
+
+  class VisibilityCheckDecorator {
+    - visibilityStrategy: VisibilityStrategy
+    - fan: Fan
+    --
+    + getContent(id: UUID): Object
+  }
+
+  class AuditAccessDecorator {
+    - auditService: AuditService
+    --
+    + getContent(id: UUID): Object
+  }
+
+  class CacheDecorator {
+    - cache: Map<UUID, Object>
+    - ttlSeconds: int
+    --
+    + getContent(id: UUID): Object
+    + invalidate(id: UUID): void
+  }
+
+  BaseContentAccessor ..|> ContentAccessor
+  ContentAccessDecorator ..|> ContentAccessor
+  ContentAccessDecorator o--> ContentAccessor
+  VisibilityCheckDecorator --|> ContentAccessDecorator
+  AuditAccessDecorator --|> ContentAccessDecorator
+  CacheDecorator --|> ContentAccessDecorator
+  VisibilityCheckDecorator --> VisibilityStrategy
+}
+
+' ============================================================
+' PACKAGE: REPOSITORY PATTERN - TENANT SCOPED
+' ============================================================
+package "Repository Pattern - Tenant Scoped" #F9FBE7 {
+
+  abstract class TenantAwareRepository {
+    # tenantId: UUID
+    --
+    + findById(id: UUID): Object
+    + findAll(filters: Map): List
+    + save(entity: Object): Object
+    + delete(id: UUID): void
+    # applyTenantFilter(query): Query
+  }
+
+  class BlogPostRepository {
+    --
+    + findById(id: UUID): BlogPost
+    + findAll(filters: Map): List<BlogPost>
+    + findByCategory(categoryId): List<BlogPost>
+    + findByVisibility(v): List<BlogPost>
+    + save(post: BlogPost): BlogPost
+    + delete(id: UUID): void
+  }
+
+  class MerchProductRepository {
+    --
+    + findById(id: UUID): MerchProduct
+    + findAll(filters: Map): List<MerchProduct>
+    + findByCategory(categoryId): List<MerchProduct>
+    + findAvailable(): List<MerchProduct>
+    + save(product: MerchProduct): MerchProduct
+    + delete(id: UUID): void
+  }
+
+  class MerchOrderRepository {
+    --
+    + findById(id: UUID): MerchOrder
+    + findAll(filters: Map): List<MerchOrder>
+    + findByFan(fanId: UUID): List<MerchOrder>
+    + findByStatus(status): List<MerchOrder>
+    + save(order: MerchOrder): MerchOrder
+    + delete(id: UUID): void
+  }
+
+  class FanRepository {
+    --
+    + findById(id: UUID): Fan
+    + findAll(filters: Map): List<Fan>
+    + findByEmail(email: String): Fan
+    + save(fan: Fan): Fan
+    + delete(id: UUID): void
+  }
+
+  class FanSubscriptionRepository {
+    --
+    + findById(id: UUID): FanSubscription
+    + findAll(filters: Map): List<FanSubscription>
+    + findByFan(fanId: UUID): List<FanSubscription>
+    + findExpiring(days: int): List<FanSubscription>
+    + save(sub: FanSubscription): FanSubscription
+    + delete(id: UUID): void
+  }
+
+  class IdolProfileRepository {
+    --
+    + findById(id: UUID): IdolProfile
+    + findAll(filters: Map): List<IdolProfile>
+    + findByGroup(groupId): List<IdolProfile>
+    + save(idol: IdolProfile): IdolProfile
+    + delete(id: UUID): void
+  }
+
+  BlogPostRepository --|> TenantAwareRepository
+  MerchProductRepository --|> TenantAwareRepository
+  MerchOrderRepository --|> TenantAwareRepository
+  FanRepository --|> TenantAwareRepository
+  FanSubscriptionRepository --|> TenantAwareRepository
+  IdolProfileRepository --|> TenantAwareRepository
+}
+
+' ============================================================
+' PACKAGE: FAN DOMAIN SERVICES
+' ============================================================
+package "Fan Domain Services" #E8EAF6 {
+
+  class FanNotificationService {
+    --
+    + createNotification(fanId, type, msg): FanNotification
+    + markAsRead(notificationId): void
+    + getUnread(fanId): List<FanNotification>
+    + getPreferences(fanId): List<NotificationPreference>
+    + updatePreference(fanId, type, enabled): void
+  }
+
+  class EmailService {
+    --
+    + sendEmail(to, subject, body): void
+    + sendBulk(recipients, subject, body): void
+    + sendTemplate(to, templateId, vars): void
+  }
+
+  class MerchOrderService {
+    - orderRepository: MerchOrderRepository
+    - paymentContext: PaymentContext
+    - eventPublisher: FanEventPublisher
+    --
+    + placeOrder(fanId, cartId): MerchOrder
+    + processPayment(orderId): Payment
+    + cancelOrder(orderId): void
+    + getOrderHistory(fanId): List<MerchOrder>
+  }
+
+  class FanSubscriptionService {
+    - subscriptionRepository: FanSubscriptionRepository
+    - eventPublisher: FanEventPublisher
+    --
+    + subscribe(fanId, tierId): FanSubscription
+    + renew(subscriptionId): void
+    + cancel(subscriptionId): void
+    + checkExpiring(): void
+  }
+
+  class ContentService {
+    - contentAccessor: ContentAccessor
+    - accessContext: ContentAccessContext
+    --
+    + getBlogPost(fanId, postId): BlogPost
+    + getMediaGallery(fanId, galleryId): MediaGallery
+    + getMediaItem(fanId, itemId): MediaItem
+  }
+
+  MerchOrderService --> MerchOrderRepository
+  MerchOrderService --> PaymentContext
+  MerchOrderService --> FanEventPublisher
+  FanSubscriptionService --> FanSubscriptionRepository
+  FanSubscriptionService --> FanEventPublisher
+  ContentService --> ContentAccessor
+  ContentService --> ContentAccessContext
+  FanNotificationListener --> FanNotificationService
+  EmailNotificationListener --> EmailService
+}
+
+' ============================================================
+' CROSS-PACKAGE CONNECTIONS - ADMIN LAYER
+' ============================================================
+ServiceAdmin --> AdminOperationContext : uses
+ServiceAdmin --> AdminRequest : creates
+AdminOperationContext --> AdminCommandInvoker : triggers
+AdminCommandInvoker --> AdminFacade : routes through
+AuditCommandDecorator --> AuditService : logs to
+PermissionCheckDecorator --> ServiceAdmin : validates
+AuditStrategyDecorator --> AuditService : logs to
+TenantService --> Tenant : manages
+BillingService --> TenantSubscription : manages
+BillingService --> Plan : manages
+FeatureFlagService --> FeatureFlag : manages
+FeatureFlagService --> TenantFeatureOverride : manages
+AuditService --> AuditLog : persists
+AuditEntry --> AuditService : sent to
+ServiceAdmin --> ImpersonationSession : initiates
+
+' ============================================================
+' CROSS-PACKAGE CONNECTIONS - FAN/IDOL LAYER
+' ============================================================
+Fan --> FanSubscription : has
+Fan --> MerchCart : owns
+Fan --> Address : has
+BlogComment --> Fan : written by
+BlogLike --> Fan : liked by
+EventRSVP --> Fan : made by
+FanNotification --> Fan : belongs to
+FanActivityAuditListener --> AuditService : logs to
+MerchOrderService --> MerchOrder : manages
+FanSubscriptionService --> FanSubscription : manages
+TenantAdmin --> FanEventPublisher : triggers events via
+TenantAdmin --> IdolProfile : manages
+TenantAdmin --> BlogPost : manages
+TenantAdmin --> MerchProduct : manages
+TenantAdmin --> IdolEvent : manages
+TenantAdmin --> ExternalSite : manages
+TenantAdmin --> MediaGallery : manages
+TenantAdmin --> Discography : manages
+TenantAdmin --> MembershipTier : manages
+
+@enduml

@@ -36,8 +36,11 @@ Route::prefix('auth')->group(function () {
 
 // Protected auth routes (requires valid Sanctum token)
 Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
+    Route::get('me', [AuthEditorController::class, 'me']);
+});
+
+Route::middleware('auth:sanctum')->prefix('auth/editor')->group(function () {
     Route::post('logout', [AuthEditorController::class, 'logout']);
-    Route::get('me',      [AuthEditorController::class, 'me']);
 });
 
 // Project routes
@@ -261,29 +264,3 @@ Route::middleware(['resolve.tenant', 'auth:sanctum', 'ensure.fan'])
         Route::put('preferences', [NotificationController::class, 'updatePreferences']);
     });
 
-Route::get('/admin/test-plans', function () {
-    return response()->json([
-        'success' => true
-    ]);
-});
-
-Route::middleware(['auth:sanctum'])
-->get('/admin/test-auth', function () {
-    return response()->json([
-        'user' => auth()->user()
-    ]);
-});
-
-
-use Illuminate\Http\Request;
-
-// temp (for testing routes)
-Route::middleware('resolve.tenant')
-->get('/tenant-test', function(Request $request){
-
-    return [
-        'host'=>request()->getHost(),
-        'tenant'=>$request->tenant()->toArray()
-    ];
-
-});
