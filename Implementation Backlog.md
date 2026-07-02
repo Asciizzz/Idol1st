@@ -30,7 +30,8 @@ This backlog follows the implementation order derived from [project.md](project.
 
 ## Phase 2. Events And Observer
 
-- [ ] Emit domain events for post publish, merch updates, event creation, subscription changes, and order status changes.
+- [x] Add the first publish event/listener path.
+- [ ] Emit domain events for merch updates, event creation, subscription changes, and order status changes.
 - [ ] Hook notifications, audit logs, and outbound email to those events.
 - [ ] Add queue-backed jobs when a side effect does not need to block the request.
 - [ ] Use the event layer to eliminate duplicated side-effect code in controllers.

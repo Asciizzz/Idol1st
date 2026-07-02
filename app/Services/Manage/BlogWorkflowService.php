@@ -2,10 +2,10 @@
 
 namespace App\Services\Manage;
 
+use App\Events\BlogPostPublished;
 use App\Models\BlogComment;
 use App\Models\BlogPost;
 use App\Models\Tenant;
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -42,13 +42,7 @@ class BlogWorkflowService
             'published_at' => $post->published_at ?? now(),
         ]);
 
-        app(NotificationService::class)->broadcast(
-            $tenant,
-            'NEW_POST',
-            "New post: {$post->title}",
-            $post->id,
-            'BlogPost',
-        );
+        event(new BlogPostPublished($tenant, $post->fresh('category')));
 
         return $post->fresh('category');
     }
