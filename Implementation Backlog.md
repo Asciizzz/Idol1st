@@ -23,7 +23,7 @@ This backlog follows the implementation order derived from [project.md](project.
 - [x] Extract an admin facade or application service layer for tenant, billing, feature flag, and audit workflows.
 - [x] Introduce a dedicated fan-service layer for blog, event, merch, and membership actions.
 - [x] Normalize the tenant workspace shell naming (`tenant-panel.blade.php`, workspace labels, docs).
-- [ ] Centralize tenant-aware query helpers or repositories only where repetition is already a problem.
+- [x] Centralize tenant-aware query helpers or repositories only where repetition is already a problem.
 - [ ] Keep controllers thin and limit them to request/response handling.
 
 ## Phase 2. Events And Observer
@@ -50,9 +50,9 @@ This backlog follows the implementation order derived from [project.md](project.
 
 ## Recommended Next Commit
 
-1. Fix route/auth ambiguity and remove or quarantine diagnostics.
-2. Add the first service-layer extraction for one admin workflow and one fan workflow.
-3. Add tests around tenant scoping before deeper refactoring.
+1. Add the first event-driven side effect path for a publish or merch workflow.
+2. Hook audit or notification handling into that event.
+3. Add a focused test for the new event-driven path.
 
 ## Notes
 

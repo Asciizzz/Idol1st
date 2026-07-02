@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Fan extends Authenticatable
 {
-    use HasApiTokens, HasUuids;
+    use BelongsToTenant, HasApiTokens, HasUuids;
 
     protected $fillable = [
         'tenant_id',
@@ -42,7 +43,7 @@ class Fan extends Authenticatable
             ->where('status', 'ACTIVE')
             ->latestOfMany();
     }
-    
+
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);

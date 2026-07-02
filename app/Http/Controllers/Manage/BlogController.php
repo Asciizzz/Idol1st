@@ -24,8 +24,8 @@ class BlogController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $query = BlogPost::with('category')
-            ->where('tenant_id', $tenant->id);
+        $query = BlogPost::forTenant($tenant)
+            ->with('category');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -86,7 +86,7 @@ class BlogController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $post = BlogPost::where('tenant_id', $tenant->id)
+        $post = BlogPost::forTenant($tenant)
             ->findOrFail($postId);
 
         $post->update([
@@ -117,7 +117,7 @@ class BlogController extends Controller
         $tenant = app(Tenant::class);
 
         // Ensure the comment belongs to a post in this tenant
-        $comment = BlogComment::whereHas('post', fn ($q) => $q->where('tenant_id', $tenant->id))
+        $comment = BlogComment::whereHas('post', fn ($q) => $q->forTenant($tenant))
             ->findOrFail($commentId);
 
         $comment->update(['is_hidden' => true]);

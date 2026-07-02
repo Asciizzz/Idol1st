@@ -29,23 +29,23 @@ class FanSiteController extends Controller
         return view('fan.home', [
             'tenant' => $tenant,
 
-            'posts' => BlogPost::where('tenant_id', $tenant->id)
+            'posts' => BlogPost::forTenant($tenant)
                 ->where('status', 'PUBLISHED')
                 ->latest()
                 ->limit(3)
                 ->get(),
 
-            'events' => IdolEvent::where('tenant_id', $tenant->id)
+            'events' => IdolEvent::forTenant($tenant)
                 ->where('status', 'UPCOMING')
                 ->limit(3)
                 ->get(),
 
-            'products' => MerchProduct::where('tenant_id', $tenant->id)
+            'products' => MerchProduct::forTenant($tenant)
                 ->where('status', 'ACTIVE')
                 ->limit(3)
                 ->get(),
 
-            'tiers' => MembershipTier::where('tenant_id', $tenant->id)
+            'tiers' => MembershipTier::forTenant($tenant)
                 ->where('is_active', true)
                 ->get()
         ]);
@@ -56,7 +56,7 @@ class FanSiteController extends Controller
         $tenant = request()->tenant();
 
         return view('fan.news', [
-            'posts' => BlogPost::where('tenant_id', $tenant->id)
+            'posts' => BlogPost::forTenant($tenant)
                 ->where('status', 'PUBLISHED')
                 ->latest()
                 ->get()
@@ -68,7 +68,7 @@ class FanSiteController extends Controller
         $tenant = request()->tenant();
 
         return view('fan.events', [
-            'events' => IdolEvent::where('tenant_id', $tenant->id)
+            'events' => IdolEvent::forTenant($tenant)
                 ->where('status', 'UPCOMING')
                 ->get()
         ]);
@@ -80,7 +80,7 @@ class FanSiteController extends Controller
 
         return view('fan.merch', [
 
-            'products' => MerchProduct::where('tenant_id', $tenant->id)
+            'products' => MerchProduct::forTenant($tenant)
                 ->where('status', 'ACTIVE')
                 ->get()
 
@@ -92,7 +92,7 @@ class FanSiteController extends Controller
         $tenant = request()->tenant();
 
         return view('fan.membership', [
-            'tiers' => MembershipTier::where('tenant_id', $tenant->id)
+            'tiers' => MembershipTier::forTenant($tenant)
                 ->where('is_active', true)
                 ->get()
         ]);
@@ -105,8 +105,8 @@ class FanSiteController extends Controller
 
         $fan = Auth::guard('fan')->user();
 
-        $cart = MerchCart::where('fan_id', $fan->id)
-            ->where('tenant_id', $tenant->id)
+        $cart = MerchCart::forTenant($tenant)
+            ->where('fan_id', $fan->id)
             ->first();
 
         $items = $cart
@@ -125,10 +125,7 @@ class FanSiteController extends Controller
 
         $fan = Auth::guard('fan')->user();
 
-        $product = MerchProduct::where(
-            'tenant_id',
-            $tenant->id
-        )
+        $product = MerchProduct::forTenant($tenant)
             ->findOrFail($request->product_id);
 
         $cart = MerchCart::firstOrCreate([
@@ -154,8 +151,8 @@ class FanSiteController extends Controller
         $tenant = request()->tenant();
         $fan = Auth::guard('fan')->user();
 
-        $cart = MerchCart::where('fan_id', $fan->id)
-            ->where('tenant_id', $tenant->id)
+        $cart = MerchCart::forTenant($tenant)
+            ->where('fan_id', $fan->id)
             ->first();
 
         $items = $cart
@@ -194,8 +191,8 @@ class FanSiteController extends Controller
             'payment'              => ['required', 'in:CREDIT_CARD,PAYPAL,BANK_TRANSFER'],
         ]);
 
-        $cart = MerchCart::where('fan_id', $fan->id)
-            ->where('tenant_id', $tenant->id)
+        $cart = MerchCart::forTenant($tenant)
+            ->where('fan_id', $fan->id)
             ->first();
 
         $items = $cart

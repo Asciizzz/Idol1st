@@ -29,8 +29,8 @@ class MerchController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $query = MerchProduct::with('category', 'variants')
-            ->where('tenant_id', $tenant->id);
+        $query = MerchProduct::forTenant($tenant)
+            ->with('category', 'variants');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -106,7 +106,7 @@ class MerchController extends Controller
     public function updateStock(UpdateVariantStockRequest $request, string $variantId): JsonResponse
     {
         $tenant  = app(Tenant::class);
-        $variant = MerchVariant::whereHas('product', fn ($q) => $q->where('tenant_id', $tenant->id))
+        $variant = MerchVariant::whereHas('product', fn ($q) => $q->forTenant($tenant))
             ->findOrFail($variantId);
 
         $diff = $request->stock_qty - $variant->stock_qty;
@@ -129,8 +129,8 @@ class MerchController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $query = MerchOrder::with('items', 'payment', 'shipment')
-            ->where('tenant_id', $tenant->id);
+        $query = MerchOrder::forTenant($tenant)
+            ->with('items', 'payment', 'shipment');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -156,7 +156,7 @@ class MerchController extends Controller
     public function ship(ShipOrderRequest $request, string $orderId): JsonResponse
     {
         $tenant = app(Tenant::class);
-        $order  = MerchOrder::where('tenant_id', $tenant->id)->findOrFail($orderId);
+        $order  = MerchOrder::forTenant($tenant)->findOrFail($orderId);
 
         if (! in_array($order->status, ['PAID'])) {
             return response()->json([

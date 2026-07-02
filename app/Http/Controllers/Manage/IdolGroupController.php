@@ -20,7 +20,7 @@ class IdolGroupController extends Controller
         $tenant = app(Tenant::class);
 
         $groups = IdolGroup::with('members.socialLinks')
-            ->where('tenant_id', $tenant->id)
+            ->forTenant($tenant)
             ->get();
 
         return response()->json([

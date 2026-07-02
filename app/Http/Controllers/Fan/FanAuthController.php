@@ -24,7 +24,7 @@ class FanAuthController extends Controller
         $tenant = app(Tenant::class);
 
         // Check uniqueness within this tenant
-        $emailTaken = Fan::where('tenant_id', $tenant->id)
+        $emailTaken = Fan::forTenant($tenant)
             ->where('email', $request->email)
             ->exists();
 
@@ -34,7 +34,7 @@ class FanAuthController extends Controller
             ]);
         }
 
-        $usernameTaken = Fan::where('tenant_id', $tenant->id)
+        $usernameTaken = Fan::forTenant($tenant)
             ->where('username', $request->username)
             ->exists();
 
@@ -69,7 +69,7 @@ class FanAuthController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $fan = Fan::where('tenant_id', $tenant->id)
+        $fan = Fan::forTenant($tenant)
             ->where('email', $request->email)
             ->first();
 

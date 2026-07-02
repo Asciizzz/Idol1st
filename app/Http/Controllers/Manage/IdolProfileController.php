@@ -23,7 +23,7 @@ class IdolProfileController extends Controller
     {
         $tenant  = app(Tenant::class);
         $profile = IdolProfile::with('socialLinks')
-            ->where('tenant_id', $tenant->id)
+            ->forTenant($tenant)
             ->firstOrCreate(
                 ['tenant_id' => $tenant->id],
                 ['id' => Str::uuid(), 'stage_name' => $tenant->name]
@@ -43,7 +43,7 @@ class IdolProfileController extends Controller
     public function update(UpdateIdolProfileRequest $request): JsonResponse
     {
         $tenant  = app(Tenant::class);
-        $profile = IdolProfile::where('tenant_id', $tenant->id)
+        $profile = IdolProfile::forTenant($tenant)
             ->firstOrCreate(
                 ['tenant_id' => $tenant->id],
                 ['id' => Str::uuid(), 'stage_name' => $tenant->name]

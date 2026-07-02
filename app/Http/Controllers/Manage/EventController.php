@@ -22,7 +22,7 @@ class EventController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $query = IdolEvent::where('tenant_id', $tenant->id);
+        $query = IdolEvent::forTenant($tenant);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);

@@ -21,8 +21,8 @@ class MembershipTierController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $tiers = MembershipTier::with('perks')
-            ->where('tenant_id', $tenant->id)
+        $tiers = MembershipTier::forTenant($tenant)
+            ->with('perks')
             ->get();
 
         return response()->json([
